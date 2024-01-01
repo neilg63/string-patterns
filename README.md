@@ -45,3 +45,6 @@ fn replace_final_os(input: &str) -> bool {
 }
 ```
 
+
+NB: Although I've used the library methods in three of my commercial projects, this library is very much an alpha release as I evaluate
+which of the many auxiliary methods, not documented here, belong in this library.

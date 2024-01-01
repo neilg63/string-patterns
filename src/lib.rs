@@ -66,14 +66,19 @@ pub trait StripCharacters {
 
 }
 
+/// Methods to validate strings with character classes
 pub trait CharGroupMatch {
+  /// Does the string contain any digits
   fn has_digits(&self) -> bool;
 
+  /// Does the string contain any alphanumeric characters including those from non-Latin alphabets
   fn has_alphanumeric(&self) -> bool;
 
+  /// Does the string contain any letters including those from non-Latin alphabets, but excluding digits
   fn has_alphabetic(&self) -> bool;
 }
 
+/// Method to check if the string may be parsed to an integer or float
 pub trait IsNumeric {
   fn is_numeric(&self) -> bool;
 }
@@ -82,7 +87,7 @@ impl IsNumeric for String {
 
   /// Check if the string may be parsed to a number
   fn is_numeric(&self) -> bool {
-      self.pattern_match(r#"^(\d+,)*\d+((\.)\d+)?"#, false)
+      self.pattern_match(r#"^-?(\d+,)*\d+((\.)\d+)?"#, false)
   }
 }
 
@@ -126,11 +131,13 @@ pub trait ToSegments {
 
 }
 
+/// Converts arrays or vectors of strs to a vector of owned strings
 pub trait ToStrings {
   fn to_strings(&self) -> Vec<String>;
 }
 
 impl<T: ToString> ToStrings for Vec<T> {
+  /// Converts arrays or vectors of strs to a vector of owned strings
   fn to_strings(&self) -> Vec<String> {
       self.into_iter().map(|s| s.to_string()).collect()
   }
@@ -216,6 +223,8 @@ impl StripCharacters for String {
     self.chars().into_iter().filter(|c| c.is_digit(10)).collect::<String>()
   }
 
+  /// Correct numeric strings with commas as thousand separators or as decimal separators
+  /// to a regular format with punctuation only for decimal points before being parsed to an integer or float
   fn correct_numeric_string(&self, enforce_comma_separator: bool) -> Self {
       let commas = self.find_matched_indices(",");
       let last_comma_index = commas.last().unwrap_or(&0).to_owned();
@@ -234,6 +243,7 @@ impl StripCharacters for String {
       }
   }
 
+  /// conditionally extract numeric strings from a longer string
   fn to_numeric_strings_conditional(&self, enforce_comma_separator: bool) -> Vec<String> {
     let mut prev_char = ' ';
     let mut seq_num = 0;
