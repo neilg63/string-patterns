@@ -42,7 +42,7 @@ fn replace_final_os(input: &str) -> String {
 ```rust
 
 fn replace_final_os(input: &str) -> String {
-  input.to_string().pattern_replace(r#"(\w)o\b$"#, "$1um")
+  input.to_string().pattern_replace(r#"(\w)o\b$"#, "$1um", true) // case insensitive replacement
 }
 ```
 ##### extract the third non-empty segment of a long path name
