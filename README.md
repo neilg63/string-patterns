@@ -1,6 +1,7 @@
 # String Patterns
 
-This library makes it easier to validate and post-process strings in Rust. It builds on the Rust standard library with help from the default regular expression library, regex. It has no other dependencies. It aims to make working with strings as easy in Rust as it is Javascript or python without compromising performance:
+This library makes it easier to validate and post-process strings in Rust. It builds on the Rust standard library with help from the default regular expression library, regex. It has no other dependencies. It aims to make working with strings as easy in Rust as it is Javascript or Python without compromising performance.
+The library provides a number of utility methods to split strings into vectors of strings or a head and tail components and to extract valid numbers from longer texts. I will add more documentation as the library progresses beyond the alpha stage.
 
 ### standard Rust with the Regex library
 ```rust
