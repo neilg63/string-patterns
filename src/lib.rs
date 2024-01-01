@@ -603,6 +603,13 @@ mod tests {
     assert_eq!(source_str.strip_non_chars(),target_str );
   }
 
+  #[test]
+  fn test_segment_match() {
+    let path_string = "/var/www/mysite.com/web/uploads".to_string();
+    let domain = path_string.to_segment("/",2).unwrap_or("".to_string()); 
+    let expected_string = "mysite.com".to_string();
+    assert_eq!(domain, expected_string);
+  }
 
   #[test]
   fn test_to_tail() {

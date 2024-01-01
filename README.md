@@ -45,10 +45,10 @@ fn replace_final_os(input: &str) -> String {
   input.to_string().pattern_replace(r#"(\w)o\b$"#, "$1um")
 }
 ```
-##### extract the third part of a long path name
+##### extract the third non-empty segment of a long path name
 ```rust
 let path_string = "/var/www/mysite.com/web/uploads".to_string();
-let domain = path_string.segment(2); // Some("mysite.com".to_string())
+let domain = path_string.to_segment("/", 2); // Some("mysite.com".to_string())
 ```
 
 ##### extract the first decimal value as an f64 from a longer string
