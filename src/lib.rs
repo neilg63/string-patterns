@@ -93,8 +93,12 @@ impl IsNumeric for String {
 
 pub trait ToSegments {
 
-  /// Extract a vector of strings from a string-like object with a given separator
+  /// Extract a vector of non-empty strings from a string-like object with a given separator
+  /// excluding leading, trailing or double separators
   fn to_segments(&self, separator: &str) -> Vec<Self> where Self:Sized;
+
+  /// Extract a vector of strings from a string-like object with a given separator
+  fn to_parts(&self, separator: &str) -> Vec<Self> where Self:Sized;
 
   /// Extract only the head before the first occurrence of a separator
   fn to_head(&self, separator: &str) -> Self  where Self:Sized;
@@ -390,9 +394,14 @@ impl PatternReplace for Vec<String> {
 
 
 impl ToSegments for String {
-  fn to_segments(&self, separator: &str) -> Vec<String> {
+  fn to_parts(&self, separator: &str) -> Vec<String> {
     let splitter = self.split(separator);
     splitter.into_iter().map(|s| s.to_string()).collect::<Vec<String>>()
+  }
+
+  fn to_segments(&self, separator: &str) -> Vec<String> {
+    let splitter = self.split(separator);
+    splitter.into_iter().map(|s| s.to_string()).filter(|s| s.len() > 0).collect::<Vec<String>>()
   }
 
   fn to_head(&self, separator: &str) -> String {
@@ -415,7 +424,7 @@ impl ToSegments for String {
   }
 
   fn to_end(&self, separator: &str) -> String {
-    let parts = self.to_segments(separator);
+    let parts = self.to_parts(separator);
     if parts.len() > 0 {
       parts.last().unwrap_or(self).to_owned()
     } else {
@@ -424,7 +433,7 @@ impl ToSegments for String {
   }
 
   fn to_tail(&self, separator: &str) -> String {
-    let parts = self.to_segments(separator);
+    let parts = self.to_parts(separator);
     let num_parts = parts.len();
     if num_parts > 0 {
       parts[1..num_parts].join(separator)
@@ -511,7 +520,7 @@ impl ToSegments for String {
   /// 
   /// Extract a tuple of the tail and remainder, like split_once in reverse and returning strings
   fn to_start_end(&self, separator: &str) -> (String, String) {
-    let parts = self.to_segments(separator);
+    let parts = self.to_parts(separator);
     let last_part = "".to_string();
     let num_parts = parts.len();
     if num_parts > 0 {
