@@ -1,13 +1,13 @@
 # String Patterns
 
 This library makes it easier to validate and manipulate strings in Rust. It builds on Rust's standard library with help from the default regular expression library, *regex*. It has no other dependencies. It aims to make working with strings as easy in Rust as it is Javascript or Python without compromising performance.
-The library provides a number of utility methods to split strings into vectors of strings or a head and tail components and to extract valid numbers from longer texts. I will add more documentation as the library progresses beyond the alpha stage.
+The library provides a number of utility methods to split strings into vectors of strings or a head and tail components and to extract valid numbers from longer texts. I will add more documentation as the library progresses beyond the alpha stage. I added variant match and replace methods with _ci (case-insensitive) or _cs (case-sensitive) suffixes as shorthand for the equivalent plain methods thatv require a boolean case_insensitive flag. In case-insensitive mode the non-capturing /(?i)/ flag is prepended automatically.
 
 ##### standard Rust with the Regex library
 ```rust
 
 fn is_valid_time_string(input: &str) -> bool {
-  let regex_str = r#"^\d\d?:\d\d(:\d\d)?$"#;
+  let regex_str = r#"^[012]\d?:[0-5]\d(:[0-5]\d)?$"#;
   let re = Regex::new(&regex_str);
   if let Ok(is_matched) =  re.is_match(input) {
     is_matched
@@ -42,7 +42,7 @@ fn replace_final_os(input: &str) -> String {
 ```rust
 
 fn replace_final_os(input: &str) -> String {
-  input.to_string().pattern_replace(r#"(\w)o\b$"#, "$1um", true) // case insensitive replacement
+  input.to_string().pattern_replace_ci(r#"(\w)o\b$"#, "$1um") // case insensitive replacement
 }
 ```
 
@@ -55,10 +55,23 @@ let new_strings = sample_strings.pattern_replace(pattern, replacement);
 /// should yield the strings "æpples", "bananas", "cærrots", "dates"
 ```
 
+##### Replace multiple pattern/replacement pairs 
+```rust
+let source_str = "The dying Edmund decides to try to save Lear and Cordelia.".to_string();
+  let pattern_replacements = [
+    (r#"\bEdmund\b"#, "Edward"),
+    (r#"\bCordelia\b"#, "Cecilia")
+  ];
+/// Should equal "The dying Edward decides to try to save Lear and Cecilia."
+let target_str = source_str.pattern_replace_pairs(&pattern_replacements); 
+```
+
 ##### Extract the third non-empty segment of a long path name
 ```rust
 let path_string = "/var/www/mysite.com/web/uploads".to_string();
-let domain = path_string.to_segment("/", 2); // Some("mysite.com".to_string())
+if let Some(domain) = path_string.to_segment("/", 2) {
+  println!("The site name is: {}". domain); // "mysite.com" is an owned string
+}
 ```
 
 ##### Extract the first decimal value as an f64 from a longer string
