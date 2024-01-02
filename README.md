@@ -54,9 +54,9 @@ let domain = path_string.to_segment("/", 2); // Some("mysite.com".to_string())
 ##### extract the first decimal value as an f64 from a longer string
 ```rust
 let input_string = "Price £12.50 each".to_string();
-let price_gbp = input_string.to_first_number(); // 12.5 as f64
+let price_gbp = input_string.to_first_number::<f64>(); // 12.5 as f64, uses the same syntax as parse::<f64>()
 ```
 
 
 NB: Although I've used the library methods in three of my commercial projects, this library is very much an alpha release as I evaluate
-which of the many auxiliary methods, not documented here, belong in this library.
+which of the many auxiliary methods, not documented here, belong in this library. Version updates in the 0.1.x series reflect mainly corrections to this file.
