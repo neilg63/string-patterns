@@ -511,7 +511,7 @@ impl PatternMatchMany for String {
   }
 
   /// Matches all of the patterns with case-insensitive flag
-  /// e.g. ("a[ck]", true) => matches "ac" or "ak" whether upper, lower or mixed case
+  /// e.g. (r#"a[ck]"#, true) => matches "ac" or "ak" whether upper, lower or mixed case
   /// with an array of tuples (pattern, replacement, case_insensitive)
   fn pattern_match_many_mixed(&self, pattern_sets: &[(&str, bool)]) -> bool {
     let mut num_matched = 0usize;
