@@ -1,6 +1,6 @@
 # String Patterns
 
-This library makes it easier to validate and post-process strings in Rust. It builds on the Rust standard library with help from the default regular expression library, regex. It has no other dependencies. It aims to make working with strings as easy in Rust as it is Javascript or Python without compromising performance.
+This library makes it easier to validate and manipulate strings in Rust. It builds on Rust's standard library with help from the default regular expression library, *regex*. It has no other dependencies. It aims to make working with strings as easy in Rust as it is Javascript or Python without compromising performance.
 The library provides a number of utility methods to split strings into vectors of strings or a head and tail components and to extract valid numbers from longer texts. I will add more documentation as the library progresses beyond the alpha stage.
 
 ##### standard Rust with the Regex library
@@ -45,18 +45,32 @@ fn replace_final_os(input: &str) -> String {
   input.to_string().pattern_replace(r#"(\w)o\b$"#, "$1um", true) // case insensitive replacement
 }
 ```
-##### extract the third non-empty segment of a long path name
+
+##### Replace text in a vector of strings
+```rust
+let sample_strings = ["apples", "bananas", "carrots", "dates"].to_strings(); /// cast to vector of owned strings
+let pattern = r#"a([pr])"#;
+let replacement = "æ$1";
+let new_strings = sample_strings.pattern_replace(pattern, replacement);
+/// should yield the strings "æpples", "bananas", "cærrots", "dates"
+```
+
+##### Extract the third non-empty segment of a long path name
 ```rust
 let path_string = "/var/www/mysite.com/web/uploads".to_string();
 let domain = path_string.to_segment("/", 2); // Some("mysite.com".to_string())
 ```
 
-##### extract the first decimal value as an f64 from a longer string
+##### Extract the first decimal value as an f64 from a longer string
 ```rust
+const GBP_TO_EUR = 0.83f64;
+
 let input_string = "Price £12.50 each".to_string();
-let price_gbp = input_string.to_first_number::<f64>(); // 12.5 as f64, uses the same syntax as parse::<f64>()
+if let Ok(price_gbp) = input_string.to_first_number::<f64>() {
+  // 12.5 as f64, uses the same syntax as parse::<f64>()
+  let price_eur = price_gbp / GBP_TO_EUR;
+}
 ```
 
-
-NB: Although I've used the library methods in three of my commercial projects, this library is very much an alpha release as I evaluate
+NB: Although I've used the library methods in three of my commercial projects, this project is very much in its alpha stage as I evaluate
 which of the many auxiliary methods, not documented here, belong in this library. Version updates in the 0.1.x series reflect mainly corrections to this file.

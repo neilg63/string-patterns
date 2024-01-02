@@ -1,11 +1,11 @@
 [package]
 name = "string-patterns"
-version = "0.1.4"
+version = "0.1.5"
 edition = "2021"
-description = "Makes it easier to work with common string patterns and regular expressions in Rust, adding regex match and replace methods to the standard String type"
+description = "Makes it easier to work with common string patterns and regular expressions in Rust, adding convenient regex match and replace methods (pattern_match and pattern_replace) to the standard String type as well to vectors of strings"
 repository = "https://github.com/neilg63/string-patterns"
 categories = ["strings"]
-license = "GPL-2.0-or-later WITH Bison-exception-2.2"
+license = "GPL-2.0-or-later with Bison-exception-2.2"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]

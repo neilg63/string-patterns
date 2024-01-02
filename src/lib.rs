@@ -13,12 +13,21 @@ pub trait PatternMatch {
 
   fn pattern_match(&self, pattern: &str, case_insensitive: bool) -> bool;
 
+  fn pattern_match_ci(&self, pattern: &str) -> bool;
+
+  fn pattern_match_cs(&self, pattern: &str) -> bool;
+
 }
 
+/// Core regular expression replacement methods 
 pub trait PatternReplace {
   fn pattern_replace(&self, pattern: &str, replacement: &str, case_insensitive: bool) -> Self where Self:Sized;
 
   fn pattern_replace_result(&self, pattern: &str, replacement: &str,case_insensitive: bool) -> Result<Self, Error> where Self:Sized;
+
+  fn pattern_replace_ci(&self, pattern: &str, replacement: &str) -> Self where Self:Sized;
+
+  fn pattern_replace_cs(&self, pattern: &str, replacement: &str) -> Self where Self:Sized;
 
 }
 
@@ -159,14 +168,13 @@ pub trait MatchOccurrences {
 }
 
 
-
 impl MatchOccurrences for String {
   fn find_matched_indices(&self, pat: &str) -> Vec<usize> {
     self.match_indices(pat).into_iter().map(|pair| pair.0).collect::<Vec<usize>>()
   }
 }
 
-
+/// Implement regular expression match and replace methods for String
 impl PatternMatch for String {
 
   ///
@@ -183,7 +191,7 @@ impl PatternMatch for String {
 }
 
   ///
-  /// Simpple regex-compatible match method that will return false 
+  /// Simple regex-compatible match method that will return false 
   /// if the pattern does not match the source string or the regex fails
   /// 
   fn pattern_match(&self, pattern: &str, case_insensitive: bool) -> bool {
@@ -193,6 +201,21 @@ impl PatternMatch for String {
         false
       }
   }
+
+  ///
+  /// Simple case-insensitive regex-compatible match method that will return false 
+  /// if the pattern does not match the source string or the regex fails
+  fn pattern_match_ci(&self, pattern: &str) -> bool {
+    self.pattern_match(pattern, true)
+  }
+
+  ///
+  /// Simple case-sensitive regex-compatible match method that will return false 
+  /// if the pattern does not match the source string or the regex fails
+  fn pattern_match_cs(&self, pattern: &str) -> bool {
+    self.pattern_match(pattern, false)
+  }
+
 }
 
 
@@ -212,6 +235,20 @@ impl PatternReplace for String {
   /// 
   fn pattern_replace(&self, pattern: &str, replacement: &str, case_insensitive: bool) -> String {
     self.pattern_replace_result(pattern, replacement, case_insensitive).unwrap_or(self.to_owned())
+  }
+
+  ///
+  /// Simple case-insensitive regex-enabledd replace method that will return the same string if the regex fails
+  /// 
+  fn pattern_replace_ci(&self, pattern: &str, replacement: &str) -> String {
+    self.pattern_replace(pattern, replacement, true)
+  }
+
+  ///
+  /// Simple case-sensitive regex-enabledd replace method that will return the same string if the regex fails
+  /// 
+  fn pattern_replace_cs(&self, pattern: &str, replacement: &str) -> String {
+    self.pattern_replace(pattern, replacement, false)
   }
 
 }
@@ -359,13 +396,25 @@ impl PatternMatch for [String] {
     }
   }
 
-    ///
-    /// Simpple regex-compatible match method that will return false 
+
+    /// Simple regex-compatible match method that will return false 
     /// if the pattern does not match the source string or the regex fails
-    /// 
     fn pattern_match(&self, pattern: &str, case_insensitive: bool) -> bool {
       self.pattern_match_result(pattern, case_insensitive).unwrap_or(false)
     }
+
+    /// Case-insensitive regex-compatible match method that will return false 
+    /// if the pattern does not match the source string or the regex fails
+    fn pattern_match_ci(&self, pattern: &str) -> bool {
+      self.pattern_match(pattern, true)
+    }
+
+    /// Case-sensitive regex-compatible match method that will return false 
+    /// if the pattern does not match the source string or the regex fails
+    fn pattern_match_cs(&self, pattern: &str) -> bool {
+      self.pattern_match(pattern, false)
+    }
+
 }
 
 impl PatternReplace for Vec<String> {
@@ -389,16 +438,217 @@ impl PatternReplace for Vec<String> {
     self.pattern_replace_result(pattern, replacement, case_insensitive).unwrap_or(self.to_owned())
   }
 
+
+  /// Simple case-insensitive regex-enabled replace method that will return the same string if the regex fails
+  fn pattern_replace_ci(&self, pattern: &str, replacement: &str) -> Vec<String> {
+    self.pattern_replace(pattern, replacement, true)
+  }
+
+  /// Simple case-sensitive regex-enabled replace method that will return the same string if the regex fails
+  fn pattern_replace_cs(&self, pattern: &str, replacement: &str) -> Vec<String> {
+    self.pattern_replace(pattern, replacement, false)
+  }
+
 }
 
+/// Provides methods to match and replace with multiple patterns 
+/// expressed as arrays of tuples or simple strs (for pattern_match_many_ci and pattern_match_many_cs)
+pub trait PatternMatchMany {
+  /// Matches all of the patterns in case-sensitivity flag
+  /// with an array of tuples (patterns, case_insensitive)
+  fn pattern_match_many(&self, patterns: &[&str], case_insensitive: bool) -> bool;
 
+  /// Matches all of the patterns in case-insensitive mode
+  /// with an array of str patterns
+  fn pattern_match_many_ci(&self, patterns: &[&str]) -> bool;
+
+   /// Matches all of the patterns in case-sensitive mode
+  /// with an array of str patterns
+  fn pattern_match_many_cs(&self, patterns: &[&str]) -> bool;
+
+  /// Matches all of the patterns with case-insensitive flag
+  /// e.g. ("a[ck]", true) => matches "ac" or "ak" whether upper, lower or mixed case
+  /// with an array of tuples (pattern, replacement, case_insensitive)
+  fn pattern_match_many_mixed(&self, pattern_sets: &[(&str, bool)]) -> bool;
+  
+  /// string matches all conditional patterns which may be positive / negative and case insensitive or not
+  fn pattern_match_many_conditional(&self, pattern_sets: &[(bool, &str, bool)]) -> bool;
+
+  /// Replaces multiple sets of patterns with replacements and boolean case sensitivity 
+  /// with an array of tuples (pattern, replacement, case_insensitive)
+  fn pattern_replace_pairs(&self, replacement_sets: &[(&str, &str)]) -> Self where Self: Sized;
+
+  /// Replaces multiple sets of patterns with replacements in case-sensitive mode
+  /// with an array of simple tuples (pattern, replacement)
+  fn pattern_replace_sets(&self, replacement_sets: &[(&str, &str, bool)]) -> Self where Self: Sized;
+}
+
+impl PatternMatchMany for String {
+
+  /// Matches all of the patterns in case-sensitivity flag
+  /// with an array of tuples (patterns, case_insensitive)
+  fn pattern_match_many(&self, patterns: &[&str], case_insensitive: bool) -> bool {
+    let mut num_matched = 0usize;
+    let num_patterns = patterns.len();
+    for pattern in patterns {
+      if self.pattern_match(pattern, case_insensitive) {
+        num_matched += 1;
+      }
+    }
+    num_matched == num_patterns
+  }
+
+  /// Matches all of the patterns in case-insensitive mode
+  /// with an array of str patterns
+  fn pattern_match_many_ci(&self, patterns: &[&str]) -> bool {
+    self.pattern_match_many(patterns, true)
+  }
+
+  /// Matches all of the patterns in case-sensitive mode
+  /// with an array of str patterns
+  fn pattern_match_many_cs(&self, patterns: &[&str]) -> bool {
+    self.pattern_match_many(patterns, false)
+  }
+
+  /// Matches all of the patterns with case-insensitive flag
+  /// e.g. ("a[ck]", true) => matches "ac" or "ak" whether upper, lower or mixed case
+  /// with an array of tuples (pattern, replacement, case_insensitive)
+  fn pattern_match_many_mixed(&self, pattern_sets: &[(&str, bool)]) -> bool {
+    let mut num_matched = 0usize;
+    let num_patterns = pattern_sets.len();
+    for pair in pattern_sets {
+      let (pattern, case_insensitive) = *pair;
+      if self.pattern_match(pattern, case_insensitive) {
+        num_matched += 1;
+      }
+    }
+    num_matched == num_patterns
+  }
+
+  /// Matches all of the patterns with positivity condition and case-insensitive flag
+  /// e.g. (false, "a[ck]", true) => does not contain "ac" or "ak" whether upper, lower or mixed case
+  /// with an array of tuples (positive, pattern, case_insensitive)
+  fn pattern_match_many_conditional(&self, pattern_sets: &[(bool, &str, bool)]) -> bool {
+    let mut num_matched = 0usize;
+    let num_patterns = pattern_sets.len();
+    for pattern_set in pattern_sets {
+      let (is_positive, pattern, case_insensitive) = *pattern_set;
+      let is_matched = self.pattern_match(pattern, case_insensitive);
+      if is_matched == is_positive {
+        num_matched += 1;
+      }
+    }
+    num_matched == num_patterns
+  }
+
+  /// Replaces multiple sets of patterns with replacements and boolean case sensitivity 
+  /// with an array of tuples (pattern, replacement, case_insensitive)
+  fn pattern_replace_sets(&self, replacement_sets: &[(&str, &str, bool)]) -> String {
+    let mut return_string = self.clone();
+    for replacement_set in replacement_sets {
+      let (pattern, replacement, case_insensitive) = *replacement_set;
+      if let Ok(new_string) = return_string.pattern_replace_result(pattern, replacement, case_insensitive) {
+        return_string = new_string;
+      }
+    }
+    return_string
+  }
+
+  /// Replaces multiple sets of patterns with replacements in case-sensitive mode
+  /// with an array of simple tuples (pattern, replacement)
+  fn pattern_replace_pairs(&self, replacement_pairs: &[(&str, &str)]) -> String {
+    let mut return_string = self.clone();
+    for replacement_pair in replacement_pairs {
+      let (pattern, replacement) = *replacement_pair;
+      if let Ok(new_string) = return_string.pattern_replace_result(pattern, replacement, false) {
+        return_string = new_string;
+      }
+    }
+    return_string
+  }
+}
+
+/// Implement PatternMatchMany for vectors of strings.
+impl PatternMatchMany for Vec<String> {
+
+  fn pattern_match_many(&self, patterns: &[&str], case_insensitive: bool) -> bool {
+    let mut num_matched = 0usize;
+    let num_patterns = patterns.len();
+    for pattern in patterns {
+      if self.pattern_match(pattern, case_insensitive) {
+        num_matched += 1;
+      }
+    }
+    num_matched == num_patterns
+  }
+
+  fn pattern_match_many_ci(&self, patterns: &[&str]) -> bool {
+    self.pattern_match_many(patterns, true)
+  }
+
+  fn pattern_match_many_cs(&self, patterns: &[&str]) -> bool {
+    self.pattern_match_many(patterns, false)
+  }
+
+  fn pattern_match_many_mixed(&self, pattern_sets: &[(&str, bool)]) -> bool {
+    let mut num_matched = 0usize;
+    let num_patterns = pattern_sets.len();
+    for pair in pattern_sets {
+      let (pattern, case_insensitive) = *pair;
+      if self.pattern_match(pattern, case_insensitive) {
+        num_matched += 1;
+      }
+    }
+    num_matched == num_patterns
+  }
+
+  fn pattern_match_many_conditional(&self, pattern_sets: &[(bool, &str, bool)]) -> bool {
+    let mut num_matched = 0usize;
+    let num_patterns = pattern_sets.len();
+    for pattern_set in pattern_sets {
+      let (is_positive, pattern, case_insensitive) = *pattern_set;
+      let is_matched = self.pattern_match(pattern, case_insensitive);
+      if is_matched == is_positive {
+        num_matched += 1;
+      }
+    }
+    num_matched == num_patterns
+  }
+
+  fn pattern_replace_sets(&self, replacement_sets: &[(&str, &str, bool)]) -> Vec<String> {
+    let mut return_strings = self.clone();
+    for replacement_set in replacement_sets {
+      let (pattern, replacement, case_insensitive) = *replacement_set;
+      if let Ok(new_strings) = return_strings.pattern_replace_result(pattern, replacement, case_insensitive) {
+        return_strings = new_strings;
+      }
+    }
+    return_strings
+  }
+
+  fn pattern_replace_pairs(&self, replacement_pairs: &[(&str, &str)]) -> Vec<String> {
+    let mut return_strings = self.clone();
+    for replacement_pair in replacement_pairs {
+      let (pattern, replacement) = *replacement_pair;
+      if let Ok(new_string) = return_strings.pattern_replace_result(pattern, replacement, false) {
+        return_strings = new_string;
+      }
+    }
+    return_strings
+  }
+}
 
 impl ToSegments for String {
+
+  /// Splits a string on the exact separator, whether initial, final or repeated.
+  /// May yield empty segments
   fn to_parts(&self, separator: &str) -> Vec<String> {
     let splitter = self.split(separator);
     splitter.into_iter().map(|s| s.to_string()).collect::<Vec<String>>()
   }
 
+  /// Splits a string on a separator, but only returns an array of non-empty strings
+  /// skipping leading, trailing or repeated separators that may otherwise yield empty strings
   fn to_segments(&self, separator: &str) -> Vec<String> {
     let splitter = self.split(separator);
     splitter.into_iter().map(|s| s.to_string()).filter(|s| s.len() > 0).collect::<Vec<String>>()
@@ -423,6 +673,7 @@ impl ToSegments for String {
     }
   }
 
+  /// extract the last segment whether empty or not
   fn to_end(&self, separator: &str) -> String {
     let parts = self.to_parts(separator);
     if parts.len() > 0 {
@@ -490,6 +741,7 @@ impl ToSegments for String {
     }
   }
 
+  /// extract inner segment via a set of tuples with separators and indices.
   fn to_inner_segment(&self, groups: &[(&str, i32)]) -> Option<String> {
     if groups.len() > 0 {
       let mut matched: Option<String> = None;
@@ -531,192 +783,6 @@ impl ToSegments for String {
     } else {
       (self.to_owned(), last_part)
     }
-  }
-
-}
-
-
-#[cfg(test)]
-mod tests {
-  use super::*;
-  #[test]
-  fn test_match_simple() {
-    let source_str = "All living beings carry genes with harmful mutations.".to_string();
-    let pattern = r"\bgenes?\b";
-    assert!(source_str.pattern_match(pattern, true));
-  }
-
-  #[test]
-  fn test_match_with_and_without_error() {
-    let source_str = "All living beings carry genes with harmful mutations.".to_string();
-    let pattern = r"\bgene(s?\b"; // bad regular expression
-    assert!(source_str.pattern_match_result(pattern, true).is_err());
-    let pattern = r"\bgene(s|z)?\b"; // good regular expression
-    assert!(source_str.pattern_match_result(pattern, true).is_ok());
-  }
-
-  #[test]
-  fn test_simple_replacement() {
-    let source_str = "It measured 10cm long and 15cm wide".to_string();
-    let pattern = r#"(\d+)\s*(cm)\b"#; 
-    let replacement = "$1 centimetres";
-    let target_str = "It measured 10 centimetres long and 15 centimetres wide".to_string();
-    assert_eq!(source_str.pattern_replace(pattern, replacement,true), target_str);
-  }
-
-  #[test]
-  fn test_match_in_string_array() {
-    let source_strs: Vec<String>  = [
-      "fisherman",
-      "obbudsman", 
-      "handyman"
-    ].to_strings();
-    let pattern = r#"\bhand\w"#; 
-    assert!(source_strs.pattern_match(pattern, true));
-    // should not match any of the above patterns
-    let pattern2 = r#"\bpost\w"#; 
-    assert_eq!(source_strs.pattern_match(pattern2, true), false);
-  }
-
-  #[test]
-  fn test_vector_replacement() {
-    let source_strs: Vec<String>  = vec![
-      "fisherman",
-      "obbudsman", 
-      "handyman"
-    ].to_strings();
-    let pattern = r#"man\b"#; 
-    let replacement = "woman";
-    let target_strs: Vec<String>  = vec![
-      "fisherwoman",
-      "obbudswoman", 
-      "handywoman"
-    ].to_strings();
-    assert_eq!(source_strs.pattern_replace(pattern, replacement,true),target_strs );
-  }
-
-
-  #[test]
-  fn test_strip_non_chars() {
-    let source_str = "Cañon, Zürich, Москва".to_string();
-    let target_str = "CañonZürichМосква".to_string();
-    assert_eq!(source_str.strip_non_chars(),target_str );
-  }
-
-  #[test]
-  fn test_segment_match() {
-    let path_string = "/var/www/mysite.com/web/uploads".to_string();
-    let domain = path_string.to_segment("/",2).unwrap_or("".to_string()); 
-    let expected_string = "mysite.com".to_string();
-    assert_eq!(domain, expected_string);
-  }
-
-  #[test]
-  fn test_to_tail() {
-    let source_str = "long/path/with-a-long-title/details".to_string();
-    let target_str = "long".to_string();
-    assert_eq!(source_str.to_inner_segment(&[("/", 2), ("-", 2)]), Some(target_str) );
-  }
-
-  #[test]
-  fn test_to_inner_segment() {
-    let source_str = "long/path/with-a-long-title/details".to_string();
-    let target_str = "long".to_string();
-    assert_eq!(source_str.to_inner_segment(&[("/", 2), ("-", 2)]), Some(target_str) );
-    let source_str2 = "complex/pattern/with-many-nested|embedded-words".to_string();
-    let target_str2 = "embedded".to_string();
-    let pairs = [("/", 2), ("-", 2), ("|", 1)];
-    assert_eq!(source_str2.to_inner_segment(&pairs), Some(target_str2) );
-  }
-
-  #[test]
-  fn test_to_first() {
-    let source_str = "/path/with/a/leading/slash".to_string();
-    let target_str = "path".to_string();
-    assert_eq!(source_str.to_first("/"), target_str );
-    let source_str2 = "path/without/a/leading/slash".to_string();
-    assert_eq!(source_str2.to_first("/"), target_str );
-  }
-
-  #[test]
-  fn test_to_last() {
-    let source_str = "/path/with/a/trailing/slash/".to_string();
-    let target_str = "slash".to_string();
-    assert_eq!(source_str.to_last("/"), target_str );
-    let source_str2 = "/path/without/a/trailing/slash".to_string();
-    assert_eq!(source_str2.to_last("/"), target_str );
-  }
-
-  #[test]
-  fn test_to_head_tail() {
-    let source_str = "comma,separated,string".to_string();
-    let start = "comma".to_string();
-    let end = "separated,string".to_string();
-    assert_eq!(source_str.to_head_tail(","), (start, end) );
-  }
-
-  #[test]
-  fn test_to_start_end() {
-    let source_str = "comma,separated,string".to_string();
-    let start = "comma,separated".to_string();
-    let end = "string".to_string();
-    assert_eq!(source_str.to_start_end(","), (start, end) );
-  }
-
-  #[test]
-  fn test_array_str_to_vec_string() {
-    let source_strs = [
-      "one",
-      "two",
-      "three"
-    ].to_strings();
-    let target_vec = [
-      "one",
-      "two",
-      "three"
-    ].to_strings();
-    assert_eq!(source_strs, target_vec );
-  }
-
-  #[test]
-  fn test_char_group_matches() {
-    let str1 = "I spent £12.50 on wine".to_string();
-
-    assert!(str1.has_alphabetic());
-
-    assert!(str1.has_digits());
-    let str2 = "I bought a bottle of champagne for twenty pounds".to_string();
-    // Deoes not contain digits
-    assert!(str2.has_digits() == false);
-
-    let str3 = "{-; _)(:-)}".to_string();
-    // Deoes not contain letters os numbers
-    assert!(str3.has_alphanumeric() == false);
-    
-  }
-
-  #[test]
-  fn test_strip_non_numeric() {
-    let source_str = "I spent £9999.99 on 2 motorbikes at the age of 72.".to_string();
-    let target_str = "9999.99 2 72".to_string();
-    assert_eq!(source_str.strip_non_numeric(), target_str);
-    // check if ythe above numbers parse successfully to numbers
-    assert_eq!(source_str.to_numbers::<f64>(), vec![9999.99f64, 2f64, 72f64]);
-
-    assert_eq!(source_str.to_first_number::<f32>().unwrap_or(0f32), 9999.99f32);
-
-    let input_text = "I'd like 2.5lb of flour please".to_string();
-
-    assert_eq!(input_text.to_first_number::<f32>().unwrap_or(0f32), 2.5f32);
-    
-    // Standard European price format. This is not ambiguous because both a dot and comma are both present
-    let input_text = "Il conto è del 1.999,50€. Come vuole pagare?".to_string();
-    assert_eq!(input_text.to_first_number::<f32>().unwrap_or(0f32), 1999.5f32);
-
-    // Rounded amount in the European format. The absence of a secondary separator makes this
-    // value ambigiuous
-    let input_text = "Il furgone pesa 1.500kg".to_string();
-    assert_eq!(input_text.to_first_number_euro::<u32>().unwrap_or(0), 1500);
   }
 
 }
