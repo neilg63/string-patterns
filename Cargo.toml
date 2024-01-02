@@ -1,6 +1,6 @@
 [package]
 name = "string-patterns"
-version = "0.1.2"
+version = "0.1.3"
 edition = "2021"
 description = "Makes it easier to work with common string patterns and regular expressions in Rust, adding regex match and replace methods to the standard String type"
 repository = "https://github.com/neilg63/string-patterns"
