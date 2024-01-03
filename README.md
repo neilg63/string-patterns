@@ -19,9 +19,8 @@ I will add more documentation as the library progresses beyond the alpha stage.
 
 fn is_valid_time_string(input: &str) -> bool {
   let time_format_pattern = r#"^([01]\d|2[0-3])?:[0-5]\d(:[0-5]\d)?$"#;
-  let re = Regex::new(time_format_pattern);
-  if let Ok(is_matched) =  re.is_match(input) {
-    is_matched
+  if let Ok(re) = Regex::new(time_format_pattern) {
+    re.is_match(input)
   } else {
     false
   }
@@ -39,10 +38,9 @@ fn is_valid_time_string(input: &str) -> bool {
 ```rust
 
 fn replace_final_os(input: &str) -> String {
-  let regex_str = r#"(\w)o\b$"#;
-  let re = Regex::new(&regex_str);
-  if let Ok(repl_string) =  re.replace_all(input, "$1um") {
-    repl_string
+  let regex_str = r#"(\w)o\b"#;
+  if let Ok(re) = Regex::new(&regex_str) {
+    re.replace_all(input, "${1}um").to_string()
   } else {
     input.to_string()
   }
@@ -122,5 +120,5 @@ if let Some(price_gbp) = sample_str.to_first_number::<f64>() {
 }
 ```
 
-NB: Although I've used the library methods in three of my commercial projects, this project is very much in its alpha stage as I evaluate
+NB: Although I've used the library methods in three of my commercial projects, this crate is very much in its alpha stage as I evaluate
 which of the many auxiliary methods, not documented here, belong in this library. Version updates in the 0.1.x series reflect mainly corrections to this file.

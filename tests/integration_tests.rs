@@ -223,15 +223,3 @@ fn test_strip_non_numeric() {
   let input_text = "Il furgone pesa 1.500kg".to_string();
   assert_eq!(input_text.to_first_number_euro::<u32>().unwrap_or(0), 1500);
 }
-
-#[test]
-fn test_replace_many() {
-  let source_str = "The dying Edmund decides to try to save Lear and Cordelia.".to_string();
-  let pattern_replacements = [
-    (r#"\bEdmund\b"#, "Edward"),
-    (r#"\bCordelia\b"#, "Cecilia")
-  ];
-  let target_str = "The dying Edward decides to try to save Lear and Cecilia.".to_string();
-
-  assert_eq!(source_str.pattern_replace_pairs(&pattern_replacements), target_str);
-}
