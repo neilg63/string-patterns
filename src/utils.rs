@@ -2,7 +2,8 @@ use regex::*;
 
 pub(crate) fn build_regex(pattern: &str, case_insensitive: bool) -> Result<Regex, Error> {
   let mut parts: Vec<&str> = vec![];
-  if case_insensitive {
+  // do not case-insensitive flag if a similar flag is already in the regular expression
+  if case_insensitive && pattern.starts_with("(?") == false {
     parts.push("(?i)");
   }
   parts.push(pattern);

@@ -72,7 +72,7 @@ fn test_vector_replacement() {
 fn test_strip_non_chars() {
   let source_str = "Cañon, Zürich, Москва".to_string();
   let target_str = "CañonZürichМосква".to_string();
-  assert_eq!(source_str.strip_non_chars(),target_str );
+  assert_eq!(source_str.strip_non_alphanum(),target_str );
 }
 
 #[test]
@@ -162,10 +162,43 @@ fn test_char_group_matches() {
   assert!(str2.has_digits() == false);
 
   let str3 = "{-; _)(:-)}".to_string();
-  // Deoes not contain letters os numbers
+  // Does not contain letters os numbers
   assert!(str3.has_alphanumeric() == false);
   
 }
+
+#[test]
+fn test_match_many() {
+  let str1 = "The 1950s proved to be a regeneration for Armstrong as both a musician and a public figure.";
+
+  let match_patterns = [r#"\bmusician\b"#, r#"\bpublic\b"#];
+  assert!(str1.pattern_match_many_ci(&match_patterns));
+
+  let match_patterns_2 = [r#"\bmusician\b"#, r#"\bjazz\b"#];
+  // Does not contains all of the above
+  
+  assert_eq!(str1.pattern_match_many_ci(&match_patterns_2), false);
+
+  // Contains at least one of the above
+  assert!(str1.pattern_match_any_ci(&match_patterns_2));
+  
+}
+
+#[test]
+fn test_simple_pattern_matches() {
+  let str1 = "Picture_of my cat-2018.PNG";
+
+  let pattern_1 = "pictureof";
+  assert!(str1.starts_with_ci_alphanum(pattern_1));
+
+  let pattern_2 = "mycat";
+  assert!(str1.contains_ci_alphanum(pattern_2));
+
+  // Ends with .png with upper, lower or mixed case letters
+  assert!(str1.ends_with_ci(".png"));
+  
+}
+
 
 #[test]
 fn test_strip_non_numeric() {
@@ -199,6 +232,6 @@ fn test_replace_many() {
     (r#"\bCordelia\b"#, "Cecilia")
   ];
   let target_str = "The dying Edward decides to try to save Lear and Cecilia.".to_string();
-   
+
   assert_eq!(source_str.pattern_replace_pairs(&pattern_replacements), target_str);
 }

@@ -35,7 +35,7 @@ pub trait StripCharacters {
 
   /// Removes all characters that any are not letters or digits, such as punctuation or symobols
   /// Letters include those used in most non-Latin alphabets
-  fn strip_non_chars(&self) -> Self where Self:Sized;
+  fn strip_non_alphanum(&self) -> Self where Self:Sized;
 
   // Remove all characters except digits, including punctuation such as decmimal points
   fn strip_non_digits(&self) -> Self where Self:Sized;
@@ -85,6 +85,27 @@ pub trait CharGroupMatch {
 
   /// Does the string contain any letters including those from non-Latin alphabets, but excluding digits
   fn has_alphabetic(&self) -> bool;
+}
+
+/// Regex-free matcher methods for common use cases
+pub trait SimpleMatch {
+  /// Starts with a case-insensitive alphanumeric sequence
+  fn starts_with_ci(&self, pattern: &str) -> bool;
+  
+  /// Starts with a case-insensitive alphanumeric sequence
+  fn starts_with_ci_alphanum(&self, pattern: &str) -> bool;
+  
+  /// Ends with a case-insensitive alphanumeric sequence
+  fn ends_with_ci(&self, pattern: &str) -> bool;
+  
+  /// Ends with a case-insensitive alphanumeric sequence
+  fn ends_with_ci_alphanum(&self, pattern: &str) -> bool;
+
+  /// Contains a case-insensitive alphanumeric sequence
+  fn contains_ci(&self, pattern: &str) -> bool;
+  
+  /// Contains a case-insensitive alphanumeric sequence
+  fn contains_ci_alphanum(&self, pattern: &str) -> bool;
 }
 
 /// Method to check if the string may be parsed to an integer or float
@@ -174,8 +195,8 @@ impl MatchOccurrences for String {
   }
 }
 
-/// Implement regular expression match and replace methods for String
-impl PatternMatch for String {
+/// Implement regular expression match and replace methods for str and owned String
+impl PatternMatch for str {
 
   ///
   /// Simple regex-compatible match method that will return an optional boolean 
@@ -256,7 +277,7 @@ impl PatternReplace for String {
 impl StripCharacters for String {
     
 
-  fn strip_non_chars(&self) -> String {
+  fn strip_non_alphanum(&self) -> String {
     self.chars().into_iter().filter(|c| c.is_alphanumeric()).collect::<String>()
   }
 
@@ -373,7 +394,7 @@ impl StripCharacters for String {
 
 }
 
-impl CharGroupMatch for String {
+impl CharGroupMatch for str {
 
   fn has_digits(&self) -> bool {
       self.chars().any(|c| char::is_digit(c, 10))
@@ -388,6 +409,54 @@ impl CharGroupMatch for String {
   }
 }
 
+impl SimpleMatch for str {
+  /// Starts with a case-insensitive sequence
+  fn starts_with_ci(&self, pattern: &str) -> bool {
+    self.to_lowercase().starts_with(&pattern.to_lowercase())
+  }
+  
+  /// Starts with a case-insensitive alphanumeric sequence
+  fn starts_with_ci_alphanum(&self, pattern: &str) -> bool {
+    self.to_lowercase().strip_non_alphanum().starts_with(&pattern.to_lowercase())
+  }
+  
+  /// Ends with a case-insensitive sequence
+  fn ends_with_ci(&self, pattern: &str) -> bool {
+    self.to_lowercase().ends_with(&pattern.to_lowercase())
+  }
+  
+  /// Ends with a case-insensitive alphanumeric sequence
+  fn ends_with_ci_alphanum(&self, pattern: &str) -> bool {
+    self.to_lowercase().strip_non_alphanum().ends_with(&pattern.to_lowercase())
+  }
+
+  /// Contains a case-insensitive sequence
+  fn contains_ci(&self, pattern: &str) -> bool {
+    self.to_lowercase().contains(&pattern.to_lowercase())
+  }
+  
+  /// Contains a case-insensitive alphanumeric sequence
+  fn contains_ci_alphanum(&self, pattern: &str) -> bool {
+    self.to_lowercase().strip_non_alphanum().contains(&pattern.to_lowercase())
+  }
+}
+
+
+pub trait PatternMatches {
+  /// Returns result with a vector of boolean matches for an array or vector of strings with case-insensitive flag
+  /// or an error if the regex does not compile
+  fn pattern_matches_result(&self, pattern: &str, case_insensitive: bool) -> Result<Vec<bool>, Error>;
+
+  /// Returns vector of boolean matches for an array or vector of strings with case-insensitive flag
+  fn pattern_matches(&self, pattern: &str, case_insensitive: bool) -> Vec<bool>;
+
+  /// Returns vector of boolean matches for an array or vector of strings in case-insensitive mode
+  fn pattern_matches_ci(&self, pattern: &str) -> Vec<bool>;
+
+  /// Returns vector of boolean matches for an array or vector of strings in case-sensitive mode
+  fn pattern_matches_cs(&self, pattern: &str) -> Vec<bool>;
+}
+
 impl PatternMatch for [String] {
   fn pattern_match_result(&self, pattern: &str, case_insensitive: bool) -> Result<bool, Error> {
     match build_regex(pattern, case_insensitive) {
@@ -395,25 +464,53 @@ impl PatternMatch for [String] {
       Err(error) => Err(error)
     }
   }
+  /// Simple regex-compatible match method that will return false 
+  /// if the pattern does not match the source string or the regex fails
+  fn pattern_match(&self, pattern: &str, case_insensitive: bool) -> bool {
+    self.pattern_match_result(pattern, case_insensitive).unwrap_or(false)
+  }
+
+  /// Case-insensitive regex-compatible match method that will return false 
+  /// if the pattern does not match the source string or the regex fails
+  fn pattern_match_ci(&self, pattern: &str) -> bool {
+    self.pattern_match(pattern, true)
+  }
+
+  /// Case-sensitive regex-compatible match method that will return false 
+  /// if the pattern does not match the source string or the regex fails
+  fn pattern_match_cs(&self, pattern: &str) -> bool {
+    self.pattern_match(pattern, false)
+  }
+
+}
+
+impl PatternMatches for [String] {
 
 
-    /// Simple regex-compatible match method that will return false 
-    /// if the pattern does not match the source string or the regex fails
-    fn pattern_match(&self, pattern: &str, case_insensitive: bool) -> bool {
-      self.pattern_match_result(pattern, case_insensitive).unwrap_or(false)
+  fn pattern_matches_result(&self, pattern: &str, case_insensitive: bool) -> Result<Vec<bool>, Error> {
+    match build_regex(pattern, case_insensitive) {
+      Ok(re) => Ok(self.into_iter().map(|segment| re.is_match(segment)).collect::<Vec<bool>>()),
+      Err(error) => Err(error)
     }
+  }
 
-    /// Case-insensitive regex-compatible match method that will return false 
-    /// if the pattern does not match the source string or the regex fails
-    fn pattern_match_ci(&self, pattern: &str) -> bool {
-      self.pattern_match(pattern, true)
+  /// Returns vector of boolean matches for an array or vector of strings with case-insensitive flag
+  fn pattern_matches(&self, pattern: &str, case_insensitive: bool) -> Vec<bool> {
+    match self.pattern_matches_result(pattern, case_insensitive) {
+      Ok(results) => results,
+      Err(_error) => self.into_iter().map(|_segment| false).collect::<Vec<bool>>()
     }
+  }
 
-    /// Case-sensitive regex-compatible match method that will return false 
-    /// if the pattern does not match the source string or the regex fails
-    fn pattern_match_cs(&self, pattern: &str) -> bool {
-      self.pattern_match(pattern, false)
-    }
+  /// Returns vector of boolean matches for an array or vector of strings in case-insensitive mode
+  fn pattern_matches_ci(&self, pattern: &str) -> Vec<bool> {
+    self.pattern_matches(pattern, true)
+  }
+
+  /// Returns vector of boolean matches for an array or vector of strings in case-sensitive mode
+  fn pattern_matches_cs(&self, pattern: &str) -> Vec<bool> {
+    self.pattern_matches(pattern, false)
+  }
 
 }
 
@@ -451,7 +548,7 @@ impl PatternReplace for Vec<String> {
 
 }
 
-/// Provides methods to match and replace with multiple patterns 
+/// Provides methods to match with multiple patterns 
 /// expressed as arrays of tuples or simple strs (for pattern_match_many_ci and pattern_match_many_cs)
 pub trait PatternMatchMany {
   /// Matches all of the patterns in case-sensitivity flag
@@ -473,17 +570,43 @@ pub trait PatternMatchMany {
   
   /// string matches all conditional patterns which may be positive / negative and case insensitive or not
   fn pattern_match_many_conditional(&self, pattern_sets: &[(bool, &str, bool)]) -> bool;
+  
+  /// Matches one or more of the patterns in case-sensitivity flag
+  /// with an array of tuples (patterns, case_insensitive)
+  fn pattern_match_any(&self, patterns: &[&str], case_insensitive: bool) -> bool;
 
-  /// Replaces multiple sets of patterns with replacements and boolean case sensitivity 
+  /// Matches one or more of the patterns in case-insensitive mode
+  /// with an array of str patterns
+  fn pattern_match_any_ci(&self, patterns: &[&str]) -> bool;
+
+   /// Matches one or more of the patterns in case-sensitive mode
+  /// with an array of str patterns
+  fn pattern_match_any_cs(&self, patterns: &[&str]) -> bool;
+
+  /// Matches one or more of the patterns with case-insensitive boolean flag
+  fn pattern_match_any_mixed(&self, pattern_sets: &[(&str, bool)]) -> bool;
+  
+  /// string matches one or more conditional patterns which may be positive / negative and case insensitive or not
+  fn pattern_match_any_conditional(&self, pattern_sets: &[(bool, &str, bool)]) -> bool;
+}
+
+/// Provides methods to replace with multiple patterns 
+/// expressed as arrays of tuples
+pub trait PatternReplaceMany {
+  /// Replaces multiple sets of patterns with replacements in case-sensitive mode
   /// with an array of tuples (pattern, replacement, case_insensitive)
   fn pattern_replace_pairs(&self, replacement_sets: &[(&str, &str)]) -> Self where Self: Sized;
+
+  /// Replaces multiple sets of patterns with replacements in case-insensitive mode
+  /// with an array of tuples (pattern, replacement, case_insensitive)
+  fn pattern_replace_pairs_ci(&self, replacement_sets: &[(&str, &str)]) -> Self where Self: Sized;
 
   /// Replaces multiple sets of patterns with replacements in case-sensitive mode
   /// with an array of simple tuples (pattern, replacement)
   fn pattern_replace_sets(&self, replacement_sets: &[(&str, &str, bool)]) -> Self where Self: Sized;
 }
 
-impl PatternMatchMany for String {
+impl PatternMatchMany for str {
 
   /// Matches all of the patterns in case-sensitivity flag
   /// with an array of tuples (patterns, case_insensitive)
@@ -541,6 +664,57 @@ impl PatternMatchMany for String {
     num_matched == num_patterns
   }
 
+  /// Matches one or more of the patterns in case-sensitivity flag
+  /// with an array of tuples (patterns, case_insensitive)
+  fn pattern_match_any(&self, patterns: &[&str], case_insensitive: bool) -> bool {
+    for pattern in patterns {
+      if self.pattern_match(pattern, case_insensitive) {
+         return true;
+      }
+    }
+    false
+  }
+
+  /// Matches one or more of the patterns in case-insensitive mode
+  /// with an array of str patterns
+  fn pattern_match_any_ci(&self, patterns: &[&str]) -> bool {
+    self.pattern_match_any(patterns, true)
+  }
+
+  /// Matches one or more of the patterns in case-sensitive mode
+  /// with an array of str patterns
+  fn pattern_match_any_cs(&self, patterns: &[&str]) -> bool {
+    self.pattern_match_any(patterns, false)
+  }
+
+  /// Matches one or more of the patterns with case-insensitive flag
+  /// e.g. (r#"a[ck]"#, true) => matches "ac" or "ak" whether upper, lower or mixed case
+  /// with an array of tuples (pattern, replacement, case_insensitive)
+  fn pattern_match_any_mixed(&self, pattern_sets: &[(&str, bool)]) -> bool {
+    for pair in pattern_sets {
+      let (pattern, case_insensitive) = *pair;
+      if self.pattern_match(pattern, case_insensitive) {
+         return true;
+      }
+    }
+    false
+  }
+
+  /// Matches one or more of the patterns with positivity condition and case-insensitive flag
+  fn pattern_match_any_conditional(&self, pattern_sets: &[(bool, &str, bool)]) -> bool {
+   for pattern_set in pattern_sets {
+      let (is_positive, pattern, case_insensitive) = *pattern_set;
+      let is_matched = self.pattern_match(pattern, case_insensitive);
+      if is_matched == is_positive {
+         return true;
+      }
+    }
+    false
+  }
+
+}
+
+impl PatternReplaceMany for String {
   /// Replaces multiple sets of patterns with replacements and boolean case sensitivity 
   /// with an array of tuples (pattern, replacement, case_insensitive)
   fn pattern_replace_sets(&self, replacement_sets: &[(&str, &str, bool)]) -> String {
@@ -566,10 +740,23 @@ impl PatternMatchMany for String {
     }
     return_string
   }
+
+  /// Replaces multiple sets of patterns with replacements in case-insensitive mode
+  /// with an array of simple tuples (pattern, replacement)
+  fn pattern_replace_pairs_ci(&self, replacement_pairs: &[(&str, &str)]) -> String {
+    let mut return_string = self.clone();
+    for replacement_pair in replacement_pairs {
+      let (pattern, replacement) = *replacement_pair;
+      if let Ok(new_string) = return_string.pattern_replace_result(pattern, replacement, true) {
+        return_string = new_string;
+      }
+    }
+    return_string
+  }
 }
 
 /// Implement PatternMatchMany for vectors of strings.
-impl PatternMatchMany for Vec<String> {
+impl PatternMatchMany for [String] {
 
   fn pattern_match_many(&self, patterns: &[&str], case_insensitive: bool) -> bool {
     let mut num_matched = 0usize;
@@ -615,6 +802,56 @@ impl PatternMatchMany for Vec<String> {
     num_matched == num_patterns
   }
 
+  /// with an array of tuples (patterns, case_insensitive)
+  /// Matches one or more of the patterns in case-sensitivity flag
+  fn pattern_match_any(&self, patterns: &[&str], case_insensitive: bool) -> bool {
+    for pattern in patterns {
+      if self.pattern_match(pattern, case_insensitive) {
+         return true;
+      }
+    }
+    false
+  }
+
+  /// Matches one or more of the patterns in case-insensitive mode
+  /// with an array of str patterns
+  fn pattern_match_any_ci(&self, patterns: &[&str]) -> bool {
+    self.pattern_match_any(patterns, true)
+  }
+
+  /// Matches one or more of the patterns in case-sensitive mode
+  /// with an array of str patterns
+  fn pattern_match_any_cs(&self, patterns: &[&str]) -> bool {
+    self.pattern_match_any(patterns, false)
+  }
+
+  /// Matches one or more of the patterns with case-insensitive flag
+  /// e.g. (r#"a[ck]"#, true) => matches "ac" or "ak" whether upper, lower or mixed case
+  /// with an array of tuples (pattepattern_match_many_cirn, replacement, case_insensitive)
+  fn pattern_match_any_mixed(&self, pattern_sets: &[(&str, bool)]) -> bool {
+    for pair in pattern_sets {
+      let (pattern, case_insensitive) = *pair;
+      if self.pattern_match(pattern, case_insensitive) {
+         return true;
+      }
+    }
+    false
+  }
+
+  /// Matches one or more of the patterns with positivity condition and case-insensitive flag
+  fn pattern_match_any_conditional(&self, pattern_sets: &[(bool, &str, bool)]) -> bool {
+    for pattern_set in pattern_sets {
+      let (is_positive, pattern, case_insensitive) = *pattern_set;
+      let is_matched = self.pattern_match(pattern, case_insensitive);
+      if is_matched == is_positive {
+         return true;
+      }
+    }
+    false
+  }
+}
+
+impl PatternReplaceMany for Vec<String> {
   fn pattern_replace_sets(&self, replacement_sets: &[(&str, &str, bool)]) -> Vec<String> {
     let mut return_strings = self.clone();
     for replacement_set in replacement_sets {
@@ -631,6 +868,17 @@ impl PatternMatchMany for Vec<String> {
     for replacement_pair in replacement_pairs {
       let (pattern, replacement) = *replacement_pair;
       if let Ok(new_string) = return_strings.pattern_replace_result(pattern, replacement, false) {
+        return_strings = new_string;
+      }
+    }
+    return_strings
+  }
+
+  fn pattern_replace_pairs_ci(&self, replacement_pairs: &[(&str, &str)]) -> Vec<String> {
+    let mut return_strings = self.clone();
+    for replacement_pair in replacement_pairs {
+      let (pattern, replacement) = *replacement_pair;
+      if let Ok(new_string) = return_strings.pattern_replace_result(pattern, replacement, true) {
         return_strings = new_string;
       }
     }

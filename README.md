@@ -7,8 +7,8 @@ The library provides a number of utility methods to split strings into vectors o
 ```rust
 
 fn is_valid_time_string(input: &str) -> bool {
-  let regex_str = r#"^[012]\d?:[0-5]\d(:[0-5]\d)?$"#;
-  let re = Regex::new(&regex_str);
+  let time_format_pattern = r#"^([01]\d|2[0-3])?:[0-5]\d(:[0-5]\d)?$"#;
+  let re = Regex::new(time_format_pattern);
   if let Ok(is_matched) =  re.is_match(input) {
     is_matched
   } else {
@@ -20,7 +20,7 @@ fn is_valid_time_string(input: &str) -> bool {
 ##### with the string-patterns library
 ```rust
 fn is_valid_time_string(input: &str) -> bool {
-  input.to_string().pattern_match(r#"^\d\d?:\d\d(:\d\d)?$"#)
+  input.pattern_match_cs(r#"^([01]\d|2[0-3])?:[0-5]\d(:[0-5]\d)?$"#)
 }
 ```
 
@@ -43,6 +43,22 @@ fn replace_final_os(input: &str) -> String {
 
 fn replace_final_os(input: &str) -> String {
   input.to_string().pattern_replace_ci(r#"(\w)o\b$"#, "$1um") // case insensitive replacement
+}
+```
+
+##### Simple case-insensitive match on string value
+```rust
+let str_1 = "Dog food";
+if str_1.starts_with_ci("dog") {
+  println!("{} is dog-related", str_1);
+}
+```
+
+##### Simple case-insensitive match on the alphanumeric characters only in a longer string
+```rust
+let str_1 = "Do you spell hip-hop with a hyphen?";
+if str_1.contains_ci_alphanum("hiphop") {
+  println!("{} is hip-hop-related", str_1);
 }
 ```
 
@@ -76,12 +92,12 @@ if let Some(domain) = path_string.to_segment("/", 2) {
 
 ##### Extract the first decimal value as an f64 from a longer string
 ```rust
-const GBP_TO_EUR = 0.83f64;
+const GBP_TO_EURO: f64 = 0.835;
 
-let input_string = "Price £12.50 each".to_string();
-if let Ok(price_gbp) = input_string.to_first_number::<f64>() {
-  // 12.5 as f64, uses the same syntax as parse::<f64>()
-  let price_eur = price_gbp / GBP_TO_EUR;
+let sample_str = "Price £12.50 each".to_string();
+if let Some(price_gbp) = sample_str.to_first_number::<f64>() {
+    let price_eur = price_gbp / GBP_TO_EURO;
+    println!("The price is euros is {:.2}", price_eur);
 }
 ```
 
