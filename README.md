@@ -85,9 +85,10 @@ let new_strings = sample_strings.pattern_replace(pattern, replacement);
 let source_str = "The dying Edmund decides to try to save Lear and Cordelia.".to_string();
   let pattern_replacements = [
     (r#"\bEdmund\b"#, "Edward"),
+    (r#"\bLear\b"#, "Larry")
     (r#"\bCordelia\b"#, "Cecilia")
   ];
-/// Should equal "The dying Edward decides to try to save Lear and Cecilia."
+/// Should equal "The dying Edward decides to try to save Larry and Cecilia."
 let target_str = source_str.pattern_replace_pairs(&pattern_replacements); 
 ```
 
