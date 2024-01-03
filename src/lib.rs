@@ -461,6 +461,7 @@ impl SimpleMatch for str {
 }
 
 
+/// Pattern methods for arrays or vectors only, return vectors of booleans matching each input string
 pub trait PatternMatches {
   /// Returns result with a vector of boolean matches for an array or vector of strings with case-insensitive flag
   /// or an error if the regex does not compile
