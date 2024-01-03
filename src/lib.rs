@@ -5,32 +5,47 @@ use std::str::FromStr;
 use regex::*;
 use utils::*;
 
+/// Core regular expression match methods
 pub trait PatternMatch {
-  /// Apply a regular expression match on the current String-like object
+  /// Apply a regular expression match on the current string
   /// If the regex doesn't compile it will return an error
-  /// 
   fn pattern_match_result(&self, pattern: &str, case_insensitive: bool) -> Result<bool, Error>;
 
+  /// Apply a regular expression match on the current string with a boolean case_insensitive flag
+  /// NB: If the regex doesn't compile it will return false
   fn pattern_match(&self, pattern: &str, case_insensitive: bool) -> bool;
 
+  /// Apply a regular expression match on the current string in case-insensitive mode
+  /// NB: If the regex doesn't compile it will return false
   fn pattern_match_ci(&self, pattern: &str) -> bool;
 
+  /// Apply a regular expression match on the current string in case-sensitive mode
+  /// NB: If the regex doesn't compile it will return false
   fn pattern_match_cs(&self, pattern: &str) -> bool;
 
 }
 
 /// Core regular expression replacement methods 
 pub trait PatternReplace {
+  /// Apply a regular expression match on the current string with a boolean case_insensitive flag
+  /// NB: If the regex doesn't compile it will return an Error, otherwise in Ok result.
   fn pattern_replace(&self, pattern: &str, replacement: &str, case_insensitive: bool) -> Self where Self:Sized;
 
+  /// Replace all matches of the pattern within a longer text with a boolean case_insensitive flag
+  /// If the regex fails, nothing will be replaced
   fn pattern_replace_result(&self, pattern: &str, replacement: &str,case_insensitive: bool) -> Result<Self, Error> where Self:Sized;
 
+  /// Replace all matches of the pattern within a longer text in case-insensitive mode
+  /// If the regex fails, nothing will be replaced
   fn pattern_replace_ci(&self, pattern: &str, replacement: &str) -> Self where Self:Sized;
 
+  /// Replace all matches of the pattern within a longer text in case-sensitive mode
+  /// If the regex fails, nothing will be replaced
   fn pattern_replace_cs(&self, pattern: &str, replacement: &str) -> Self where Self:Sized;
 
 }
 
+/// Set of methods to strip unwanted characters by type or extract vectors of numeric strings, integers or floats
 pub trait StripCharacters {
 
   /// Removes all characters that any are not letters or digits, such as punctuation or symobols
@@ -121,6 +136,10 @@ impl IsNumeric for String {
   }
 }
 
+/// Methods to split a longer strong on a separator and return a vector of strings,
+/// a tuple of two strings or single optional string segment
+/// Note some methods may return empty segments in the case of leading, trailing or repeated separators
+/// See notes below
 pub trait ToSegments {
 
   /// Extract a vector of non-empty strings from a string-like object with a given separator
@@ -178,6 +197,7 @@ impl<T: ToString> ToStrings for Vec<T> {
 }
 
 impl<T: ToString> ToStrings for [T] {
+  /// Converts arrays or vectors of strs to a vector of owned strings
   fn to_strings(&self) -> Vec<String> {
       self.into_iter().map(|s| s.to_string()).collect::<Vec<String>>()
   }
@@ -185,11 +205,14 @@ impl<T: ToString> ToStrings for [T] {
 
 /// Return the indices of all ocurrences of a character
 pub trait MatchOccurrences {
+  /// Return the indices only of all matches of a given string pattern (not a regular expression)
+  /// Builds on match_indices in the Rust standard library
   fn find_matched_indices(&self, pat: &str) -> Vec<usize>;
 }
 
 
 impl MatchOccurrences for String {
+    /// Return the indices only of all matches of a given regular expression
   fn find_matched_indices(&self, pat: &str) -> Vec<usize> {
     self.match_indices(pat).into_iter().map(|pair| pair.0).collect::<Vec<usize>>()
   }
@@ -241,9 +264,8 @@ impl PatternMatch for str {
 
 
 impl PatternReplace for String {
-  ///
-  /// Optional regex-enabledd replace method that will return None if the regex fails
-  /// 
+  
+  /// Regex-enabled replace method that will return an OK String result if successful and an error if the regex fails
   fn pattern_replace_result(&self, pattern: &str, replacement: &str, case_insensitive: bool) -> Result<String, Error> {
     match build_regex(pattern, case_insensitive) {
       Ok(re) => Ok(re.replace_all(self, replacement).to_string()),
@@ -251,23 +273,19 @@ impl PatternReplace for String {
     }
   }
 
-  ///
-  /// Simple regex-enabledd replace method that will return the same string if the regex fails
-  /// 
+  /// Simple regex-enabled replace method that will return the same string if the regex fails
   fn pattern_replace(&self, pattern: &str, replacement: &str, case_insensitive: bool) -> String {
     self.pattern_replace_result(pattern, replacement, case_insensitive).unwrap_or(self.to_owned())
   }
 
-  ///
-  /// Simple case-insensitive regex-enabledd replace method that will return the same string if the regex fails
-  /// 
+
+  /// Simple case-insensitive regex-enabled replace method that will return the same string if the regex fails
   fn pattern_replace_ci(&self, pattern: &str, replacement: &str) -> String {
     self.pattern_replace(pattern, replacement, true)
   }
 
-  ///
-  /// Simple case-sensitive regex-enabledd replace method that will return the same string if the regex fails
-  /// 
+
+  /// Simple case-sensitive regex-enabled replace method that will return the same string if the regex fails
   fn pattern_replace_cs(&self, pattern: &str, replacement: &str) -> String {
     self.pattern_replace(pattern, replacement, false)
   }
@@ -276,11 +294,12 @@ impl PatternReplace for String {
 
 impl StripCharacters for String {
     
-
+  /// Remove all characters that are not letters or numerals for later string comparison. Does not use a regular expression
   fn strip_non_alphanum(&self) -> String {
     self.chars().into_iter().filter(|c| c.is_alphanumeric()).collect::<String>()
   }
 
+  /// Remove all characters that are not numerals for later string comparison. Does not use a regular expression
   fn strip_non_digits(&self) -> String {
     self.chars().into_iter().filter(|c| c.is_digit(10)).collect::<String>()
   }
@@ -486,7 +505,8 @@ impl PatternMatch for [String] {
 
 impl PatternMatches for [String] {
 
-
+  /// Returns an Ok result with a vector of boolean matches for an array or vector of strings with a case-insensitive flag
+  /// and an error only if the regex fails to compile.
   fn pattern_matches_result(&self, pattern: &str, case_insensitive: bool) -> Result<Vec<bool>, Error> {
     match build_regex(pattern, case_insensitive) {
       Ok(re) => Ok(self.into_iter().map(|segment| re.is_match(segment)).collect::<Vec<bool>>()),
