@@ -39,7 +39,7 @@ fn is_valid_time_string(input: &str) -> bool {
 
 fn replace_final_os(input: &str) -> String {
   let regex_str = r#"(\w)o\b"#;
-  if let Ok(re) = Regex::new(&regex_str) {
+  if let Ok(re) = Regex::new(regex_str) {
     re.replace_all(input, "${1}um").to_string()
   } else {
     input.to_string()
