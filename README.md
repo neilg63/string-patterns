@@ -96,7 +96,7 @@ let target_str = source_str.pattern_replace_pairs(&pattern_replacements);
 ```rust
 let path_string = "/var/www/mysite.com/web/uploads".to_string();
 if let Some(domain) = path_string.to_segment("/", 2) {
-  println!("The site name is: {}". domain); // "mysite.com" is an owned string
+  println!("The site name is: {}", domain); // "mysite.com" is an owned string
 }
 ```
 
