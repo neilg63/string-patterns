@@ -149,5 +149,22 @@ if source_str.match_words_by_proximity("lions?", "cats?", -20, 20, true) {
 }
 ```
 
+### Traits
+
+- **CharGroupMatch**:	Methods to validate strings with character classes
+- **IsNumeric**	Method to check if the string may be parsed to an integer or float
+- **MatchOccurrences**:	Return the indices of all ocurrences of a character
+- **PatternMatch**	Core regular expression match methods
+- **PatternMatchMany**:	Provides methods to match with multiple patterns expressed as arrays of tuples or simple strs
+- **PatternMatches**:	Pattern methods for arrays or vectors only, return vectors of booleans matching each input string
+- **PatternReplace**:	Core regular expression replacement methods
+- **PatternReplaceMany**:	Provides methods to replace with multiple patterns expressed as arrays of tuples
+- **MatchWord**: Has convenience methods to match words with various word boundary rules. New to 0.2.0
+- **PatternCapture**: Returns captures or vectors of each match, whether overlapping or not and to return counts of matching patterns or words. New to version 0.2.0
+- **SimpleMatch**:	Regex-free matcher methods for common use cases
+- **StripCharacters**:	Set of methods to strip unwanted characters by type or extract vectors of numeric strings, integers or floats
+- **ToSegments**:	Methods to split a longer strong on a separator and return a vector of strings, a tuple of two strings or single optional string segment Note some methods may return empty segments in the case of leading, trailing or repeated separators See notes below
+- **ToStrings**:	Converts arrays or vectors of strs to a vector of owned strings
+
 NB: Although I've used the library methods in three of my commercial projects, this crate is very much in its alpha stage as I evaluate
 which of the many auxiliary methods, not documented here, belong in this library. Version updates in the 0.1.x series reflect mainly corrections to this file.
