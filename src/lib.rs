@@ -779,6 +779,7 @@ impl PatternReplaceMany for String {
 /// Implement PatternMatchMany for vectors of strings.
 impl PatternMatchMany for [String] {
 
+  /// Match all from an array of strs with a boolean case_insensitive parameter
   fn pattern_match_many(&self, patterns: &[&str], case_insensitive: bool) -> bool {
     let mut num_matched = 0usize;
     let num_patterns = patterns.len();
@@ -790,14 +791,17 @@ impl PatternMatchMany for [String] {
     num_matched == num_patterns
   }
 
+  /// Match all from an array of strs with a in case-insensitive mode
   fn pattern_match_many_ci(&self, patterns: &[&str]) -> bool {
     self.pattern_match_many(patterns, true)
   }
 
+  /// Match all from an array of strs with a in case-sensitive mode
   fn pattern_match_many_cs(&self, patterns: &[&str]) -> bool {
     self.pattern_match_many(patterns, false)
   }
 
+  /// Match all from an array of tuples of strs and boolean case_insensitive flags
   fn pattern_match_many_mixed(&self, pattern_sets: &[(&str, bool)]) -> bool {
     let mut num_matched = 0usize;
     let num_patterns = pattern_sets.len();
@@ -810,6 +814,8 @@ impl PatternMatchMany for [String] {
     num_matched == num_patterns
   }
 
+  /// Match all from an array of tuples of boolean positive, strs and boolean case_insensitive flags
+  /// Will check of each pattern is or is not matched with mixed case-sensitity rules
   fn pattern_match_many_conditional(&self, pattern_sets: &[(bool, &str, bool)]) -> bool {
     let mut num_matched = 0usize;
     let num_patterns = pattern_sets.len();
@@ -872,7 +878,10 @@ impl PatternMatchMany for [String] {
   }
 }
 
+/// ReplaceMany implementation for vectors of owned strings
 impl PatternReplaceMany for Vec<String> {
+
+  /// Replace all matched patterns with mixed case-sensitivity flags, expressed as tuples of (pattern: &str, replacement: &str, case_insensitive: bool)
   fn pattern_replace_sets(&self, replacement_sets: &[(&str, &str, bool)]) -> Vec<String> {
     let mut return_strings = self.clone();
     for replacement_set in replacement_sets {
@@ -884,6 +893,8 @@ impl PatternReplaceMany for Vec<String> {
     return_strings
   }
 
+  /// Replace all matched patterns in case-sensitive mode (unless defined in the pattern via (?i)),
+  /// expressed as tuples of (pattern: &str, replacement: &str)
   fn pattern_replace_pairs(&self, replacement_pairs: &[(&str, &str)]) -> Vec<String> {
     let mut return_strings = self.clone();
     for replacement_pair in replacement_pairs {
@@ -895,6 +906,8 @@ impl PatternReplaceMany for Vec<String> {
     return_strings
   }
 
+  /// Replace all matched patterns in case-insensitive,
+  /// expressed as tuples of (pattern: &str, replacement: &str)
   fn pattern_replace_pairs_ci(&self, replacement_pairs: &[(&str, &str)]) -> Vec<String> {
     let mut return_strings = self.clone();
     for replacement_pair in replacement_pairs {
@@ -907,6 +920,7 @@ impl PatternReplaceMany for Vec<String> {
   }
 }
 
+/// Implement string segment split and capture method for String
 impl ToSegments for String {
 
   /// Splits a string on the exact separator, whether initial, final or repeated.

@@ -51,7 +51,7 @@ fn replace_final_os(input: &str) -> String {
 ```rust
 
 fn replace_final_os(input: &str) -> String {
-  input.to_string().pattern_replace_ci(r#"(\w)o\b$"#, "$1um") // case insensitive replacement
+  input.to_string().pattern_replace_ci(r#"(\w)o\b"#, "${1}um") // case-insensitive replacement
 }
 ```
 
@@ -76,19 +76,20 @@ if str_1.contains_ci_alphanum("hiphop") {
 let sample_strings = ["apples", "bananas", "carrots", "dates"].to_strings(); /// cast to vector of owned strings
 let pattern = r#"a([pr])"#;
 let replacement = "æ$1";
-let new_strings = sample_strings.pattern_replace(pattern, replacement);
+// With arrays or vectors the regex need only be compiled once
+let new_strings = sample_strings.pattern_replace_ci(pattern, replacement); // case-insensitive replacement
 /// should yield the strings "æpples", "bananas", "cærrots", "dates"
 ```
 
 ##### Replace multiple pattern/replacement pairs 
 ```rust
-let source_str = "The dying Edmund decides to try to save Lear and Cordelia.".to_string();
+let source_str = "The dying King Edmund decides to try to save Lear and Cordelia.".to_string();
   let pattern_replacements = [
     (r#"\bEdmund\b"#, "Edward"),
     (r#"\bLear\b"#, "Larry")
     (r#"\bCordelia\b"#, "Cecilia")
   ];
-/// Should equal "The dying Edward decides to try to save Larry and Cecilia."
+/// Should equal "The dying King Edward decides to try to save Larry and Cecilia."
 let target_str = source_str.pattern_replace_pairs(&pattern_replacements); 
 ```
 
