@@ -223,3 +223,19 @@ fn test_strip_non_numeric() {
   let input_text = "Il furgone pesa 1.500kg".to_string();
   assert_eq!(input_text.to_first_number_euro::<u32>().unwrap_or(0), 1500);
 }
+
+#[test]
+fn test_match_word() {
+  let source_str = "Lions are unique among cats in that they live in a group or pride.";
+  let target_word = "lions?"; // optional s at the end
+  assert!(source_str.match_word_ci(target_word));
+  // check if ythe above numbers parse successfully to numbers
+  assert!(source_str.match_word_start_ci("uniq"));
+
+  assert!(source_str.match_word_end_ci("nique"));
+
+  assert!(source_str.match_word_bounds("cat", WordBounds::Both, true));
+
+  // lion and cat must occur within 20 letters of each other
+  assert!(source_str.match_words_by_proximity("lion", "cat", -20, 20, true));
+}

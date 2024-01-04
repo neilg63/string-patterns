@@ -5,6 +5,28 @@ use std::str::FromStr;
 use regex::*;
 use utils::*;
 
+/// Defines the start, end and both bounds of a word
+pub enum WordBounds {
+  Start,
+  End,
+  Both,
+}
+
+impl WordBounds {
+  /// Convert word bounds 
+  pub fn to_pattern(&self, word: &str) -> String {
+    match self {
+      WordBounds::Start => [r#"\b"#, word].concat(),
+      WordBounds::End => [word, r#"\b"#].concat(),
+      WordBounds::Both => [r#"\b"#, word, r#"\b"#].concat(),
+    }
+  }
+}
+
+fn build_word_pattern(word: &str, bounds: WordBounds) -> String {
+  bounds.to_pattern(word)
+}
+
 /// Core regular expression match methods
 pub trait PatternMatch {
   /// Apply a regular expression match on the current string
@@ -1068,4 +1090,271 @@ impl ToSegments for String {
     }
   }
 
+}
+
+
+/// Set of methods to capture groups or match objects derived from Regex::captures.
+pub trait PatternCapture {
+
+  /// Yields an option with Regex::Captures as returned from re.captures, Accepts a boolean case_insensitive flag
+  fn pattern_captures(&self, pattern: &str, case_insensitive: bool) -> Option<Captures>;
+
+  /// Yields a vector of Match objects with start and end index + the captured string. Accepts a boolean case_insensitive flag
+  fn pattern_matches_vec(&self, pattern: &str, case_insensitive: bool) -> Vec<Match>;
+
+  /// Yields a option with first match object if available with a boolean case_insensitive flag
+  fn pattern_first_match(&self, pattern: &str, case_insensitive: bool) -> Option<Match>;
+
+  /// Yields a option with last match object if available with a boolean case_insensitive flag
+  fn pattern_last_match(&self, pattern: &str, case_insensitive: bool) -> Option<Match>;
+
+  /// returns an option with a pair of match objects
+  /// If there is only one match the match objects will have the same indices
+  fn pattern_first_last_matches(&self, pattern: &str, case_insensitive: bool) -> Option<((Match, Match))>;
+
+  /// Yields an option with an unsigned integer for the index of the start of the first match
+  /// with a boolean case_insensitive flag
+  fn pattern_first_index(&self, pattern: &str, case_insensitive: bool) -> Option<usize>;
+
+  /// Yields an option with an unsigned integer for the index of the end of the first match
+  /// with a boolean case_insensitive flag
+  fn pattern_first_end_index(&self, pattern: &str, case_insensitive: bool) -> Option<usize>;
+
+  /// Yields an option with an unsigned integer for the index of the start of the last match
+  /// with a boolean case_insensitive flag
+  fn pattern_last_start_index(&self, pattern: &str, case_insensitive: bool) -> Option<usize>;
+
+  /// Yields an option with an unsigned integer for the index of the end of the last match
+  /// with a boolean case_insensitive flag
+  fn pattern_last_index(&self, pattern: &str, case_insensitive: bool) -> Option<usize>;
+
+  // Counts the number of matches with a boolean case_insensitive flag
+  fn pattern_count(&self, pattern: &str, case_insensitive: bool) -> usize;
+}
+
+impl PatternCapture for str {
+
+  // Yields an option with Regex::Captures as returned from re.captures, Accepts a boolean case_insensitive flag
+  fn pattern_captures(&self, pattern: &str, case_insensitive: bool) -> Option<Captures> {
+    if let Ok(re) = build_regex(pattern, case_insensitive) {
+      re.captures(self)
+    } else {
+      None
+    }
+  }
+
+  /// Yields a vector of Match objects with start and end index + the captured string. Accepts a boolean case_insensitive flag
+  fn pattern_matches_vec(&self, pattern: &str, case_insensitive: bool) -> Vec<Match> {
+    if let Ok(re) = build_regex(pattern, case_insensitive) {
+      if let Some(results) = re.captures(self) {
+        results.iter().filter(|c| c.is_some()).map(|c| c.unwrap()).collect::<Vec<Match>>()
+      } else {
+        vec![]
+      }
+    } else {
+      vec![]
+    }
+  }
+
+  /// Yields a option with first match object if available with a boolean case_insensitive flag
+  fn pattern_first_match(&self, pattern: &str, case_insensitive: bool) -> Option<Match> {
+    let matched_segments = self.pattern_matches_vec(pattern, case_insensitive);
+    if let Some(first) = matched_segments.get(0) {
+      Some(*first)
+    } else {
+      None
+    }
+  }
+
+  /// Yields a option with last match object if available with a boolean case_insensitive flag
+  fn pattern_last_match(&self, pattern: &str, case_insensitive: bool) -> Option<Match> {
+    let matched_segments = self.pattern_matches_vec(pattern, case_insensitive);
+    if let Some(last) = matched_segments.last() {
+      Some(*last)
+    } else {
+      None
+    }
+  }
+
+  /// returns an option with a pair of match objects
+  /// If there is only one match the match objects will have the same indices
+  fn pattern_first_last_matches(&self, pattern: &str, case_insensitive: bool) -> Option<(Match, Match)> {
+    let matched_segments = self.pattern_matches_vec(pattern, case_insensitive);
+    if let Some(first) = matched_segments.get(0) {
+      if let Some(last) = matched_segments.last() {
+        return Some((*first, *last));
+      }
+    }
+    None
+  }
+
+  /// Yields an option with an unsigned integer for the index of the start of the last match
+  /// with a boolean case_insensitive flag
+  fn pattern_first_index(&self, pattern: &str, case_insensitive: bool) -> Option<usize> {
+    if let Some(first) = self.pattern_first_match(pattern, case_insensitive) {
+      Some(first.start())
+    } else {
+      None
+    }
+  }
+
+  /// Yields an option with an unsigned integer for the index of the end of the first match
+  /// with a boolean case_insensitive flag
+  fn pattern_first_end_index(&self, pattern: &str, case_insensitive: bool) -> Option<usize> {
+    if let Some(first) = self.pattern_first_match(pattern, case_insensitive) {
+      Some(first.end())
+    } else {
+      None
+    }
+  }
+
+  /// Yields an option with an unsigned integer for the index of the start of the last match
+  /// with a boolean case_insensitive flag
+  fn pattern_last_start_index(&self, pattern: &str, case_insensitive: bool) -> Option<usize> {
+    if let Some(first) = self.pattern_first_match(pattern, case_insensitive) {
+      Some(first.start())
+    } else {
+      None
+    }
+  }
+
+  // Yields an option with an unsigned integer for the index of the end of the last match
+  /// with a boolean case_insensitive flag
+  fn pattern_last_index(&self, pattern: &str, case_insensitive: bool) -> Option<usize> {
+    if let Some(first) = self.pattern_first_match(pattern, case_insensitive) {
+      Some(first.end())
+    } else {
+      None
+    }
+  }
+
+  // Counts the number of matches with a boolean case_insensitive flag
+  fn pattern_count(&self, pattern: &str, case_insensitive: bool) -> usize {
+    self.pattern_matches_vec(pattern, case_insensitive).len()
+  }
+
+}
+
+
+pub trait MatchWord {
+
+  /// Match a word with bounds options and case_insensitive flag
+  fn match_word_bounds(&self, word: &str, bounds: WordBounds, case_insensitive: bool) -> bool;
+
+  /// Match a whole word with a case_insensitive flag
+  fn match_word(&self, word: &str, case_insensitive: bool) -> bool;
+
+  /// Match from the start of a word with a case_insensitive flag
+  fn match_word_start(&self, word: &str, case_insensitive: bool) -> bool;
+
+  /// Match to the end of a word with a case_insensitive flag
+  fn match_word_end(&self, word: &str, case_insensitive: bool) -> bool;
+
+  /// Match a whole word in case-insensitive mode
+  fn match_word_ci(&self, word: &str) -> bool;
+
+  /// Match from the start of a word in case-insensitive mode
+  fn match_word_start_ci(&self, word: &str) -> bool;
+
+  /// Match to the end of a word in case-insensitive mode
+  fn match_word_end_ci(&self, word: &str) -> bool;
+
+  /// Match a whole word in case-sensitive mode
+  fn match_word_cs(&self, word: &str) -> bool;
+
+  /// Match from the start of a word in case-sensitive mode
+  fn match_word_start_cs(&self, word: &str) -> bool;
+
+  /// Match to the end of a word in case-sensitive mode
+  fn match_word_end_cs(&self, word: &str) -> bool;
+
+  /// Match a word pair by min and max proximity, where a negative min value implies before the end of the first word
+  fn match_words_by_proximity(&self, first: &str, second: &str, min: i16, max: i16, case_insensitive: bool) -> bool;
+}
+
+impl MatchWord for str {
+
+  /// Match a word with bounds options and case_insensitive flag
+  fn match_word_bounds(&self, word: &str, bounds: WordBounds, case_insensitive: bool) -> bool {
+    let word_pattern = bounds.to_pattern(word);
+    self.pattern_match(&word_pattern, case_insensitive)
+  }
+
+  /// Case-conditional match of a whole word
+  /// To match only the start or end, use the start and end methods or expand the pattern with \w* at either end
+  fn match_word(&self, word: &str, case_insensitive: bool) -> bool {
+    let word_pattern = build_word_pattern(word, WordBounds::Both);
+    self.pattern_match(&word_pattern, case_insensitive)
+  }
+
+  /// Case-conditional match from the start of a word boundary
+  fn match_word_start(&self, word: &str, case_insensitive: bool) -> bool {
+    let word_pattern = build_word_pattern(word, WordBounds::Start);
+    self.pattern_match(&word_pattern, case_insensitive)
+  }
+
+  /// Case-conditional match to the end of a word boundary
+  fn match_word_end(&self, word: &str, case_insensitive: bool) -> bool {
+    let word_pattern = build_word_pattern(word, WordBounds::End);
+    self.pattern_match(&word_pattern, case_insensitive)
+  }
+
+  /// Case-insensitive whole word match, for words with optional hyphens use -?, e.g. hip-?hop matches hip-hop and hiphop, but not hip-hopping
+  /// To match only the start or end, use the start and end methods or expand the pattern with \w* at either end
+  fn match_word_ci(&self, word: &str) -> bool {
+    self.match_word(word, true)
+  }
+
+  /// Case-insensitive match from the start of a word boundary
+  fn match_word_start_ci(&self, word: &str) -> bool {
+    self.match_word_start(word, true)
+  }
+
+  /// Case-insensitive match to the end of a word boundary
+  fn match_word_end_ci(&self, word: &str) -> bool {
+    self.match_word_end(word, true)
+  }
+
+  /// Case-sensitive whole word match, for words with optional hyphens use -?, e.g. hip-?hop matches hip-hop and hiphop, but not hip-hopping
+  /// To match only the start or end, use the start and end methods or expand the pattern with \w* at either end
+  fn match_word_cs(&self, word: &str) -> bool {
+    self.match_word(word, false)
+  }
+
+  /// Case-sensitive match from the start of a word boundary
+  fn match_word_start_cs(&self, word: &str) -> bool {
+    self.match_word_start(word, false)
+  }
+
+  /// Case-sensitive match to the end of a word boundary
+  fn match_word_end_cs(&self, word: &str) -> bool {
+    self.match_word_end(word, false)
+  }
+
+  /// Check if whole word patterns occur in close proximity as defined by their min and max values
+  /// If the second word may occur before the first the min value should negative
+  /// The distance between the end of the first and start of the second word is measured
+  fn match_words_by_proximity(&self, first: &str, second: &str, min: i16, max: i16, case_insensitive: bool) -> bool {
+    let word_pattern_1 = build_word_pattern(first, WordBounds::Both);
+    let word_pattern_2 = build_word_pattern(second, WordBounds::Both);
+    if let Some((first_first,first_last)) = self.pattern_first_last_matches(&word_pattern_1, case_insensitive) {
+      if let Some((second_first, second_last)) = self.pattern_first_last_matches(&word_pattern_2, case_insensitive) {
+        let diff_i64 = second_last.start() as i64 - first_first.end() as i64;
+        // although indices are usize and convert to i64 for negative values, only consider differences in i16 range (-32768 to 32767)
+        // which suffices for text proximity matches
+        if diff_i64 >= i16::MIN as i64 && diff_i64 <= i16::MAX as i64 {
+          let diff = diff_i64 as i16;
+          return diff >= min && diff <= max;
+        } else if min < 0 {
+          // reverse match logic if negative min offsets are allowed
+          let diff_2_i64 = first_last.start() as i64 - second_first.end() as i64;
+          if diff_2_i64 >= i16::MIN as i64 && diff_2_i64 <= i16::MAX as i64 {
+            let diff_2 = diff_i64 as i16;
+            return diff_2 >= min && diff_2 <= max;
+          }
+        }
+      }
+    }
+    false
+  }
 }

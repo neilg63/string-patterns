@@ -86,7 +86,7 @@ let new_strings = sample_strings.pattern_replace_ci(pattern, replacement); // ca
 let source_str = "The dying King Edmund decides to try to save Lear and Cordelia.".to_string();
   let pattern_replacements = [
     (r#"\bEdmund\b"#, "Edward"),
-    (r#"\bLear\b"#, "Larry")
+    (r#"\bLear\b"#, "Larry"),
     (r#"\bCordelia\b"#, "Cecilia")
   ];
 /// Should equal "The dying King Edward decides to try to save Larry and Cecilia."
