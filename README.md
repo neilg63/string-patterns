@@ -6,9 +6,9 @@
 
 This library makes it easier to validate and manipulate strings in Rust. It builds on Rust's standard library with help from the default regular expression library, *regex*. It has no other dependencies. It aims to make working with strings as easy in Rust as it is Javascript or Python with cleaner syntax and without unduly compromising performance if used sparingly alongside simpler string matching functions such as starts_with, contains or ends_with. To this end, I added methods such as *starts_with_ci* and *starts_with_ci_alphanum* for basic string validation without regular expressions. 
 
-The library provides a number of utility methods to split strings into vectors of strings or a head and tail components and to extract valid numbers from longer texts.
+The library provides a number of utility methods to split strings into vectors of strings or a head and tail components and to extract valid numbers from longer texts. Version 0.2.0 has extra methods for capture and match objects to facilitate to advanced text processing;
 
-I added variant match and replace methods with _ci (case-insensitive) or _cs (case-sensitive) suffixes as shorthand for the equivalent plain methods that require a boolean *case_insensitive* parameter. In case-insensitive mode the non-capturing /(?i)/ flag is prepended automatically. This will not be prepended if you add another non-capturing group at the start of your regex. In every other way, the pattern-prefixed methods act as wrappers for the equivalent *re.is_match* and *re.replace_all* methods in the Regex library and should cover most common uses cases for regular expressions.
+I added variant match and replace methods with _ci (case-insensitive) or _cs (case-sensitive) suffixes as shorthand for the equivalent plain methods that require a boolean *case_insensitive* parameter. In case-insensitive mode the non-capturing /(?i)/ flag is prepended automatically. This will not be prepended if you add another non-capturing group at the start of your regex. In every other way, the pattern-prefixed methods act as wrappers for the equivalent *re.is_match*, *re.replace_all*, *re.find* and *re.capture_iter* methods in the Regex library and should cover most common uses cases for regular expressions.
 
 Most of the *match* methods will work on *&str* and *String*, while the replacement methods are only implemented for *owned strings*. Likewise, match methods are implemented for arrays and vectors of strings, while replacement methods are only implemented for vectors of *owned strings*;
 
@@ -71,6 +71,24 @@ if str_1.contains_ci_alphanum("hiphop") {
 }
 ```
 
+##### Extract the first match from a string
+```rust
+let str_1 = "The park has many lions, spotted hyenas, leopards, rhinoceroses, hippopotamuses, giraffes, cheetahs and baboons";
+if let Some(matched_item) = str_1.pattern_first_match(r#"\bspotted\s+\w+\b"#) {
+  println!("`{}` occurs between positions {} and {}", matched_item.as_str(), matched_item.start(), matched_item.end());
+}
+```
+
+##### Count matches of a pattern
+```rust
+let sample_text = r#"Humpty Dumpty sat on a wall,
+          Humpty Dumpty had a great fall
+          All the king's horses and all the king's men
+          Couldn't put Humpty together again."#;
+  let sample_word = "humpty";
+  println!("{} occurs {} in the above text", sample_word, sample_text.count_word("humpty", true) )
+```
+
 ##### Replace text in a vector of strings
 ```rust
 let sample_strings = ["apples", "bananas", "carrots", "dates"].to_strings(); /// cast to vector of owned strings
@@ -119,6 +137,15 @@ let sample_str = "Price £12.50 each".to_string();
 if let Some(price_gbp) = sample_str.to_first_number::<f64>() {
     let price_eur = price_gbp / GBP_TO_EURO;
     println!("The price is euros is {:.2}", price_eur);
+}
+```
+
+##### Test the proximity of two words
+```rust
+let source_str = "Lions are unique among cats in that they live in a group or pride.";
+// Do the words 'lion(s)' and 'cat(s)' occur within 20 characters of each other?
+if source_str.match_words_by_proximity("lions?", "cats?", -20, 20, true) {
+  println!("This sentence mentions lions in the context of cats");
 }
 ```
 

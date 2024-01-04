@@ -229,13 +229,48 @@ fn test_match_word() {
   let source_str = "Lions are unique among cats in that they live in a group or pride.";
   let target_word = "lions?"; // optional s at the end
   assert!(source_str.match_word_ci(target_word));
-  // check if ythe above numbers parse successfully to numbers
+  // check if the above numbers parse successfully to numbers
   assert!(source_str.match_word_start_ci("uniq"));
 
   assert!(source_str.match_word_end_ci("nique"));
 
-  assert!(source_str.match_word_bounds("cat", WordBounds::Both, true));
+  assert!(source_str.match_word_bounds("cats", WordBounds::Both, true));
 
   // lion and cat must occur within 20 letters of each other
-  assert!(source_str.match_words_by_proximity("lion", "cat", -20, 20, true));
+  assert!(source_str.match_words_by_proximity("lions", "cats", -20, 20, true));
+}
+
+#[test]
+fn test_match_count() {
+  let long_text = r#"Newborn cubs are helpless and blind and have a thick coat with dark spots that usually disappear with maturity.
+      Cubs are able to follow their mothers at about three months of age and are weaned by six or seven months.
+      They begin participating in kills by 11 months but probably cannot survive on their own until they are two years old. 
+      Although lionesses will nurse cubs other than their own, 
+      they are surprisingly inattentive mothers and often leave their cubs alone for up to 24 hours."#;
+  assert_eq!(long_text.count_pattern(r#"\s\d\d\b"#, false), 2); // two-digit numerals
+  assert_eq!(long_text.count_word("cubs?", true), 4); // occurrences of cub or cubs with any upper, lower or mixed case letters
+  // check if the above numbers parse successfully to numbers
+
+  let sample_text = r#"Humpty Dumpty sat on a wall,
+          Humpty Dumpty had a great fall
+          All the king's horses and all the king's men
+          Couldn't put Humpty together again."#;
+   assert_eq!(sample_text.count_word("humpty", true), 3);
+  
+}
+
+#[test]
+fn test_first_match_count() {
+  let sample_text = r#"Lionesses living in open savanna do most of the hunting, whereas males typically appropriate their meals from the female’s kills"#;
+  
+  // Method return full details of teh first match for subsequent manipulation
+  let matched_item = sample_text.pattern_first_match(r#"\bsavannah?"#, true);
+  assert_eq!(matched_item.unwrap().start(), 25); // The first occurence should start at position 25
+
+  // convenience method if only need the end index of the first match
+  let first_end_index = sample_text.pattern_first_end_index(r#"\bsavannah?"#, true);
+  assert_eq!(first_end_index.unwrap(), 32); // The first occurence should end at position 30
+  
+  // check if the above numbers parse successfully to numbers
+  
 }
