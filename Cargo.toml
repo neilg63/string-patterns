@@ -4,7 +4,7 @@ version = "0.1.9"
 edition = "2021"
 description = "Makes it easier to work with common string patterns and regular expressions in Rust, adding convenient regex match and replace methods (pattern_match and pattern_replace) to the standard String type as well to vectors of strings"
 repository = "https://github.com/neilg63/string-patterns"
-categories = ["strings"]
+categories = ["strings", "parsing"]
 license = "GPL-2.0-or-later WITH Bison-exception-2.2"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
