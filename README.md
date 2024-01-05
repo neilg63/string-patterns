@@ -86,7 +86,7 @@ let sample_text = r#"Humpty Dumpty sat on a wall,
           All the king's horses and all the king's men
           Couldn't put Humpty together again."#;
   let sample_word = "humpty";
-  println!("{} occurs {} in the above text", sample_word, sample_text.count_word("humpty", true) )
+  println!("{} occurs {} times in the above text", sample_word, sample_text.count_word("humpty", true) )
 ```
 
 ##### Replace text in a vector of strings
