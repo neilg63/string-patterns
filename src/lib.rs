@@ -97,7 +97,9 @@ pub trait StripCharacters {
 
   fn to_numbers_euro<T: FromStr>(&self) -> Vec<T>;
 
-  /// Correct number
+  /// Correct numbers to conform to use dots (periods, full-stops) only as decimal separators
+  /// Works only on the first number encountered and used with to_numeric_strings or to_numeric_strings_euro
+  /// to correct multiple numbers in a longer string
   fn correct_numeric_string(&self, enforce_comma_separator: bool) -> Self;
 
   /// Extracts the first valid integer or float from a longer string if present
@@ -225,7 +227,7 @@ impl<T: ToString> ToStrings for [T] {
   }
 }
 
-/// Return the indices of all ocurrences of a character
+/// Return the indices of all ocurrences of a string
 pub trait MatchOccurrences {
   /// Return the indices only of all matches of a given string pattern (not a regular expression)
   /// Builds on match_indices in the Rust standard library
@@ -328,6 +330,7 @@ impl StripCharacters for String {
 
   /// Correct numeric strings with commas as thousand separators or as decimal separators
   /// to a regular format with punctuation only for decimal points before being parsed to an integer or float
+  /// This is best used only with numeric strings as it will strip commas and dots not used as decimal separators
   fn correct_numeric_string(&self, enforce_comma_separator: bool) -> Self {
       let commas = self.find_matched_indices(",");
       let last_comma_index = commas.last().unwrap_or(&0).to_owned();

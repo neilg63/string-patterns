@@ -84,6 +84,19 @@ fn test_segment_match() {
 }
 
 #[test]
+fn test_to_segments() {
+  let path_string = "/var/www/mysite.com/web/uploads/".to_string();
+  // should extract only non-empty segments
+  let segments = path_string.to_segments("/"); 
+  let expected_segments = ["var", "www", "mysite.com", "web", "uploads"].to_strings();
+  assert_eq!(segments, expected_segments);
+  // convert all parts split by a separator whether empty or not
+  let parts = path_string.to_parts("/"); 
+  let expected_parts = ["", "var", "www", "mysite.com", "web", "uploads", ""].to_strings();
+  assert_eq!(parts, expected_parts);
+}
+
+#[test]
 fn test_to_tail() {
   let source_str = "long/path/with-a-long-title/details".to_string();
   let target_str = "long".to_string();
@@ -222,6 +235,26 @@ fn test_strip_non_numeric() {
   // value ambigiuous
   let input_text = "Il furgone pesa 1.500kg".to_string();
   assert_eq!(input_text.to_first_number_euro::<u32>().unwrap_or(0), 1500);
+}
+
+#[test]
+fn test_correct_floats() {
+  let source_str = "Ho pagato 15,00€ per l'ingresso.".to_string();
+  // with numbers that can be corrected parsed and cast to floats
+  let target_str = "Ho pagato 15.00€ per l'ingresso.".to_string(); 
+  // Correct a euro-style number and always interpret commas as decimal separators.
+  assert_eq!(source_str.correct_numeric_string(true), target_str);
+
+  let source_str_2 = "Pesa 1.678 grammi".to_string(); 
+  let target_str_2 = "Pesa 1678 grammi".to_string(); // do not use in longer phrases with commas and dots as punctuation
+  // Correct a euro-style number and always interpret commas as decimal separators.
+  assert_eq!(source_str_2.correct_numeric_string(true), target_str_2);
+
+  let sample_str = "Ho pagato 12,50€ per 1.500 grammi di sale.".to_string();
+  // with numbers that can be corrected parsed and cast to floats
+  let target_numbers = vec![12.5f32, 1500f32]; 
+  // Correct euro-style numbers and convert to 32-bit floats
+  assert_eq!(sample_str.to_numbers_euro::<f32>(), target_numbers);
 }
 
 #[test]
