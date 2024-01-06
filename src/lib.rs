@@ -1590,7 +1590,7 @@ impl ReplaceWord for String {
 
   /// Replace one or pairs of whole words with a boolean case_insensitive flag
   fn replace_words(&self, pairs: &[(&str, &str)], case_insensitive: bool) -> String {
-    let mut output = String::new();
+    let mut output = self.clone();
     for pair in pairs {
       let (word, replacement) = *pair;
       let pattern = build_whole_word_pattern(word);
@@ -1611,7 +1611,7 @@ impl ReplaceWord for String {
 
   /// Replace one or sets of whole words with case_insensitive flags as the last tuple element
   fn replace_word_sets(&self, tuples: &[(&str, &str, bool)]) -> String {
-    let mut output = String::new();
+    let mut output = self.clone();
     for row in tuples {
       let (word, replacement, case_insensitive) = *row;
       let pattern = build_whole_word_pattern(word);
