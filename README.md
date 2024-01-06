@@ -178,15 +178,15 @@ if source_str.match_words_by_proximity("lions?", "cats?", -20, 20, true) {
 - **StripCharacters**:	Set of methods to strip unwanted characters by type or extract vectors of numeric strings, integers or floats without regular expressions
 - **SimpleMatch**:	Regex-free matcher methods for common validation rules, e.g. starts_with_ci_alphanum checks if the first letters or numerals in a sample string in case-insensitive mode without regular expressions.
 - **MatchOccurrences**:	Return the indices of all ocurrences of an exact string
-- **PatternMatch**	Core regular expression match methods, wrappers for re.is_match with variants with case-insensitive (_ci) and case-sensitive (_cs)
+- **PatternMatch**	Core regular expression match methods, wrappers for re.is_match with case-insensitive (_ci) and case-sensitive (_cs) variants
 - **PatternMatchMany**:	Provides methods to match with multiple patterns expressed as arrays of tuples or simple strs
 - **PatternMatches**:	Pattern methods for arrays or vectors only, return vectors of booleans matching each input string
 - **PatternReplace**:	Core regular expression replacement methods
 - **PatternReplaceMany**:	Provides methods to replace with multiple patterns expressed as arrays of tuples
 - **MatchWord**: Has convenience methods to match words with various word boundary rules. New to 0.2.0
-- **ReplaceWord**: Provides methods to replace one or more words with clean syntax
+- **ReplaceWord**: Provides methods to replace one or more words with clean syntax. New to 0.2.3
 - **PatternCapture**: Returns captures or vectors of each match, whether overlapping or not, and counts of matching patterns or words. New to version 0.2.0
-- **ToSegments**:	Methods to split a longer strong on a separator and return a vector of strings, a tuple of two strings or single optional string segment Note some methods may return empty segments in the case of leading, trailing or repeated separators.
+- **ToSegments**:	Methods to split a longer string on a separator and return a vector of strings, a tuple of two strings or single optional string segment Note some methods may return empty segments in the case of leading, trailing or repeated separators.
 - **ToStrings**:	Converts arrays or vectors of strs to a vector of owned strings
 
 NB: Although I've used the library methods in three of my commercial projects, this crate is very much in its alpha stage as I evaluate
