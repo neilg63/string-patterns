@@ -1,4 +1,4 @@
-2.2[![mirror](https://img.shields.io/badge/mirror-github-blue)](https://github.com/neilg63/string-patterns)
+[![mirror](https://img.shields.io/badge/mirror-github-blue)](https://github.com/neilg63/string-patterns)
 [![crates.io](https://img.shields.io/crates/v/string-patterns.svg)](https://crates.io/crates/string-patterns)
 [![docs.rs](https://docs.rs/string-patterns/badge.svg)](https://docs.rs/string-patterns)
 
