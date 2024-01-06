@@ -74,7 +74,7 @@ if str_1.contains_ci_alphanum("hiphop") {
 ##### Extract the first match from a string
 ```rust
 let str_1 = "The park has many lions, spotted hyenas, leopards, rhinoceroses, hippopotamuses, giraffes, cheetahs and baboons";
-if let Some(matched_item) = str_1.pattern_first_match(r#"\bspotted\s+\w+\b"#) {
+if let Some(matched_item) = str_1.pattern_first_match(r#"\bspotted\s+\w+\b"#, true) {
   println!("`{}` occurs between positions {} and {}", matched_item.as_str(), matched_item.start(), matched_item.end());
 }
 ```
