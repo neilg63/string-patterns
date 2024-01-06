@@ -190,4 +190,4 @@ if source_str.match_words_by_proximity("lions?", "cats?", -20, 20, true) {
 - **ToStrings**:	Converts arrays or vectors of strs to a vector of owned strings
 
 NB: Although I've used the library methods in three of my commercial projects, this crate is very much in its alpha stage as I evaluate
-which of the many auxiliary methods, not documented here, belong in this library. Version updates in the 0.1.x series reflect mainly corrections to this file.
+which of the many auxiliary methods, not documented here, belong in this library. Many minor version updates in the 0.1.x 0.2.x series reflect mainly corrections to this file.
