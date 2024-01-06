@@ -1,4 +1,4 @@
-[![mirror](https://img.shields.io/badge/mirror-github-blue)](https://github.com/neilg63/string-patterns)
+2.2[![mirror](https://img.shields.io/badge/mirror-github-blue)](https://github.com/neilg63/string-patterns)
 [![crates.io](https://img.shields.io/crates/v/string-patterns.svg)](https://crates.io/crates/string-patterns)
 [![docs.rs](https://docs.rs/string-patterns/badge.svg)](https://docs.rs/string-patterns)
 
@@ -6,9 +6,9 @@
 
 This library makes it easier to validate and manipulate strings in Rust. It builds on Rust's standard library with help from the default regular expression crate, *regex*. It has no other dependencies. It aims to make working with strings as easy in Rust as it is Javascript or Python with cleaner syntax and without unduly compromising performance if used sparingly alongside simpler string matching functions such as starts_with, contains or ends_with. To this end, the crate provides methods such as *starts_with_ci* and *starts_with_ci_alphanum* for basic string validation without regular expressions. 
 
-The library provides a number of utility methods to split strings into vectors of strings or a head and tail components and to extract valid numbers from longer texts. Version 0.2.0 has extra methods to capture and count matched strings with offsets to facilitate advanced text processing.
+The library provides a number of utility methods to split strings into vectors of strings or a head and tail components and to extract valid numbers from longer texts. Version 0.2.0 has extra methods to capture and count matched strings with offsets to facilitate advanced text processing and version 2.3 introduces new methods to match and replace words without intrusive word boundary anchors. The is_numeric() method in the IsNumeric trait now applies a strict regex-free check on compatibility with the parse::<T>() method;
 
-Variant match and replace methods with _ci (case-insensitive) or _cs (case-sensitive) suffixes are shorthand for the equivalent plain methods that require a boolean *case_insensitive* parameter. In case-insensitive mode the non-capturing /(?i)/ flag is prepended automatically. This will not be prepended if you add another non-capturing group at the start of your regex. In every other way, the pattern-prefixed methods behave in the same way as *re.is_match*, *re.replace_all*, *re.find* and *re.capture_iter* methods in the Regex library. String-patterns unleashes most of the core functionality of the Regex crate, on which it depends, to cover most common use cases in text processing and to act as a building block for specific validators (e.g. email validation) and text transformers.
+Variant *match* and *replace* methods with _ci (case-insensitive) or _cs (case-sensitive) suffixes are shorthand for the equivalent plain methods that require a boolean *case_insensitive* parameter. In case-insensitive mode the non-capturing /(?i)/ flag is prepended automatically. This will not be prepended if you add another non-capturing group at the start of your regex. In every other way, the pattern-prefixed methods behave in the same way as *re.is_match*, *re.replace_all*, *re.find* and *re.capture_iter* methods in the Regex library. String-patterns unleashes most of the core functionality of the Regex crate, on which it depends, to cover most common use cases in text processing and to act as a building block for specific validators (e.g. email validation) and text transformers.
 
 Most of the *match* methods will work on *&str* and *String*, while the replacement methods are only implemented for *owned strings*. Likewise, match methods are implemented for arrays and vectors of strings, while replacement methods are only implemented for vectors of *owned strings*. The traits may be implemented for string-like object, e.g. a struct or tuple with a string field.
 
@@ -111,6 +111,28 @@ let source_str = "The dying King Edmund decides to try to save Lear and Cordelia
 let target_str = source_str.pattern_replace_pairs(&pattern_replacements); 
 ```
 
+##### Replace multiple word pairs in case-sensitive mode
+```rust
+/// This should have the same result as above but with cleaner and less error-prone syntax
+let source_str = "The dying King Edmund decides to try to save Lear and Cordelia.".to_string();
+  let pattern_replacements = [
+    ("Edmund"#, "Edward"),
+    ("Lear", "Larry"),
+    ("Cordelia", "Cecilia")
+  ];
+/// Should read "The dying King Edward decides to try to save Larry and Cecilia."
+let target_str = source_str.replace_words_cs(&pattern_replacements); 
+```
+
+##### Match any words in case-insensitive mode
+```rust
+let source_str = "Two cheetahs ran across the field".to_string();
+let cat_like_words = ["lions?","tigers?", "pumas?", "panthers?", "jaguars?", "leopards?", "lynx(es)?", "cheetahs?"];
+if source_str.match_any_words_ci(&cat_like_words) {
+  println!("`{}` is related to cats", source_str);
+}
+```
+
 ##### Extract the third non-empty segment of a long path name
 ```rust
 let path_string = "/var/www/mysite.com/web/uploads".to_string();
@@ -162,6 +184,7 @@ if source_str.match_words_by_proximity("lions?", "cats?", -20, 20, true) {
 - **PatternReplace**:	Core regular expression replacement methods
 - **PatternReplaceMany**:	Provides methods to replace with multiple patterns expressed as arrays of tuples
 - **MatchWord**: Has convenience methods to match words with various word boundary rules. New to 0.2.0
+- **ReplaceWord**: Provides methods to replace one or more words with clean syntax
 - **PatternCapture**: Returns captures or vectors of each match, whether overlapping or not, and counts of matching patterns or words. New to version 0.2.0
 - **ToSegments**:	Methods to split a longer strong on a separator and return a vector of strings, a tuple of two strings or single optional string segment Note some methods may return empty segments in the case of leading, trailing or repeated separators.
 - **ToStrings**:	Converts arrays or vectors of strs to a vector of owned strings

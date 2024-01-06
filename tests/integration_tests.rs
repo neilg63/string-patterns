@@ -212,6 +212,19 @@ fn test_simple_pattern_matches() {
   
 }
 
+#[test]
+fn test_is_numeric() {
+  let num_str_1 = "-1227.75";
+  assert!(num_str_1.is_numeric());
+  
+  let num_str_2 = "-1,227.75"; // will not validate with commas, unless corrected
+  assert_eq!(num_str_2.is_numeric(), false);
+  // &str has to be cast to an owned String first
+  assert!(num_str_2.to_owned().correct_numeric_string(false).is_numeric());
+
+  let num_str_3 = "-1.227,75"; // European-style with commas as decimal separators
+  assert!(num_str_3.to_owned().correct_numeric_string(true).is_numeric());
+}
 
 #[test]
 fn test_strip_non_numeric() {
@@ -293,16 +306,44 @@ fn test_match_count() {
 }
 
 #[test]
+fn test_first_match() {
+  let sample_text = r#"Trout belong mainly to two genera: Oncorhynchus and Salvelinus."#;
+  let pattern = r#"\bonco\w+us\b?"#;
+  let target_matched_str = "Oncorhynchus";
+  let matched_item = sample_text.pattern_first_match(pattern, true);
+  assert_eq!(matched_item.unwrap().as_str(), target_matched_str); 
+}
+
+#[test]
+fn test_replace_word() {
+  let sample_text = "On one of the darkest days of the year she fled on a boat";
+  // This is a contrived example, only `on` should be replaced and not one
+  let target_text = "upon one of the darkest days of the year she fled upon a boat";
+  let word = "on";
+  let replacement = "upon";
+  let replacement_string = sample_text.to_string().replace_word_ci(word, replacement);
+  assert_eq!(replacement_string, target_text.to_string()); 
+}
+
+#[test]
+fn match_all_or_any_words() {
+  let sample_text = "A species of teleost fish usually lives in only one kind of habitat at any stage of its life cycle.";
+  let words = ["fish", "habitat", "trout"];
+  assert_eq!(sample_text.match_words_ci(&words), false); // does not contain trout and should be false
+  assert!(sample_text.match_any_words_ci(&words)); 
+}
+
+#[test]
 fn test_first_match_count() {
   let sample_text = r#"Lionesses living in open savanna do most of the hunting, whereas males typically appropriate their meals from the female’s kills"#;
   
-  // Method return full details of teh first match for subsequent manipulation
+  // Method return full details of the first match for subsequent manipulation
   let matched_item = sample_text.pattern_first_match(r#"\bsavannah?"#, true);
   assert_eq!(matched_item.unwrap().start(), 25); // The first occurence should start at position 25
 
   // convenience method if only need the end index of the first match
   let first_end_index = sample_text.pattern_first_end_index(r#"\bsavannah?"#, true);
-  assert_eq!(first_end_index.unwrap(), 32); // The first occurence should end at position 30
+  assert_eq!(first_end_index.unwrap(), 32); // The first occurence should end at position 32
   
   // check if the above numbers parse successfully to numbers
   

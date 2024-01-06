@@ -27,6 +27,15 @@ fn build_word_pattern(word: &str, bounds: WordBounds) -> String {
   bounds.to_pattern(word)
 }
 
+fn build_whole_word_pattern(word: &str) -> String {
+  build_word_pattern(word, WordBounds::Both)
+}
+
+fn build_optional_whole_word_pattern(words: &[&str]) -> String {
+  let word_pattern = ["(", &words.join("|"), ")"].concat();
+  build_word_pattern(&word_pattern, WordBounds::Both)
+}
+
 /// Core regular expression match methods
 pub trait PatternMatch {
   /// Apply a regular expression match on the current string
@@ -149,14 +158,43 @@ pub trait SimpleMatch {
 
 /// Method to check if the string may be parsed to an integer or float
 pub trait IsNumeric {
+  /// strict check on a numeric string before using .parse::<T>()
+  /// use trim() or correct_numeric_string() first for looser number validation
   fn is_numeric(&self) -> bool;
 }
 
-impl IsNumeric for String {
+/// Implementation for &str / String
+impl IsNumeric for str {
 
   /// Check if the string may be parsed to a number
+  /// This is a now a strict regex-free check
+  /// Use trim() or correct_numeric_string() first for looser number validation
   fn is_numeric(&self) -> bool {
-      self.pattern_match(r#"^-?(\d+,)*\d+((\.)\d+)?"#, false)
+    let num_chars = self.chars().count();
+    let last_index = num_chars - 1;
+    let mut num_valid = 0usize;
+    let mut index = 0usize;
+    let mut num_decimal_separators = 0usize;
+    for c in self.chars().into_iter() {
+      let is_digit = c.is_digit(10);
+      let valid_char =  if is_digit {
+        true
+      } else {
+        match c {
+          '-' => index == 0,
+          '.' => index < last_index && num_decimal_separators < 1,
+          _ => false
+        }
+      };
+      if c == '.' {
+        num_decimal_separators += 1;
+      }
+      if valid_char {
+        num_valid += 1;
+      }
+      index += 1;
+    }
+    num_valid == num_chars
   }
 }
 
@@ -286,7 +324,7 @@ impl PatternMatch for str {
 
 }
 
-
+/// Core regex replacement methods for Strings
 impl PatternReplace for String {
   
   /// Regex-enabled replace method that will return an OK String result if successful and an error if the regex fails
@@ -345,7 +383,7 @@ impl StripCharacters for String {
           [main.replace(".", ""), dec_part].join(".")
         }
       } else {
-        self.to_owned()
+        self.replace(",", "")
       }
   }
 
@@ -1245,7 +1283,7 @@ impl PatternCapture for str {
 
   // Counts the number of matches with a boolean case_insensitive flag
   fn count_word(&self, word: &str, case_insensitive: bool) -> usize {
-    let pattern = build_word_pattern(word, WordBounds::Both);
+    let pattern = build_whole_word_pattern(word);
     self.pattern_matches_vec(&pattern, case_insensitive).len()
   }
 
@@ -1260,6 +1298,9 @@ pub trait MatchWord {
   /// Match a whole word with a case_insensitive flag
   fn match_word(&self, word: &str, case_insensitive: bool) -> bool;
 
+  /// Match any whole words only with a boolean case_insensitive flag
+  fn match_any_words(&self, words: &[&str], case_insensitive: bool) -> bool;
+
   /// Match from the start of a word with a case_insensitive flag
   fn match_word_start(&self, word: &str, case_insensitive: bool) -> bool;
 
@@ -1268,6 +1309,9 @@ pub trait MatchWord {
 
   /// Match a whole word in case-insensitive mode
   fn match_word_ci(&self, word: &str) -> bool;
+
+  /// Match any whole words only in case-insensitive mode
+  fn match_any_words_ci(&self, words: &[&str]) -> bool;
 
   /// Match from the start of a word in case-insensitive mode
   fn match_word_start_ci(&self, word: &str) -> bool;
@@ -1278,6 +1322,9 @@ pub trait MatchWord {
   /// Match a whole word in case-sensitive mode
   fn match_word_cs(&self, word: &str) -> bool;
 
+  /// Match any whole words only in case-sensitive mode
+  fn match_any_words_cs(&self, words: &[&str]) -> bool;
+
   /// Match from the start of a word in case-sensitive mode
   fn match_word_start_cs(&self, word: &str) -> bool;
 
@@ -1286,8 +1333,35 @@ pub trait MatchWord {
 
   /// Match a word pair by min and max proximity, where a negative min value implies before the end of the first word
   fn match_words_by_proximity(&self, first: &str, second: &str, min: i16, max: i16, case_insensitive: bool) -> bool;
+
+  /// Count matched words from array with boundary and case_insensitive options
+  fn count_matched_words_bounds(&self, words: &[&str], bounds: WordBounds, case_insensitive: bool) -> usize;
+
+  /// Match all words in array with boundary and case_insensitive options
+  fn match_words_bounds(&self, words: &[&str], bounds: WordBounds, case_insensitive: bool) -> bool;
+
+  /// Match all whole words only with a boolean case_insensitive flag
+  fn match_words(&self, words: &[&str], case_insensitive: bool) -> bool;
+
+  /// Match all whole words in case-insensitive mode
+  fn match_words_ci(&self, words: &[&str]) -> bool;
+
+  /// Match all whole words in case-sensitive mode
+  fn match_words_cs(&self, words: &[&str]) -> bool;
+
+  /// Match sets of words with positivity, pattern and case_insensitive parameters in tuples
+  /// e.g. to match sentences with cat(s) but not dog(s) (lower case only)
+  /// let sets = [(true, "cats?", true), (false, "dogs?", false)]; 
+  fn match_words_sets_conditional(&self, sets: &[(bool, &str, bool)]) -> bool;
+
+  /// Match sets of words with positivity and pattern tuple in case-insensitive mode
+  /// e.g. to match sentences with cat(s) but not dog(s) (lower case only)
+  /// let sets = [(true, "cats?"), (false, "dogs?")];
+  fn match_words_sets_conditional_ci(&self, tuples: &[(bool, &str)]) -> bool;
+
 }
 
+/// Implement MatchWord methods for str and String
 impl MatchWord for str {
 
   /// Match a word with bounds options and case_insensitive flag
@@ -1299,8 +1373,8 @@ impl MatchWord for str {
   /// Case-conditional match of a whole word
   /// To match only the start or end, use the start and end methods or expand the pattern with \w* at either end
   fn match_word(&self, word: &str, case_insensitive: bool) -> bool {
-    let word_pattern = build_word_pattern(word, WordBounds::Both);
-    self.pattern_match(&word_pattern, case_insensitive)
+    let pattern = build_whole_word_pattern(word);
+    self.pattern_match(&pattern, case_insensitive)
   }
 
   /// Case-conditional match from the start of a word boundary
@@ -1351,8 +1425,8 @@ impl MatchWord for str {
   /// If the second word may occur before the first the min value should negative
   /// The distance between the end of the first and start of the second word is measured
   fn match_words_by_proximity(&self, first: &str, second: &str, min: i16, max: i16, case_insensitive: bool) -> bool {
-    let word_pattern_1 = build_word_pattern(first, WordBounds::Both);
-    let word_pattern_2 = build_word_pattern(second, WordBounds::Both);
+    let word_pattern_1 = build_whole_word_pattern(first);
+    let word_pattern_2 = build_whole_word_pattern(second);
     if let Some((first_first,first_last)) = self.pattern_first_last_matches(&word_pattern_1, case_insensitive) {
       if let Some((second_first, second_last)) = self.pattern_first_last_matches(&word_pattern_2, case_insensitive) {
         let diff_i64 = second_last.start() as i64 - first_first.end() as i64;
@@ -1373,4 +1447,178 @@ impl MatchWord for str {
     }
     false
   }
+
+  /// Count matched words from an array of strs with boundary and case_insensitive options
+  fn count_matched_words_bounds(&self, words: &[&str], bounds: WordBounds, case_insensitive: bool) -> usize {
+    let mut num_matched = 0;
+    for word in words {
+      let pattern = bounds.to_pattern(word);
+      if self.pattern_match(&pattern, case_insensitive) {
+        num_matched += 1;
+      }
+    }
+    num_matched
+  }
+
+  /// Match all words in array with boundary and case_insensitive options
+  fn match_words_bounds(&self, words: &[&str], bounds: WordBounds, case_insensitive: bool) -> bool {
+    words.len() == self.count_matched_words_bounds(words, bounds, case_insensitive)
+  }
+
+  /// Match all whole words only with a boolean case_insensitive flag
+  fn match_words(&self, words: &[&str], case_insensitive: bool) -> bool {
+    self.match_words_bounds(words, WordBounds::Both, case_insensitive)
+  }
+
+  /// Match any whole words only with a boolean case_insensitive flag
+  fn match_any_words(&self, words: &[&str], case_insensitive: bool) -> bool {
+    let pattern = build_optional_whole_word_pattern(words);
+    self.pattern_match(&pattern, case_insensitive)
+  }
+
+  /// Match all whole words in case-insensitive mode
+  fn match_words_ci(&self, words: &[&str]) -> bool {
+    self.match_words_bounds(words, WordBounds::Both, true)
+  }
+
+  /// Match any whole words only in case-insensitive mode
+  fn match_any_words_ci(&self, words: &[&str]) -> bool {
+    let pattern = build_optional_whole_word_pattern(words);
+    self.pattern_match(&pattern, true)
+  }
+
+  /// Match all whole words in case-sensitive mode
+  fn match_words_cs(&self, words: &[&str]) -> bool {
+    self.match_words_bounds(words, WordBounds::Both, false)
+  }
+
+  /// Match any whole words only in case-sensitive mode
+  fn match_any_words_cs(&self, words: &[&str]) -> bool {
+    let pattern = build_optional_whole_word_pattern(words);
+    self.pattern_match(&pattern, false)
+  }
+
+  /// Match sets of words with positivity, pattern and case_insensitive parameters in tuples
+  /// e.g. to match sentences with cat(s) but not dog(s) (lower case only)
+  /// let sets = [(true, "cats?", true), (false, "dogs?", false)]; 
+  fn match_words_sets_conditional(&self, sets: &[(bool, &str, bool)]) -> bool {
+    let num_words = sets.len();
+    let mut num_matched = 0;
+    for row in sets {
+      let (is_positive, word, case_insensitive) = *row;
+      let pattern = build_whole_word_pattern(word);
+      if self.pattern_match(&pattern, case_insensitive) == is_positive {
+        num_matched += 1;
+      }
+    }
+    num_matched == num_words
+  }
+
+  /// Match sets of words with positivity and pattern tuple in case-insensitive mode
+  /// e.g. to match sentences with cat(s) but not dog(s) (lower case only)
+  /// let sets = [(true, "cats?"), (false, "dogs?")];
+  fn match_words_sets_conditional_ci(&self, tuples: &[(bool, &str)]) -> bool {
+    let num_words = tuples.len();
+    let mut num_matched = 0;
+    for row in tuples {
+      let (is_positive, word) = *row;
+      let pattern = build_whole_word_pattern(word);
+      if self.pattern_match(&pattern, true) == is_positive {
+        num_matched += 1;
+      }
+    }
+    num_matched == num_words
+  }
+
 }
+
+/// Methods for whole or partial word replacements
+pub trait ReplaceWord {
+
+  /// Replace words with boundary and case_insensitive options
+  fn replace_word_bounds(&self, word: &str, replacement: &str, bounds: WordBounds, case_insensitive: bool) -> Self where Self:Sized;
+
+  /// Replace whole words with case_insensitive options
+  fn replace_word(&self, word: &str, replacement: &str, case_insensitive: bool) -> Self where Self:Sized;
+
+  /// Replace whole words with in case-insensitive mode
+  fn replace_word_ci(&self, word: &str, replacement: &str) -> Self where Self:Sized;
+
+  /// Replace whole words with in case-sensitive mode
+  fn replace_word_cs(&self, word: &str, replacement: &str) -> Self where Self:Sized;
+
+  /// Replace one or pairs of whole words with a boolean case_insensitive flag
+  fn replace_words(&self, pairs: &[(&str, &str)], case_insensitive: bool) -> Self where Self:Sized;
+
+  /// Replace one or pairs of whole words in case-insensitive mode
+  fn replace_words_ci(&self, pairs: &[(&str, &str)]) -> Self where Self:Sized;
+
+  /// Replace one or pairs of whole words in case-sensitive mode
+  fn replace_words_cs(&self, pairs: &[(&str, &str)]) -> Self where Self:Sized;
+
+  /// Replace one or sets of whole words with case_insensitive flags as the last tuple element
+  fn replace_word_sets(&self, pairs: &[(&str, &str, bool)]) -> Self where Self:Sized;
+
+}
+
+
+/// Methods for whole or partial word replacements
+impl ReplaceWord for String {
+
+  /// Replace words with boundary and case_insensitive options
+  fn replace_word_bounds(&self, word: &str, replacement: &str, bounds: WordBounds, case_insensitive: bool) -> String {
+    let pattern = build_word_pattern(word, bounds);
+    self.pattern_replace(&pattern, replacement, case_insensitive)
+  }
+
+  /// Replace whole words with case_insensitive options
+  fn replace_word(&self, word: &str, replacement: &str, case_insensitive: bool) -> String {
+    let pattern = build_whole_word_pattern(word);
+    self.pattern_replace(&pattern, replacement, case_insensitive)
+  }
+  /// Replace whole words with in case-insensitive mode
+  fn replace_word_ci(&self, word: &str, replacement: &str) -> String {
+    let pattern = build_whole_word_pattern(word);
+    self.pattern_replace(&pattern, replacement, true)
+  }
+
+  /// Replace whole words with in case-sensitive mode
+  fn replace_word_cs(&self, word: &str, replacement: &str) -> String {
+    let pattern = build_whole_word_pattern(word);
+    self.pattern_replace(&pattern, replacement, false)
+  }
+
+  /// Replace one or pairs of whole words with a boolean case_insensitive flag
+  fn replace_words(&self, pairs: &[(&str, &str)], case_insensitive: bool) -> String {
+    let mut output = String::new();
+    for pair in pairs {
+      let (word, replacement) = *pair;
+      let pattern = build_whole_word_pattern(word);
+      output = output.pattern_replace(&pattern, replacement, case_insensitive);
+    }
+    output
+  }
+
+  /// Replace one or pairs of whole words in case-insensitive mode
+  fn replace_words_ci(&self, pairs: &[(&str, &str)]) -> String {
+    self.replace_words(pairs, true)
+  }
+
+  /// Replace one or pairs of whole words in case-sensitive mode
+  fn replace_words_cs(&self, pairs: &[(&str, &str)]) -> String {
+    self.replace_words(pairs, false)
+  }
+
+  /// Replace one or sets of whole words with case_insensitive flags as the last tuple element
+  fn replace_word_sets(&self, tuples: &[(&str, &str, bool)]) -> String {
+    let mut output = String::new();
+    for row in tuples {
+      let (word, replacement, case_insensitive) = *row;
+      let pattern = build_whole_word_pattern(word);
+      output = output.pattern_replace(&pattern, replacement, case_insensitive);
+    }
+    output
+  }
+
+}
+
