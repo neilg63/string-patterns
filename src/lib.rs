@@ -23,18 +23,6 @@ impl WordBounds {
   }
 }
 
-fn build_word_pattern(word: &str, bounds: WordBounds) -> String {
-  bounds.to_pattern(word)
-}
-
-fn build_whole_word_pattern(word: &str) -> String {
-  build_word_pattern(word, WordBounds::Both)
-}
-
-fn build_optional_whole_word_pattern(words: &[&str]) -> String {
-  let word_pattern = ["(", &words.join("|"), ")"].concat();
-  build_word_pattern(&word_pattern, WordBounds::Both)
-}
 
 /// Core regular expression match methods
 pub trait PatternMatch {
@@ -1289,7 +1277,7 @@ impl PatternCapture for str {
 
 }
 
-
+/// Provides methods to match words with differnt word boundary and case-semsitivity rules 
 pub trait MatchWord {
 
   /// Match a word with bounds options and case_insensitive flag

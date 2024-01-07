@@ -194,7 +194,14 @@ fn test_match_many() {
 
   // Contains at least one of the above
   assert!(str1.pattern_match_any_ci(&match_patterns_2));
-  
+}
+
+#[test]
+fn test_replace_many_words() {
+  let sample_text = "Twenty cats lived in the large mansion.".to_string();
+  let replacement_pairs = [("cats", "dogs"), ("mansion", "hut"), ("large", "tiny")];
+  let expected_text = "Twenty dogs lived in the tiny hut.".to_string();
+  assert_eq!(sample_text.replace_words_ci(&replacement_pairs), expected_text);
 }
 
 #[test]
