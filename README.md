@@ -6,7 +6,7 @@
 
 This library makes it easier to validate and manipulate strings in Rust. It builds on Rust's standard library with help from the default regular expression crate, *regex*. It has no other dependencies. It aims to make working with strings as easy in Rust as it is Javascript or Python with cleaner syntax and without unduly compromising performance if used sparingly alongside simpler string matching functions such as starts_with, contains or ends_with. To this end, the crate provides methods such as *starts_with_ci* and *starts_with_ci_alphanum* for basic string validation without regular expressions. 
 
-The library provides a number of utility methods to split strings into vectors of strings or a head and tail components and to extract valid numbers from longer texts. Version 0.2.0 has extra methods to capture and count matched strings with offsets to facilitate advanced text processing and version 0.2.5 introduces new methods to match and replace words without intrusive word boundary anchors. The is_numeric() method in the IsNumeric trait now applies a strict regex-free check on compatibility with the parse::<T>() method;
+The library provides a number of utility methods to split strings into vectors of strings or a head and tail components and to extract valid numbers from longer texts. Version 0.2.0 has extra methods to capture and count matched strings with offsets to facilitate advanced text processing and version 0.2.5 introduces new methods to match and replace words without intrusive word boundary anchors. The is_numeric() method in the IsNumeric trait now applies a strict regex-free check on compatibility with the parse() method;
 
 Variant *match* and *replace* methods with _ci (case-insensitive) or _cs (case-sensitive) suffixes are shorthand for the equivalent plain methods that require a boolean *case_insensitive* parameter. In case-insensitive mode the non-capturing /(?i)/ flag is prepended automatically. This will not be prepended if you add another non-capturing group at the start of your regex. In every other way, the pattern-prefixed methods behave in the same way as *re.is_match*, *re.replace_all*, *re.find* and *re.capture_iter* methods in the Regex library. String-patterns unleashes most of the core functionality of the Regex crate, on which it depends, to cover most common use cases in text processing and to act as a building block for specific validators (e.g. email validation) and text transformers.
 
@@ -137,7 +137,7 @@ if source_str.match_any_words_ci(&cat_like_words) {
 ```rust
 let path_string = "/var/www/mysite.com/web/uploads".to_string();
 if let Some(domain) = path_string.to_segment("/", 2) {
-  println!("The site name is: {}", domain); // "mysite.com" is an owned string
+  println!("The domain folder name is: {}", domain); // "mysite.com" is an owned string
 }
 ```
 
