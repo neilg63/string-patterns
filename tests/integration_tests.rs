@@ -77,10 +77,22 @@ fn test_strip_non_chars() {
 
 #[test]
 fn test_segment_match() {
-  let path_string = "/var/www/mysite.com/web/uploads".to_string();
+  let path_string = "/var/www/mysite.com/web/uploads";
+  // ignore leading slash
   let domain = path_string.to_segment("/",2).unwrap_or("".to_string()); 
   let expected_string = "mysite.com".to_string();
   assert_eq!(domain, expected_string);
+}
+
+#[test]
+fn test_to_string_vector() {
+  // ignore leading slash
+  let path_string = "/var/www/mysite.com/web/uploads";
+  let segments = path_string.to_segments("/"); 
+  assert_eq!(segments.len(), 5);
+  let fourth_element = segments.get(3).unwrap().to_owned();
+  let expected_string = "web".to_owned();
+  assert_eq!(fourth_element, expected_string);
 }
 
 #[test]
