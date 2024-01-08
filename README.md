@@ -116,7 +116,7 @@ let target_str = source_str.pattern_replace_pairs(&pattern_replacements);
 /// This should have the same result as above but with cleaner and less error-prone syntax
 let source_str = "The dying King Edmund decides to try to save Lear and Cordelia.".to_string();
   let pattern_replacements = [
-    ("Edmund"#, "Edward"),
+    ("Edmund", "Edward"),
     ("Lear", "Larry"),
     ("Cordelia", "Cecilia")
   ];
