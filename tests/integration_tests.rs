@@ -1,4 +1,4 @@
-use string_patterns::*;
+use string_patterns::{*, enums::WordBounds};
 
 #[cfg(test)]
 
@@ -231,6 +231,21 @@ fn test_is_numeric() {
 
   let num_str_3 = "-1.227,75"; // European-style with commas as decimal separators
   assert!(num_str_3.to_owned().correct_numeric_string(true).is_numeric());
+}
+
+#[test]
+fn test_has_digits() {
+  // Does this have a valid decimal digit sequence that may be extracted as a valid number
+  let num_str_1 = "serial number: 93025371";
+  assert!(num_str_1.has_digits());
+
+  // Is this a valid decimal digit sequence that may be cast to an integer
+  let num_str_1 = "93025371";
+  assert!(num_str_1.is_digits_only());
+  
+  // Is this a valid hexadecimal string that may be cast to a float via from_str_radix(16)
+  let num_str_2 = "1ec9F9a";
+  assert!(num_str_2.is_digits_only_radix(16));
 }
 
 #[test]

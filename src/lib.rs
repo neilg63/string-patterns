@@ -1,28 +1,11 @@
 extern crate regex;
 mod utils;
+pub mod enums;
 
 use std::str::FromStr;
 use regex::*;
 use utils::*;
-
-/// Defines the start, end and both bounds of a word
-pub enum WordBounds {
-  Start,
-  End,
-  Both,
-}
-
-impl WordBounds {
-  /// Convert word bounds 
-  pub fn to_pattern(&self, word: &str) -> String {
-    match self {
-      WordBounds::Start => [r#"\b"#, word].concat(),
-      WordBounds::End => [word, r#"\b"#].concat(),
-      WordBounds::Both => [r#"\b"#, word, r#"\b"#].concat(),
-    }
-  }
-}
-
+use enums::WordBounds as WordBounds;
 
 /// Core regular expression match methods
 pub trait PatternMatch {
@@ -111,18 +94,6 @@ pub trait StripCharacters {
 
 }
 
-/// Methods to validate strings with character classes
-pub trait CharGroupMatch {
-  /// Does the string contain any digits
-  fn has_digits(&self) -> bool;
-
-  /// Does the string contain any alphanumeric characters including those from non-Latin alphabets
-  fn has_alphanumeric(&self) -> bool;
-
-  /// Does the string contain any letters including those from non-Latin alphabets, but excluding digits
-  fn has_alphabetic(&self) -> bool;
-}
-
 /// Regex-free matcher methods for common use cases
 pub trait SimpleMatch {
   /// Starts with a case-insensitive alphanumeric sequence
@@ -148,6 +119,16 @@ pub trait SimpleMatch {
 pub trait IsNumeric {
   /// strict check on a numeric string before using .parse::<T>()
   /// use trim() or correct_numeric_string() first for looser number validation
+  /// This mirrors a similar function in PHP, but is will fail with spaces or 
+  /// any non-numeric characters other than a leading minus or a single decimal point
+  /// For characters, is_numeric checks for decimal digit-equivalent characters
+  /// e.g.
+  /// let input_str = "-2389.49";
+  /// let optional_value = if input_str.is_numeric() {
+  ///   input_str.parse::<f32>()
+  /// } else {
+  ///   None
+  /// };
   fn is_numeric(&self) -> bool;
 }
 
@@ -184,54 +165,6 @@ impl IsNumeric for str {
     }
     num_valid == num_chars
   }
-}
-
-/// Methods to split a longer strong on a separator and return a vector of strings,
-/// a tuple of two strings or single optional string segment
-/// Note some methods may return empty segments in the case of leading, trailing or repeated separators
-/// See notes below
-pub trait ToSegments {
-
-  /// Extract a vector of non-empty strings from a string-like object with a given separator
-  /// excluding leading, trailing or double separators
-  fn to_segments(&self, separator: &str) -> Vec<Self> where Self:Sized;
-
-  /// Extract a vector of strings from a string-like object with a given separator
-  fn to_parts(&self, separator: &str) -> Vec<Self> where Self:Sized;
-
-  /// Extract only the head before the first occurrence of a separator
-  fn to_head(&self, separator: &str) -> Self  where Self:Sized;
-
-  /// Extract only the first segment before the first occurrence of a non-initial separator
-  fn to_first(&self, separator: &str) -> Self  where Self:Sized;
-
-  /// Extract only the remainder after the first occurrence of a non-initial separator
-  fn to_remainder_end(&self, separator: &str) -> Self  where Self:Sized;
-
-  /// Extract only the last segment after the last occurrence of a non-final separator
-  fn to_last(&self, separator: &str) -> Self  where Self:Sized;
-
-  /// Extract only the beginning before the last segment following the last occurrence of a non-final separator
-  fn to_remainder_start(&self, separator: &str) -> Self  where Self:Sized;
-
-  /// Extract only the last segment
-  fn to_end(&self, separator: &str) -> Self  where Self:Sized;
-
-  /// Extract a string-like segment identified by its index from the components of a string with a given separator
-  /// e.g. String::from("10/11/2024") .to_segment(1) yields "11"
-  fn to_segment(&self, separator: &str, index: i32) -> Option<Self>  where Self:Sized;
-
-  fn to_inner_segment(&self, groups: &[(&str, i32)]) -> Option<Self>  where Self:Sized;
-
-  /// extract the remainder after the head
-  fn to_tail(&self, separator: &str) -> Self where Self:Sized;
-
-  /// extract the first and last parts after the first occurrence of the separator
-  fn to_head_tail(&self, separator: &str) -> (Self, Self)  where Self:Sized;
-
-  /// extract the first and last parts after the last occurrence of the separator
-  fn to_start_end(&self, separator: &str) -> (Self, Self)  where Self:Sized;
-
 }
 
 /// Converts arrays or vectors of strs to a vector of owned strings
@@ -464,10 +397,36 @@ impl StripCharacters for String {
 
 }
 
+
+/// Methods to validate strings with character classes
+pub trait CharGroupMatch {
+  /// Does the string contain any decimal digits
+  fn has_digits(&self) -> bool;
+
+  /// Does the string contain any digits any supported radix
+  fn has_digits_radix(&self, radix: u8) -> bool;
+
+  /// Does the string contain any alphanumeric characters including those from non-Latin alphabets
+  fn has_alphanumeric(&self) -> bool;
+
+  /// Does the string contain any letters including those from non-Latin alphabets, but excluding digits
+  fn has_alphabetic(&self) -> bool;
+
+  fn is_digits_only(&self) -> bool;
+
+  /// Does the string contain any digits any supported radix
+  fn is_digits_only_radix(&self, radix: u8) -> bool;
+
+}
+
 impl CharGroupMatch for str {
 
   fn has_digits(&self) -> bool {
-      self.chars().any(|c| char::is_digit(c, 10))
+      self.chars().any(|c| c.is_ascii_digit())
+  }
+
+  fn has_digits_radix(&self, radix: u8) -> bool {
+    self.chars().any(|c| c.is_digit(radix as u32))
   }
 
   fn has_alphanumeric(&self) -> bool {
@@ -477,6 +436,16 @@ impl CharGroupMatch for str {
   fn has_alphabetic(&self) -> bool {
     self.chars().any(char::is_alphabetic)
   }
+
+  fn is_digits_only(&self) -> bool {
+    self.chars().all(|c| c.is_ascii_digit())
+  }
+
+  /// Does the string contain any digits any supported radix
+  fn is_digits_only_radix(&self, radix: u8) -> bool {
+    self.chars().all(|c| c.is_digit(radix as u32))
+  }
+
 }
 
 impl SimpleMatch for str {
@@ -971,8 +940,56 @@ impl PatternReplaceMany for Vec<String> {
   }
 }
 
+/// Methods to split a longer strong on a separator and return a vector of strings,
+/// a tuple of two strings or single optional string segment
+/// Note some methods may return empty segments in the case of leading, trailing or repeated separators
+/// See notes below
+pub trait ToSegments {
+
+  /// Extract a vector of non-empty strings from a string-like object with a given separator
+  /// excluding leading, trailing or double separators
+  fn to_segments(&self, separator: &str) -> Vec<String>;
+
+  /// Extract a vector of strings from a string-like object with a given separator
+  fn to_parts(&self, separator: &str) -> Vec<String>;
+
+  /// Extract only the head before the first occurrence of a separator
+  fn to_head(&self, separator: &str) -> String;
+
+  /// Extract only the first segment before the first occurrence of a non-initial separator
+  fn to_first(&self, separator: &str) -> String;
+
+  /// Extract only the remainder after the first occurrence of a non-initial separator
+  fn to_remainder_end(&self, separator: &str) -> String;
+
+  /// Extract only the last segment after the last occurrence of a non-final separator
+  fn to_last(&self, separator: &str) -> String;
+
+  /// Extract only the beginning before the last segment following the last occurrence of a non-final separator
+  fn to_remainder_start(&self, separator: &str) -> String;
+
+  /// Extract only the last segment
+  fn to_end(&self, separator: &str) -> String;
+
+  /// Extract a string-like segment identified by its index from the components of a string with a given separator
+  /// e.g. String::from("10/11/2024") .to_segment(1) yields "11"
+  fn to_segment(&self, separator: &str, index: i32) -> Option<String>;
+
+  fn to_inner_segment(&self, groups: &[(&str, i32)]) -> Option<String>;
+
+  /// extract the remainder after the head
+  fn to_tail(&self, separator: &str) -> String;
+
+  /// extract the first and last parts after the first occurrence of the separator
+  fn to_head_tail(&self, separator: &str) -> (String, String);
+
+  /// extract the first and last parts after the last occurrence of the separator
+  fn to_start_end(&self, separator: &str) -> (String, String);
+
+}
+
 /// Implement string segment split and capture method for String
-impl ToSegments for String {
+impl ToSegments for str {
 
   /// Splits a string on the exact separator, whether initial, final or repeated.
   /// May yield empty segments
@@ -1011,7 +1028,7 @@ impl ToSegments for String {
   fn to_end(&self, separator: &str) -> String {
     let parts = self.to_parts(separator);
     if parts.len() > 0 {
-      parts.last().unwrap_or(self).to_owned()
+      parts.last().unwrap_or(&self.to_string()).to_owned()
     } else {
       self.to_owned()
     }
@@ -1079,7 +1096,7 @@ impl ToSegments for String {
   fn to_inner_segment(&self, groups: &[(&str, i32)]) -> Option<String> {
     if groups.len() > 0 {
       let mut matched: Option<String> = None;
-      let mut current_string = self.clone();
+      let mut current_string = self.to_string();
       for group in groups {
         if current_string.len() > 0 {
           let (separator, index) = group;

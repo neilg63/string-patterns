@@ -1,5 +1,5 @@
 use regex::*;
-use crate::WordBounds;
+use crate::enums::WordBounds;
 
 /// Build a regular expression with an optional case-insenistive non-capturing group
 /// If the source pattern starts with a non-capturing group, this will be ignored irrespective of the case_insenistive flag
