@@ -261,6 +261,20 @@ fn test_has_digits() {
 }
 
 #[test]
+fn test_match_ocurrences() {
+  // As this works on literal strs/Strings only it may only match a set number of characters
+  let str = "The fox jumped out of the box into the mixing bowl.";
+  
+  let x_indices = str.find_matched_indices("x");
+  let expected_x_indices: Vec<usize> = vec![6, 28, 41];
+  assert_eq!(x_indices, expected_x_indices);
+
+  let ox_indices = str.find_matched_indices("ox");
+  let expected_ox_indices: Vec<usize> = vec![5, 27];
+  assert_eq!(ox_indices, expected_ox_indices);
+}
+
+#[test]
 fn test_strip_non_numeric() {
   let source_str = "I spent £9999.99 on 2 motorbikes at the age of 72.".to_string();
   let target_str = "9999.99 2 72".to_string();

@@ -7,6 +7,20 @@ use regex::*;
 use utils::*;
 use enums::WordBounds as WordBounds;
 
+/// This library provides a set of traits and extension methods for &str and/or String
+/// to facilitate common string manipulations routines that may require multiple steps
+/// with the Rust standard library + Regex.
+/// Once installed you need not explicitly add regex::* to your project and
+/// string types will have many new match, replace, split and extract methods.
+/// Most methods imvoling regular expressions have variants ending in result returning the reuslt
+/// type with an error from the Regex crate and without, that return false and skips replacements
+/// if the regular is invalid. Use the main methods if you have tested your regular expression.
+/// There are also variants with a case_insensitive flag and without (_ci and _cs).
+/// When used on arrays or vectors of strings each regular expression will only be compiled and checked once, when you need 
+/// to search within a large set of text records. 
+/// Complex regular expressions, e.g. with look behind (?<=foo) or look ahead, work best after isolating a sample text snippet via simpler text-matching methods.
+/// Always consider the simplest strategy for extracting text, e.g. via to_head_tail(), to_segments(), before resorting to the regex-enabled pattern-prefixed methods.
+
 /// Core regular expression match methods
 pub trait PatternMatch {
   /// Apply a regular expression match on the current string
@@ -194,7 +208,7 @@ pub trait MatchOccurrences {
 }
 
 
-impl MatchOccurrences for String {
+impl MatchOccurrences for str {
     /// Return the indices only of all matches of a given regular expression
   fn find_matched_indices(&self, pat: &str) -> Vec<usize> {
     self.match_indices(pat).into_iter().map(|pair| pair.0).collect::<Vec<usize>>()
@@ -1148,10 +1162,10 @@ pub trait PatternCapture {
   /// Yields a vector of Match objects with start and end index + the captured string. Accepts a boolean case_insensitive flag
   fn pattern_matches_vec(&self, pattern: &str, case_insensitive: bool) -> Vec<Match>;
 
-  /// Yields a option with first match object if available with a boolean case_insensitive flag
+  /// Yields an option with first match object if available with a boolean case_insensitive flag
   fn pattern_first_match(&self, pattern: &str, case_insensitive: bool) -> Option<Match>;
 
-  /// Yields a option with last match object if available with a boolean case_insensitive flag
+  /// Yields an option with last match object if available with a boolean case_insensitive flag
   fn pattern_last_match(&self, pattern: &str, case_insensitive: bool) -> Option<Match>;
 
   /// returns an option with a pair of match objects
@@ -1209,7 +1223,7 @@ impl PatternCapture for str {
     }
   }
 
-  /// Yields a option with first match object if available with a boolean case_insensitive flag
+  /// Yields an option with first match object if available with a boolean case_insensitive flag
   /// As this uses re.find it will be fast than the matching last_match method
   fn pattern_first_match(&self, pattern: &str, case_insensitive: bool) -> Option<Match> {
     if let Ok(re) = build_regex(pattern, case_insensitive) {
@@ -1219,7 +1233,7 @@ impl PatternCapture for str {
     }
   }
 
-  /// Yields a option with last match object if available with a boolean case_insensitive flag
+  /// Yields an option with last match object if available with a boolean case_insensitive flag
   fn pattern_last_match(&self, pattern: &str, case_insensitive: bool) -> Option<Match> {
     let matched_segments = self.pattern_matches_vec(pattern, case_insensitive);
     if let Some(last) = matched_segments.last() {
