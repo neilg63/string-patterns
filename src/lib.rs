@@ -137,12 +137,14 @@ pub trait IsNumeric {
   /// any non-numeric characters other than a leading minus or a single decimal point
   /// For characters, is_numeric checks for decimal digit-equivalent characters
   /// e.g.
+  /// ```rust
   /// let input_str = "-2389.49";
   /// let optional_value = if input_str.is_numeric() {
   ///   input_str.parse::<f32>()
   /// } else {
   ///   None
   /// };
+  /// ```
   fn is_numeric(&self) -> bool;
 }
 
@@ -619,7 +621,7 @@ pub trait PatternMatchMany {
   fn pattern_match_many_cs(&self, patterns: &[&str]) -> bool;
 
   /// Matches all of the patterns with case-insensitive flag
-  /// e.g. (r#"a[ck]"#, true) => matches "ac" or "ak" whether upper, lower or mixed case
+  /// e.g. ```(r#"a[ck]"#, true)``` matches "ac" or "ak" whether upper, lower or mixed case
   /// with an array of tuples (pattern, replacement, case_insensitive)
   fn pattern_match_many_mixed(&self, pattern_sets: &[(&str, bool)]) -> bool;
   
