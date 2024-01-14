@@ -5,7 +5,7 @@ pub mod enums;
 use std::str::FromStr;
 use regex::*;
 use utils::*;
-use enums::WordBounds as WordBounds;
+use crate::enums::WordBounds;
 
 /// This library provides a set of traits and extension methods for &str and/or String
 /// to facilitate common string manipulations routines that may require multiple steps

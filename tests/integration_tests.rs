@@ -396,3 +396,14 @@ fn test_first_match_count() {
   // check if the above numbers parse successfully to numbers
   
 }
+
+#[test]
+fn test_word_bounds() {
+  let sample_text = r#"Lionesses living in open savanna do most of the hunting"#;
+  
+  // Check Word bounds is accessible externally
+  let is_matched = sample_text.match_word_bounds(r#"savan"#, WordBounds::Start, true);
+  assert!(is_matched); 
+  
+}
+

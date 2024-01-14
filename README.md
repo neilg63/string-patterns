@@ -101,13 +101,12 @@ let new_strings = sample_strings.pattern_replace_ci(pattern, replacement); // ca
 
 ##### Replace multiple pattern/replacement pairs 
 ```rust
-let source_str = "The dying King Edmund decides to try to save Lear and Cordelia.".to_string();
+let source_str = "Colourful fishing boats adorned the island's harbours.".to_string();
   let pattern_replacements = [
-    (r#"\bEdmund\b"#, "Edward"),
-    (r#"\bLear\b"#, "Larry"),
-    (r#"\bCordelia\b"#, "Cecilia")
+    ("colour", "color"),
+    ("harbour", "harbor"),
   ];
-/// Should read "The dying King Edward decides to try to save Larry and Cecilia."
+/// Should read "Colorful fishing boats adorned the island's harbors"
 let target_str = source_str.pattern_replace_pairs(&pattern_replacements); 
 ```
 
@@ -190,7 +189,7 @@ if source_str.match_words_by_proximity("lions?", "cats?", -20, 20, true) {
 - **ToStrings**:	Converts arrays or vectors of strs to a vector of owned strings
 
 ### Enums
-- **enums::WordBounds**:	Has options for Start, End and Both with a method to help regular expression patterns with the correct word boundaries
+- **WordBounds**:	Has options for *Start*, *End* and *Both* with a method to render regular expression subpatterns with the correct word boundaries
 
 NB: Although I've used the library methods in three of my commercial projects, this crate is very much in its alpha stage as I evaluate
 which of the many auxiliary methods, not documented here, belong in this library. Many minor version updates in the 0.1.x 0.2.x series reflect mainly corrections to this file.
