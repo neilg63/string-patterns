@@ -131,7 +131,7 @@ pub trait SimpleMatch {
 
 /// Method to check if the string may be parsed to an integer or float
 pub trait IsNumeric {
-  /// strict check on a numeric string before using .parse::<T>()
+  /// strict check on a numeric string before using ```.parse::<T>()```
   /// use trim() or correct_numeric_string() first for looser number validation
   /// This mirrors a similar function in PHP, but is will fail with spaces or 
   /// any non-numeric characters other than a leading minus or a single decimal point
@@ -745,7 +745,7 @@ impl PatternMatchMany for str {
   }
 
   /// Matches one or more of the patterns with case-insensitive flag
-  /// e.g. ```(r#"a[ck]"#, true)`` matches "ac" or "ak" whether upper, lower or mixed case
+  /// e.g. ```(r#"a[ck]"#, true)``` matches "ac" or "ak" whether upper, lower or mixed case
   /// with an array of tuples (pattern, replacement, case_insensitive)
   fn pattern_match_any_mixed(&self, pattern_sets: &[(&str, bool)]) -> bool {
     for pair in pattern_sets {
