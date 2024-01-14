@@ -691,7 +691,7 @@ impl PatternMatchMany for str {
   }
 
   /// Matches all of the patterns with case-insensitive flag
-  /// e.g. (r#"a[ck]"#, true) => matches "ac" or "ak" whether upper, lower or mixed case
+  /// e.g. ```(r#"a[ck]"#, true)``` "ac" or "ak" whether upper, lower or mixed case
   /// with an array of tuples (pattern, replacement, case_insensitive)
   fn pattern_match_many_mixed(&self, pattern_sets: &[(&str, bool)]) -> bool {
     let mut num_matched = 0usize;
@@ -706,7 +706,7 @@ impl PatternMatchMany for str {
   }
 
   /// Matches all of the patterns with positivity condition and case-insensitive flag
-  /// e.g. (false, "a[ck]", true) => does not contain "ac" or "ak" whether upper, lower or mixed case
+  /// e.g. ```(false, "a[ck]", true)``` does not contain "ac" or "ak" whether upper, lower or mixed case
   /// with an array of tuples (positive, pattern, case_insensitive)
   fn pattern_match_many_conditional(&self, pattern_sets: &[(bool, &str, bool)]) -> bool {
     let mut num_matched = 0usize;
@@ -745,7 +745,7 @@ impl PatternMatchMany for str {
   }
 
   /// Matches one or more of the patterns with case-insensitive flag
-  /// e.g. (r#"a[ck]"#, true) => matches "ac" or "ak" whether upper, lower or mixed case
+  /// e.g. ```(r#"a[ck]"#, true)`` matches "ac" or "ak" whether upper, lower or mixed case
   /// with an array of tuples (pattern, replacement, case_insensitive)
   fn pattern_match_any_mixed(&self, pattern_sets: &[(&str, bool)]) -> bool {
     for pair in pattern_sets {
@@ -889,7 +889,7 @@ impl PatternMatchMany for [String] {
   }
 
   /// Matches one or more of the patterns with case-insensitive flag
-  /// e.g. (r#"a[ck]"#, true) => matches "ac" or "ak" whether upper, lower or mixed case
+  /// e.g. ```(r#"a[ck]"#, true)``` matches "ac" or "ak" whether upper, lower or mixed case
   /// with an array of tuples (pattepattern_match_many_cirn, replacement, case_insensitive)
   fn pattern_match_any_mixed(&self, pattern_sets: &[(&str, bool)]) -> bool {
     for pair in pattern_sets {
