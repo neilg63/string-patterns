@@ -176,7 +176,15 @@ if source_str.match_words_by_proximity("lions?", "cats?", -20, 20, true) {
 let sample_string = "books, records and videotapes";
 let pattern = r#"\s*(,|and)\s"#;
 let items = sample_string.pattern_split_ci(pattern); // case-insensitive split
-// should yield a vectior of strings: "books", "records", "videotapes"
+// should yield a vector of strings: "books", "records", "videotapes"
+```
+
+##### Split a string into head / tail pair (case-sensitively)
+```rust
+let sample_string = "first / second - third ; fourth";
+let pattern = r#"\s*[/;-]\s*"#;
+let items = sample_string.pattern_split_pAir_cs(pattern); // case-sensitive split
+// should yield a tuple of strings: "first", "second - third ; fourth"
 ```
 
 ### Traits

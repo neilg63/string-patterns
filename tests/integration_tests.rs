@@ -418,4 +418,17 @@ fn test_split_on_pattern() {
   let expected_part_4 = "eighty".to_string();
   assert_eq!(part_4_opt.unwrap().to_owned(), expected_part_4); 
   
+  let (head, tail) = sample_text.pattern_split_pair_cs(r#"[,;-]"#);
+  let expected_head = "fifteen".to_string();
+  let expected_tail = "thousand;and;eighty-two".to_string();
+  assert_eq!(head, expected_head); 
+  assert_eq!(tail, expected_tail); 
+
+  let sample_string = "first / second - third ; fourth";
+  let pattern = r#"\s*[/;-]\s*"#;
+  let (head, tail) = sample_string.pattern_split_pair_cs(pattern); 
+  let expected_head = "first".to_string();
+  let expected_tail = "second - third ; fourth".to_string();
+  assert_eq!(head, expected_head); 
+  assert_eq!(tail, expected_tail); 
 }
