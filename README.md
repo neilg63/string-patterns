@@ -175,8 +175,6 @@ if source_str.match_words_by_proximity("lions?", "cats?", -20, 20, true) {
 ```rust
 let sample_string = "books, records and videotapes";
 let pattern = r#"\s*(,|and)\s"#;
-
-// With arrays or vectors the regex need only be compiled once
 let items = sample_string.pattern_split_ci(pattern); // case-insensitive split
 // should yield a vectior of strings: "books", "records", "videotapes"
 ```
