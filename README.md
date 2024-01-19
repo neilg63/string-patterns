@@ -177,8 +177,9 @@ let sample_string = "books, records and videotapes";
 let pattern = r#"\s*(,|and)\s"#;
 
 // With arrays or vectors the regex need only be compiled once
-let items = sample_string.pattern_split_ci(pattern); // case-insensitive replacement
-/// should yield the strings vec!["books", "records", "videotapes"]
+let items = sample_string.pattern_split_ci(pattern); // case-insensitive split
+// should yield a vectior of strings: "books", "records", "videotapes"
+```
 
 ### Traits
 
