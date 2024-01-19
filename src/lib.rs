@@ -136,15 +136,6 @@ pub trait IsNumeric {
   /// This mirrors a similar function in PHP, but is will fail with spaces or 
   /// any non-numeric characters other than a leading minus or a single decimal point
   /// For characters, is_numeric checks for decimal digit-equivalent characters
-  /// e.g.
-  /// ```rust
-  /// let input_str = "-2389.49";
-  /// let optional_value = if input_str.is_numeric() {
-  ///   input_str.parse::<f32>()
-  /// } else {
-  ///   None
-  /// };
-  /// ```
   fn is_numeric(&self) -> bool;
 }
 
@@ -954,6 +945,54 @@ impl PatternReplaceMany for Vec<String> {
     }
     return_strings
   }
+}
+
+
+/// Provides methods to split a &str/string on a regular expression
+pub trait PatternSplit {
+    /// Split a string on a regular expression with boolean case_insensitive flag. 
+    /// Returns result with vector of the parts between matches.
+    fn pattern_split_result(&self, pattern: &str, case_sensitive: bool) -> Result<Vec<String>, Error>;
+
+    /// Split a string on a regular expression with boolean case_insensitive flag. 
+    /// Returns  a vector of strings, empty if the regular expression fails.
+    fn pattern_split(&self, pattern: &str, case_sensitive: bool) -> Vec<String>;
+
+    /// Split a string on a regular expression in case-sensitive mode. 
+    /// Returns  a vector of strings, empty if the regular expression fails.
+    fn pattern_split_cs(&self, pattern: &str) -> Vec<String>;
+
+    /// Split a string on a regular expression in case-isensitive mode. 
+    /// Returns  a vector of strings, empty if the regular expression fails.
+    fn pattern_split_ci(&self, pattern: &str) -> Vec<String>;
+}
+
+/// Implemented for &str and available to String too
+impl PatternSplit for str {
+
+  /// Split a string on a regular expression
+  fn pattern_split_result(&self, pattern: &str, case_sensitive: bool) -> Result<Vec<String>, Error> {
+    match build_regex(pattern, case_sensitive) {
+      Ok(regex) => Ok(regex.split(self).into_iter().map(|s| s.to_string()).collect::<Vec<String>>()),
+      Err(error) => Err(error),
+    }
+  }
+
+  fn pattern_split(&self, pattern: &str, case_sensitive: bool) -> Vec<String> {
+    match self.pattern_split_result(pattern, case_sensitive) {
+      Ok(parts) => parts,
+      Err(_error) => vec![],
+    }
+  }
+
+  fn pattern_split_cs(&self, pattern: &str) -> Vec<String> {
+    self.pattern_split(pattern, false)
+  }
+
+  fn pattern_split_ci(&self, pattern: &str) -> Vec<String> {
+    self.pattern_split(pattern, true)
+  }
+
 }
 
 /// Methods to split a longer strong on a separator and return a vector of strings,

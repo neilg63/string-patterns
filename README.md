@@ -8,7 +8,7 @@ This library makes it easier to validate and manipulate strings in Rust. It buil
 
 The library provides a number of utility methods to split strings into vectors of strings or a head and tail components and to extract valid numbers from longer texts. Version 0.2.0 has extra methods to capture and count matched strings with offsets to facilitate advanced text processing and version 0.2.5 introduces new methods to match and replace words without intrusive word boundary anchors. The is_numeric() method in the IsNumeric trait now applies a strict regex-free check on compatibility with the parse() method and should not be confused char::is_numeric which checks for digit-like characters only and will not match minus or decimal points.
 
-Variant *match* and *replace* methods with _ci (case-insensitive) or _cs (case-sensitive) suffixes are shorthand for the equivalent plain methods that require a boolean *case_insensitive* parameter. In case-insensitive mode the non-capturing /(?i)/ flag is prepended automatically. This will not be prepended if you add another non-capturing group at the start of your regex. In every other way, the pattern-prefixed methods behave in the same way as *re.is_match*, *re.replace_all*, *re.find* and *re.capture_iter* methods in the Regex library. String-patterns unleashes most of the core functionality of the Regex crate, on which it depends, to cover most common use cases in text processing and to act as a building block for specific validators (e.g. email validation) and text transformers.
+Variant *match* and *replace* methods with _ci (case-insensitive) or _cs (case-sensitive) suffixes are shorthand for the equivalent plain methods that require a boolean *case_insensitive* parameter. In case-insensitive mode the non-capturing /(?i)/ flag is prepended automatically. This will not be prepended if you add another non-capturing group at the start of your regex. In every other way, the pattern-prefixed methods behave in the same way as *re.is_match*, *re.replace_all*, *re.find* and *re.capture_iter* methods in the Regex library. String-patterns unleashes most of the core functionality of the Regex crate, on which it depends, to cover most common use cases in text processing and to act as a building block for specific validators (e.g. email validation) and text transformers. Version 2.10 adds PatternSplit with results as string vectors.
 
 Most of the *match* methods will work on *&str* and *String*, while the replacement methods are only implemented for *owned strings*. Likewise, match methods are implemented for arrays and vectors of strings, while replacement methods are only implemented for vectors of *owned strings*. The traits may be implemented for structs or tuples with a string field.
 
@@ -169,6 +169,16 @@ if source_str.match_words_by_proximity("lions?", "cats?", -20, 20, true) {
   println!("This sentence mentions lions in the context of cats");
 }
 ```
+
+
+##### Split a string on a pattern
+```rust
+let sample_string = "books, records and videotapes";
+let pattern = r#"\s*(,|and)\s"#;
+
+// With arrays or vectors the regex need only be compiled once
+let items = sample_string.pattern_split_ci(pattern); // case-insensitive replacement
+/// should yield the strings vec!["books", "records", "videotapes"]
 
 ### Traits
 

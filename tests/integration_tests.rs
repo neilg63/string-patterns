@@ -407,3 +407,15 @@ fn test_word_bounds() {
   
 }
 
+
+#[test]
+fn test_split_on_pattern() {
+  let sample_text = r#"fifteen,thousand;and;eighty-two"#;
+  
+  // Check Word bounds is accessible externally
+  let result = sample_text.pattern_split(r#"[,;-]"#, false);
+  let part_4_opt = result.get(3);
+  let expected_part_4 = "eighty".to_string();
+  assert_eq!(part_4_opt.unwrap().to_owned(), expected_part_4); 
+  
+}
