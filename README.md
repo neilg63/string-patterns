@@ -175,7 +175,8 @@ if source_str.match_words_by_proximity("lions?", "cats?", -20, 20, true) {
 ```rust
 let sample_string = "books, records and videotapes";
 let pattern = r#"\s*(,|and)\s"#;
-let items = sample_string.pattern_split_ci(pattern); // case-insensitive split
+ // case-insensitive split
+let items = sample_string.pattern_split_ci(pattern);
 // should yield a vector of strings: "books", "records", "videotapes"
 ```
 
@@ -183,8 +184,9 @@ let items = sample_string.pattern_split_ci(pattern); // case-insensitive split
 ```rust
 let sample_string = "first / second - third ; fourth";
 let pattern = r#"\s*[/;-]\s*"#;
-let items = sample_string.pattern_split_pAir_cs(pattern); // case-sensitive split
-// should yield a tuple of strings: "first", "second - third ; fourth"
+// case-sensitive split
+let (head, tail) = sample_string.pattern_split_pair_cs(pattern); 
+// should yield => head: "first" and tail: "second - third ; fourth"
 ```
 
 ### Traits
@@ -199,6 +201,7 @@ let items = sample_string.pattern_split_pAir_cs(pattern); // case-sensitive spli
 - **PatternMatches**:	Pattern methods for arrays or vectors only, return vectors of booleans matching each input string
 - **PatternReplace**:	Core regular expression replacement methods
 - **PatternReplaceMany**:	Provides methods to replace with multiple patterns expressed as arrays of tuples
+- **PatternSplit**:	Methods to split strings to vectors or head/tail tuples of strings
 - **MatchWord**: Has convenience methods to match words with various word boundary rules. New to 0.2.0
 - **ReplaceWord**: Provides methods to replace one or more words with clean syntax. New to 0.2.5
 - **PatternCapture**: Returns captures or vectors of each match, whether overlapping or not, and counts of matching patterns or words. New to version 0.2.0
