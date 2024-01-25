@@ -324,6 +324,9 @@ impl StripCharacters for String {
     for component in self.chars() {
       let mut is_end = false;
       if component.is_digit(10) {
+        if prev_char == '-' {
+          num_string.push(prev_char);  
+        }
         num_string.push(component);
         seq_num += 1;
       } else if prev_char.is_digit(10) {
