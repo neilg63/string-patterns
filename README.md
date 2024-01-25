@@ -6,7 +6,7 @@
 
 This library makes it easier to validate and manipulate strings in Rust. It builds on Rust's standard library with help from the default regular expression crate, *regex*. It has no other dependencies. It aims to make working with strings as easy in Rust as it is Javascript or Python with cleaner syntax and without unduly compromising performance if used sparingly alongside simpler string matching functions such as starts_with, contains or ends_with. To this end, the crate provides methods such as *starts_with_ci* and *starts_with_ci_alphanum* for basic string validation without regular expressions. 
 
-The library provides a number of utility methods to split strings into vectors of strings or a head and tail components and to extract valid numbers from longer texts. Version 0.2.0 has extra methods to capture and count matched strings with offsets to facilitate advanced text processing and version 0.2.5 introduces new methods to match and replace words without intrusive word boundary anchors. The is_numeric() method in the IsNumeric trait now applies a strict regex-free check on compatibility with the parse() method and should not be confused char::is_numeric which checks for digit-like characters only and will not match minus or decimal points. Version 2.13 corrects am issue in to_first_number() that led negative numbers to be interpreted as positives. I added a new example below to show how *pattern_split* and to *first_number* this may be used together to process number-like strings.
+The library provides a number of utility methods to split strings into vectors of strings or a head and tail components and to extract valid numbers from longer texts. Version 0.2.0 has extra methods to capture and count matched strings with offsets to facilitate advanced text processing and version 0.2.5 introduces new methods to match and replace words without intrusive word boundary anchors. The is_numeric() method in the IsNumeric trait now applies a strict regex-free check on compatibility with the parse() method and should not be confused char::is_numeric which checks for digit-like characters only and will not match minus or decimal points. Version 2.13 corrects am issue in to_first_number() that led negative numbers to be interpreted as positives. I added a new example below to show how *pattern_split* and to *first_number* this may be used together to process number-like strings common in APIs.
 
 Variant *match* and *replace* methods with _ci (case-insensitive) or _cs (case-sensitive) suffixes are shorthand for the equivalent plain methods that require a boolean *case_insensitive* parameter. In case-insensitive mode the non-capturing /(?i)/ flag is prepended automatically. This will not be prepended if you add another non-capturing group at the start of your regex. In every other way, the pattern-prefixed methods behave in the same way as *re.is_match*, *re.replace_all*, *re.find* and *re.capture_iter* methods in the Regex library. String-patterns unleashes most of the core functionality of the Regex crate, on which it depends, to cover most common use cases in text processing and to act as a building block for specific validators (e.g. email validation) and text transformers. 
 
@@ -27,14 +27,14 @@ fn is_valid_time_string(input: &str) -> bool {
 }
 ```
 
-##### with the string-patterns library
+##### More concise syntax with the string-patterns library
 ```rust
 fn is_valid_time_string(input: &str) -> bool {
   input.pattern_match_cs(r#"^([01]\d|2[0-3])?:[0-5]\d(:[0-5]\d)?$"#)
 }
 ```
 
-##### standard Rust with the Regex library
+##### Sample replacement standard Rust with the Regex library
 ```rust
 
 fn replace_final_os(input: &str) -> String {
@@ -47,11 +47,13 @@ fn replace_final_os(input: &str) -> String {
 }
 ```
 
-##### with the string-patterns library
+##### More concise syntax with the string-patterns library
 ```rust
 
 fn replace_final_os(input: &str) -> String {
-  input.to_string().pattern_replace_ci(r#"(\w)o\b"#, "${1}um") // case-insensitive replacement
+  // case-insensitive replacement,
+  // NB: the regex syntax and capture rules are enforced by the Regex library
+  input.to_string().pattern_replace_ci(r#"(\w)o\b"#, "${1}um") 
 }
 ```
 
@@ -159,6 +161,20 @@ if let Some(price_gbp) = sample_str.to_first_number::<f64>() {
     let price_eur = price_gbp / GBP_TO_EURO;
     println!("The price in euros is {:.2}", price_eur);
 }
+```
+
+##### Extract three float values from a longer string that may derive from another API
+```rust
+
+let input_str = "-78.29826, 34.15 160.9";
+// the pattern expects valid decimal numbers separated by commas and/or one or more spaces
+let split_pattern = r#"(\s*,\s*|\s+)"#;
+
+let numbers: Vec<f64> = input_str.pattern_split_cs(split_pattern)
+    .into_iter().map(|s| s.to_first_number::<f64>())
+    .filter(|nr| nr.is_some())
+    .map(|s| s.unwrap()).collect();
+// yields a vector of three f64 numbers [-78.29826, 34.15, 160.9];
 ```
 
 ##### Test the proximity of two words
