@@ -435,9 +435,9 @@ fn test_split_on_pattern() {
 
 #[test]
 fn test_pattern_split_to_numbers() {
-  let input_str = "-78.29826,34.15,160.9";
+  let input_str = "-78.29826,34.15 160.9";
 
-  let numbers = input_str.pattern_split_cs(r#"\s*,\s*"#).into_iter().map(|s| s.to_first_number::<f64>()).filter(|nr| nr.is_some()).map(|s| s.unwrap_or(0f64)).collect::<Vec<f64>>();
+  let numbers = input_str.pattern_split_cs(r#"(\s*,\s*|\s+)"#).into_iter().map(|s| s.to_first_number::<f64>()).filter(|nr| nr.is_some()).map(|s| s.unwrap_or(0f64)).collect::<Vec<f64>>();
   let first_number = numbers.get(0).unwrap_or(&0f64).to_owned();
   let second_number = numbers.get(1).unwrap_or(&0f64).to_owned();
   let third_number = numbers.get(2).unwrap_or(&0f64).to_owned();
