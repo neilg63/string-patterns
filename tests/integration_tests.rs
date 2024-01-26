@@ -445,7 +445,7 @@ fn test_pattern_split_to_numbers() {
   let first_number = numbers.get(0).unwrap_or(&0f64).to_owned();
   let second_number = numbers.get(1).unwrap_or(&0f64).to_owned();
   let third_number = numbers.get(2).unwrap_or(&0f64).to_owned();
-  assert!(first_number < -70f64 && first_number > -80f64);
+  assert!(first_number < -78f64 && first_number > -79f64);
   assert_eq!(second_number, 34.15f64);
   assert_eq!(third_number, 160.9f64);
 }
