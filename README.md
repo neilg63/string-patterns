@@ -6,7 +6,7 @@
 
 This library makes it easier to validate and manipulate strings in Rust. It builds on Rust's standard library with help from the default regular expression crate, *regex*. It has no other dependencies. It aims to make working with strings as easy in Rust as it is Javascript or Python with cleaner syntax and without unduly compromising performance if used sparingly alongside simpler string matching functions such as starts_with, contains or ends_with. To this end, the crate provides methods such as *starts_with_ci* and *starts_with_ci_alphanum* for basic string validation without regular expressions. 
 
-The library provides a number of utility methods to split strings into vectors of strings or a head and tail components and to extract valid numbers from longer texts. Version 0.2.0 has extra methods to capture and count matched strings with offsets to facilitate advanced text processing and version 0.2.5 introduces new methods to match and replace words without intrusive word boundary anchors. The is_numeric() method in the IsNumeric trait now applies a strict regex-free check on compatibility with the parse() method and should not be confused char::is_numeric which checks for digit-like characters only and will not match minus or decimal points. Version 2.13 corrects am issue in to_first_number() that led negative numbers to be interpreted as positives. I added a new example below to show how *pattern_split* and to *first_number* this may be used together to process number-like strings common in APIs.
+The library provides a number of utility methods to split strings into vectors of strings or a head and tail components and to extract valid numbers from longer texts. Version 0.2.0 has extra methods to capture and count matched strings with offsets to facilitate advanced text processing and version 0.2.5 introduces new methods to match and replace words without intrusive word boundary anchors. The is_numeric() method in the IsNumeric trait now applies a strict regex-free check on compatibility with the parse() method and should not be confused char::is_numeric which checks for digit-like characters only and will not match minus or decimal points. Version 2.13 corrects an issue in to_first_number() that led negative numbers to be interpreted as positives. I added a new example below to show how *pattern_split* and to *first_number* this may be used together to process number-like strings common in APIs.
 
 Variant *match* and *replace* methods with _ci (case-insensitive) or _cs (case-sensitive) suffixes are shorthand for the equivalent plain methods that require a boolean *case_insensitive* parameter. In case-insensitive mode the non-capturing /(?i)/ flag is prepended automatically. This will not be prepended if you add another non-capturing group at the start of your regex. In every other way, the pattern-prefixed methods behave in the same way as *re.is_match*, *re.replace_all*, *re.find* and *re.capture_iter* methods in the Regex library. String-patterns unleashes most of the core functionality of the Regex crate, on which it depends, to cover most common use cases in text processing and to act as a building block for specific validators (e.g. email validation) and text transformers. 
 
@@ -14,7 +14,7 @@ Most of the *match* methods will work on *&str* and *String*, while the replacem
 
 I will add more documentation as the library progresses beyond the alpha stage. 
 
-##### standard Rust with the Regex library
+##### Regular expression match in standard Rust with the Regex library
 ```rust
 
 fn is_valid_time_string(input: &str) -> bool {
@@ -34,7 +34,7 @@ fn is_valid_time_string(input: &str) -> bool {
 }
 ```
 
-##### Sample replacement standard Rust with the Regex library
+##### Sample replacement in standard Rust with the Regex library
 ```rust
 
 fn replace_final_os(input: &str) -> String {
@@ -88,7 +88,9 @@ let sample_text = r#"Humpty Dumpty sat on a wall,
           All the king's horses and all the king's men
           Couldn't put Humpty together again."#;
   let sample_word = "humpty";
-  println!("{} occurs {} times in the above text", sample_word, sample_text.count_word("humpty", true) )
+  // count the number of whole words in case-insensitive mode
+  let num_occurrences = sample_text.count_word("humpty", true);
+  println!("{} occurs {} times in the above text", sample_word, num_occurrences );
 ```
 
 ##### Replace text in a vector of strings

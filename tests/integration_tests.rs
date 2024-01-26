@@ -448,5 +448,4 @@ fn test_pattern_split_to_numbers() {
   assert!(first_number < 70f64 && first_number > -80f64);
   assert_eq!(second_number, 34.15f64);
   assert_eq!(third_number, 160.9f64);
-
 }
