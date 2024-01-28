@@ -231,6 +231,20 @@ fn test_simple_pattern_matches() {
   
 }
 
+
+#[test]
+fn test_pattern_matches_in_arrays() {
+  let phrases = [
+    "The eyesight of a dog is not as keen as its sense of smell",
+    "The fourth critical stage in a puppy’s development is between 12 and 16 weeks",
+    "The heat cycle of the female lasts from 18 to 21 days",
+    "Most bitches whelp normally."
+  ].to_strings();
+
+  let expected_matches = vec![false, true, false, false];
+  assert_eq!(phrases.pattern_matches_ci("puppy"), expected_matches);
+}
+
 #[test]
 fn test_is_numeric() {
   let num_str_1 = "-1227.75";
