@@ -124,6 +124,19 @@ fn test_to_inner_segment() {
   let target_str2 = "embedded".to_string();
   let pairs = [("/", 2), ("-", 2), ("|", 1)];
   assert_eq!(source_str2.to_inner_segment(&pairs), Some(target_str2) );
+
+ let groups = [("/", 1), ("-", 2)];
+ let file_path = "pictures/holiday-france-1983/originals";
+ let current_year: i32 = 2024;  
+ let invalid_age: i32 = 0;
+ let expected_age: i32 = 41;
+ let matched_year = if let Some(year_string) = file_path.to_inner_segment(&groups) {
+  // only parse age if matched, standard parse() is fine, but to_first_number() will strip any characters before or after the first number.
+  year_string.parse::<i32>().unwrap_or(invalid_age)
+ } else {
+  invalid_age
+ }; // should yield 1983
+ assert_eq!(current_year - matched_year, expected_age);
 }
 
 #[test]

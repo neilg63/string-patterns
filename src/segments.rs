@@ -150,7 +150,9 @@ impl ToSegments for str {
     }
   }
 
-  /// extract inner segment via a set of tuples with separators and indices.
+  /// extract an inner segment via a set of tuples with separators and indices.
+  /// e.g. [("/", 1), ("-", 2)] applied to "pictures/holiday-france-1983/originals" 
+  /// would match "1983" as an optional string
   fn to_inner_segment(&self, groups: &[(&str, i32)]) -> Option<String> {
     if groups.len() > 0 {
       let mut matched: Option<String> = None;
