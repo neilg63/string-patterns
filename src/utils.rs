@@ -1,4 +1,4 @@
-use regex::*;
+use regex::{Regex, Error};
 use crate::enums::WordBounds;
 
 /// Build a regular expression with an optional case-insenistive non-capturing group

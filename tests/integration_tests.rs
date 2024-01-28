@@ -1,4 +1,4 @@
-use string_patterns::{*, enums::WordBounds};
+use string_patterns::*;
 
 #[cfg(test)]
 
