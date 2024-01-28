@@ -154,10 +154,13 @@ fn test_to_head_tail() {
 
 #[test]
 fn test_to_start_end() {
-  let source_str = "comma,separated,string".to_string();
+  let source_str = "comma,separated,string";
   let start = "comma,separated".to_string();
   let end = "string".to_string();
   assert_eq!(source_str.to_start_end(","), (start, end) );
+  let source_str = "one-item".to_string();
+  let empty_end = "".to_string();
+  assert_eq!(source_str.to_start_end(","), (source_str, empty_end) );
 }
 
 #[test]

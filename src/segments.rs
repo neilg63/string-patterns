@@ -182,15 +182,14 @@ impl ToSegments for str {
   /// Extract a tuple of the tail and remainder, like split_once in reverse and returning strings
   fn to_start_end(&self, separator: &str) -> (String, String) {
     let parts = self.to_parts(separator);
-    let last_part = "".to_string();
     let num_parts = parts.len();
-    if num_parts > 0 {
+    if num_parts > 1 {
       let end_index = num_parts - 1;
       let start = parts[0..end_index].join(separator);
       let end = self.to_end(separator);
       (start, end)
     } else {
-      (self.to_owned(), last_part)
+      (self.to_owned(), "".to_string())
     }
   }
 
