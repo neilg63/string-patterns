@@ -6,13 +6,11 @@
 
 This library makes it easier to validate and manipulate strings in Rust. It builds on Rust's standard library with help from the default regular expression crate, *regex*. It has no other dependencies. It aims to make working with strings as easy in Rust as it is Javascript or Python with cleaner syntax and without unduly compromising performance if used sparingly alongside simpler string matching functions such as starts_with, contains or ends_with. To this end, the crate provides methods such as *starts_with_ci* and *starts_with_ci_alphanum* for basic string validation without regular expressions. 
 
-The library provides a number of utility methods to split strings into vectors of strings or a head and tail components and to extract valid numbers from longer texts. Version 0.2.0 has extra methods to capture and count matched strings with offsets to facilitate advanced text processing and version 0.2.5 introduces new methods to match and replace words without intrusive word boundary anchors. The is_numeric() method in the IsNumeric trait now applies a strict regex-free check on compatibility with the parse() method and should not be confused char::is_numeric which checks for digit-like characters only and will not match minus or decimal points. Version 2.13 corrects an issue in to_first_number() that led negative numbers to be interpreted as positives. I added a new example below to show how *pattern_split* and to *first_number* this may be used together to process number-like strings common in APIs. Version 2.14 introduces no new features or breaking changes, but organises the traits and implementations into separate files.
+The library provides a number of utility methods to split strings into vectors of strings or a head and tail components and to extract valid numbers from longer texts. Version 0.2.0 has extra methods to capture and count matched strings with offsets to facilitate advanced text processing and version 0.2.5 introduces new methods to match and replace words without intrusive word boundary anchors. The is_numeric() method in the IsNumeric trait now applies a strict regex-free check on compatibility with the parse() method and should not be confused char::is_numeric which checks for digit-like characters only and will not match minus or decimal points. Version 2.13 has a new example showing you how to combine *pattern_split* and *to_first_number* to process numbers within longer strings as floats. Version 2.14 introduces no new features or breaking changes, but organises the traits and implementations into separate files.
 
 Variant *match* and *replace* methods with _ci (case-insensitive) or _cs (case-sensitive) suffixes are shorthand for the equivalent plain methods that require a boolean *case_insensitive* parameter. In case-insensitive mode the non-capturing /(?i)/ flag is prepended automatically. This will not be prepended if you add another non-capturing group at the start of your regex. In every other way, the pattern-prefixed methods behave in the same way as *re.is_match*, *re.replace_all*, *re.find* and *re.capture_iter* methods in the Regex library. String-patterns unleashes most of the core functionality of the Regex crate, on which it depends, to cover most common use cases in text processing and to act as a building block for specific validators (e.g. email validation) and text transformers. 
 
 Most of the *match* methods will work on *&str* and *String*, while the replacement methods are only implemented for *owned strings*. Likewise, match methods are implemented for arrays and vectors of strings, while replacement methods are only implemented for vectors of *owned strings*. The traits may be implemented for structs or tuples with a string field. Version 2.10 adds PatternSplit with results as String vectors.
-
-I will add more documentation as the library progresses beyond the alpha stage. 
 
 ##### Regular expression match in standard Rust with the Regex library
 ```rust
@@ -99,8 +97,10 @@ let sample_strings = ["apples", "bananas", "carrots", "dates"].to_strings(); ///
 let pattern = r#"a([pr])"#;
 let replacement = "æ$1";
 // With arrays or vectors the regex need only be compiled once
-let new_strings = sample_strings.pattern_replace_ci(pattern, replacement); // case-insensitive replacement
-/// should yield the strings "æpples", "bananas", "cærrots", "dates" only replacing 'a' with 'æ' before 'p' or 'r'
+// case-insensitive replacement
+let new_strings = sample_strings.pattern_replace_ci(pattern, replacement); 
+/// should yield the strings "æpples", "bananas", "cærrots", "dates"
+/// only replacing 'a' with 'æ' before 'p' or 'r'
 ```
 
 ##### Replace multiple pattern/replacement pairs 
@@ -117,20 +117,24 @@ let target_str = source_str.pattern_replace_pairs(&pattern_replacements);
 ##### Replace multiple word pairs in case-sensitive mode
 ```rust
 /// This should have the same result as above but with cleaner and less error-prone syntax
-let source_str = "The dying King Edmund decides to try to save Lear and Cordelia.".to_string();
+let source_str = "The dying King Edmund decides to try to save Lear and Cordelia.";
   let pattern_replacements = [
     ("Edmund", "Edward"),
     ("Lear", "Larry"),
     ("Cordelia", "Cecilia")
   ];
 /// Should read "The dying King Edward decides to try to save Larry and Cecilia."
-let target_str = source_str.replace_words_cs(&pattern_replacements); 
+let target_str = source_str.to_string().replace_words_cs(&pattern_replacements); 
 ```
 
 ##### Match any words in case-insensitive mode
 ```rust
-let source_str = "Two cheetahs ran across the field".to_string();
-let cat_like_words = ["lions?","tigers?", "pumas?", "panthers?", "jaguars?", "leopards?", "lynx(es)?", "cheetahs?"];
+let source_str = "Two cheetahs ran across the field";
+let cat_like_words = [
+  "lions?","tigers?", "pumas?",
+  "panthers?", "jaguars?", "leopards?",
+  "lynx(es)?", "cheetahs?"
+];
 if source_str.match_any_words_ci(&cat_like_words) {
   println!("`{}` is related to cats", source_str);
 }
@@ -230,4 +234,4 @@ let (head, tail) = sample_string.pattern_split_pair_cs(pattern);
 - **WordBounds**:	Has options for *Start*, *End* and *Both* with a method to render regular expression subpatterns with the correct word boundaries
 
 NB: Although I've used the library methods in three of my commercial projects, this crate is very much in its alpha stage as I evaluate
-which of the many auxiliary methods, not documented here, belong in this library. Many minor version updates in the 0.1.x 0.2.x series reflect mainly corrections to this file.
+which of the many auxiliary methods, not documented here, belong in this library. Many minor version updates in the 0.1.x 0.2.x series reflect mainly corrections to this file and revised tests.
