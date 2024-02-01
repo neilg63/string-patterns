@@ -6,7 +6,7 @@
 
 This library makes it easier to validate and manipulate strings in Rust. It builds on Rust's standard library with help from the default regular expression crate, *regex*. It has no other dependencies. It aims to make working with strings as easy in Rust as it is Javascript or Python with cleaner syntax and without unduly compromising performance if used sparingly alongside simpler string matching functions such as starts_with, contains or ends_with. To this end, the crate provides methods such as *starts_with_ci* and *starts_with_ci_alphanum* for basic string validation without regular expressions. 
 
-The library provides a number of utility methods to split strings into vectors of strings or a head and tail components and to extract valid numbers from longer texts. Version 0.2.0 has extra methods to capture and count matched strings with offsets to facilitate advanced text processing and version 0.2.5 introduces new methods to match and replace words without intrusive word boundary anchors. The is_numeric() method in the IsNumeric trait now applies a strict regex-free check on compatibility with the parse() method and should not be confused char::is_numeric which checks for digit-like characters only and will not match minus or decimal points. Version 2.13 has a new example showing you how to combine *pattern_split* and *to_first_number* to process numbers within longer strings as floats. Version 2.14 introduces no new features or breaking changes, but organises the traits and implementations into separate files.
+The library provides a number of utility methods to split strings into vectors of strings or a head and tail components and to extract valid numbers from longer texts. Version 0.2.0 has extra methods to capture and count matched strings with offsets to facilitate advanced text processing and version 0.2.5 introduces new methods to match and replace words without intrusive word boundary anchors. The is_numeric() method in the IsNumeric trait now applies a strict regex-free check on compatibility with the parse() method and should not be confused char::is_numeric which checks for digit-like characters only and will not match minus or decimal points. Version 2.13 adds an example showing you how to combine *pattern_split* and *to_first_number* to process numbers within longer strings as floats. 
 
 Variant *match* and *replace* methods with _ci (case-insensitive) or _cs (case-sensitive) suffixes are shorthand for the equivalent plain methods that require a boolean *case_insensitive* parameter. In case-insensitive mode the non-capturing /(?i)/ flag is prepended automatically. This will not be prepended if you add another non-capturing group at the start of your regex. In every other way, the pattern-prefixed methods behave in the same way as *re.is_match*, *re.replace_all*, *re.find* and *re.capture_iter* methods in the Regex library. String-patterns unleashes most of the core functionality of the Regex crate, on which it depends, to cover most common use cases in text processing and to act as a building block for specific validators (e.g. email validation) and text transformers. 
 
@@ -169,6 +169,21 @@ if let Some(price_gbp) = sample_str.to_first_number::<f64>() {
 }
 ```
 
+##### Extract numeric sequences from phrases and convert them to a vector of floats
+```rust
+// extract European-style numbers with commas as decimal separators and points as thousand separators
+let sample_str = "2.500 grammi di farina costa 9,90€ al supermercato.".to_string();
+  let numbers: Vec<f32> = sample_str.to_numbers_euro();
+  // If two valid numbers are matched assume the first is the weight
+  if numbers.len() > 1 {
+    let weight_grams = numbers[0];
+    let price_euros = numbers[1];
+    let price_per_kg = price_euros / (weight_grams / 1000f32);
+    // the price in kg should be 3.96
+    println!("Flour costs €{:.2} per kilo", price_per_kg);
+  }
+```
+
 ##### Extract three float values from a longer string that may derive from another API
 ```rust
 
@@ -233,5 +248,4 @@ let (head, tail) = sample_string.pattern_split_pair_cs(pattern);
 ### Enums
 - **WordBounds**:	Has options for *Start*, *End* and *Both* with a method to render regular expression subpatterns with the correct word boundaries
 
-NB: Although I've used the library methods in three of my commercial projects, this crate is very much in its alpha stage as I evaluate
-which of the many auxiliary methods, not documented here, belong in this library. Many minor version updates in the 0.1.x 0.2.x series reflect mainly corrections to this file and revised tests.
+NB: This crate is very much in its alpha stage, but has already been used in production in 3 API projects. Since version 2.14 the code base has been organised into separate files for each set of traits with related implementations.
