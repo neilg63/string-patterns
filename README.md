@@ -6,7 +6,7 @@
 
 This library makes it easier to process strings in Rust. It builds on Rust's standard library with help from its default regular expression crate, *[regex](https://crates.io/crates/regex)*. It has no other dependencies. It aims to make working with strings as easy in Rust as it is Javascript or Python with cleaner syntax. Simpler string matching methods such as starts_with, contains or ends_with will always perform better, especially when processing large data sets. To this end, the crate provides methods such as *starts_with_ci* and *starts_with_ci_alphanum* for basic string validation without regular expressions as well as extension methods to split strings into vectors of strings or a *head* and *tail* components.
 
-Version 0.2.0 introduced additional methods to capture and count matched strings with offsets and version 0.2.5 added methods to match, replace and capture and count words without intrusive word boundary anchors.
+Version 0.2.0 introduced additional methods to capture and count matched strings with offsets and version 0.2.5 added methods to match, replace, capture and count words without intrusive word boundary anchors.
 
 The is_numeric() method, in the *IsNumeric* trait, applies a strict regex-free check on compatibility with the *parse()* method. It differs from char::is_numeric which checks for digit-like characters only and does not match minus or decimal points. Parallel *has_digits* and *has_digits_only* methods are implemented for the *CharGroupMatch* trait to test only for unsigned integers. An example below shows you how to combine *pattern_split* and *to_first_number* to capture numbers within longer texts as floats.
 
