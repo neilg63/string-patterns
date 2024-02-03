@@ -273,6 +273,9 @@ fn test_is_numeric() {
 
   let num_str_3 = "-1.227,75"; // European-style with commas as decimal separators
   assert!(num_str_3.to_owned().correct_numeric_string(true).is_numeric());
+
+  let num_str_4 = "$19.99 each"; // Should fail, as this will not parse directly to a float
+  assert!(!num_str_4.is_numeric());
 }
 
 #[test]
@@ -478,4 +481,17 @@ fn test_pattern_split_to_numbers() {
   assert!(first_number < -78f64 && first_number > -79f64);
   assert_eq!(second_number, 34.15f64);
   assert_eq!(third_number, 160.9f64);
+}
+
+#[test]
+fn test_build_regex() {
+  // test if build_regex compiles
+  let pattern_1 = r#"\bb[aeiou]llsh[aeiou]t\b"#;
+  let regex_1 = build_regex(pattern_1, true);
+  assert!(regex_1.is_ok());
+
+  // test if build_regex handles errors correctly
+  let pattern_2 = r#"\bb[aeiou]llsh[aeiout\b"#;
+  let regex_2 = build_regex(pattern_2, true);
+  assert!(regex_2.is_err());
 }

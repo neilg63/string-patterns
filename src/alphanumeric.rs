@@ -8,8 +8,8 @@ use crate::{MatchOccurrences, utils::add_sanitized_numeric_string, ToSegments};
 pub trait IsNumeric {
   /// strict check on a numeric string before using ```.parse::<T>()```
   /// use trim() or correct_numeric_string() first for looser number validation
-  /// This mirrors a similar functions in Java StringUtils.isNumeric and in the PHP standard library,
-  /// but is will fail with spaces or any non-numeric characters other than a leading minus or a single decimal point
+  /// This mirrors a similar function in the PHP standard library, which is more useful than only checking for digits.
+  /// It will fail with spaces or any non-numeric characters other than a leading minus or a single decimal point
   /// For characters, is_numeric checks for decimal digit-equivalent characters
   fn is_numeric(&self) -> bool;
 }
