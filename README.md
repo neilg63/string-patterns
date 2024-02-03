@@ -8,7 +8,7 @@ This library makes it easier to process strings in Rust. It builds on Rust's sta
 
 Version 0.2.0 introduced additional methods to capture and count matched strings with offsets and version 0.2.5 added methods to match and replace words without intrusive word boundary anchors.
 
-The is_numeric() method in the *IsNumeric* trait applies a strict regex-free check on compatibility with the *parse()* method. It differs from char::is_numeric which checks for digit-like characters only and will not match minus or decimal points. There are parallel *has_digits* and *has_digits_only* methods to test only for unsigned integers. An example below shows you how to combine *pattern_split* and *to_first_number* to capture numbers within longer texts as floats. 
+The is_numeric() method in the *IsNumeric* trait applies a strict regex-free check on compatibility with the *parse()* method. It differs from char::is_numeric which checks for digit-like characters only and does not match minus or decimal points. There are parallel *has_digits* and *has_digits_only* methods to test only for unsigned integers. An example below shows you how to combine *pattern_split* and *to_first_number* to capture numbers within longer texts as floats.
 
 Many *match* and *replace* methods have variants ending in _ci (case-insensitive) or _cs (case-sensitive) as wrappers for the equivalent plain methods that require a boolean *case_insensitive* parameter. In case-insensitive mode the non-capturing /(?i)/ flag is prepended automatically. This will not be prepended if you add another non-capturing group at the start of your regex. In every other way, the pattern-prefixed methods behave in the same way as *re.is_match*, *re.replace_all*, *re.find* and *re.capture_iter* methods in the Regex library. String-patterns unleashes most of the core functionality of the Regex crate, on which it depends, to cover most common use cases in text processing and to act as a building block for specific validators (e.g. email validation) and text transformers. 
 
@@ -67,6 +67,8 @@ if str_1.starts_with_ci("dog") {
 
 ##### Simple case-insensitive match on the alphanumeric characters only in a longer string
 ```rust
+// This method is handy for validating text values from external APIs with
+// inconsistent naming conventions, e.g. first-name, first_name, firstName or "first name"
 let str_1 = "Do you spell hip-hop with a hyphen?";
 if str_1.contains_ci_alphanum("hiphop") {
   println!("{} is hip-hop-related", str_1);
@@ -234,10 +236,10 @@ let (head, tail) = sample_string.pattern_split_pair_cs(pattern);
 - **IsNumeric**	Provides a method to check if the string may be parsed to an integer or float
 - **StripCharacters**:	Set of methods to strip unwanted characters by type or extract vectors of numeric strings, integers or floats without regular expressions
 - **SimpleMatch**:	Regex-free matcher methods for common validation rules, e.g. starts_with_ci_alphanum checks if the first letters or numerals in a sample string in case-insensitive mode without regular expressions.
-- **MatchOccurrences**:	Return the indices of all ocurrences of an exact string
+- **MatchOccurrences**:	Returns the indices of all ocurrences of an exact string
 - **PatternMatch**	Core regular expression match methods, wrappers for re.is_match with case-insensitive (_ci) and case-sensitive (_cs) variants
 - **PatternMatchMany**:	Provides methods to match with multiple patterns expressed as arrays of tuples or simple strs
-- **PatternMatches**:	Pattern methods for arrays or vectors only, return vectors of booleans matching each input string
+- **PatternMatches**:	Pattern methods for arrays or vectors only, returns vectors of booleans matching each input string
 - **PatternReplace**:	Core regular expression replacement methods
 - **PatternReplaceMany**:	Provides methods to replace with multiple patterns expressed as arrays of tuples
 - **PatternSplit**:	Methods to split strings to vectors or head/tail tuples of strings
@@ -250,4 +252,5 @@ let (head, tail) = sample_string.pattern_split_pair_cs(pattern);
 ### Enums
 - **WordBounds**:	Has options for *Start*, *End* and *Both* with a method to render regular expression subpatterns with the correct word boundaries
 
-NB: This crate is very much in its alpha stage, but has already been used in production in 3 API projects. Since version 2.14 the code base has been organised into separate files for each set of traits with related implementations. Version 2.17 makes the *build_regex(pattern: &str, case_insensitive: bool)* available to implementors. This is a wrapper *for Regex::new(re: &str)*, but has a convenient case_insensitive parameter and avoids having to explicity import the *regex* crate,
+NB: This crate is still in its alpha stage, but has already been used in 3 API projects. Since version 2.14 the code base has been organised into separate files for each set of traits with related implementations. Version 2.17 makes the *build_regex(pattern: &str, case_insensitive: bool)* available to implementors. This is a wrapper *for Regex::new(re: &str)*, but has a convenient case_insensitive parameter and avoids having to explicity import the *regex* crate*.
+Some updates only reflect minor corrections to these notes and comments in other files.
