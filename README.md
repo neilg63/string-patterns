@@ -67,7 +67,7 @@ if str_1.starts_with_ci("dog") {
 
 ##### Simple case-insensitive match on the alphanumeric characters only in a longer string
 ```rust
-// This method is handy for validating text values from external APIs with
+// This method is handy for validating text values from external data sources with
 // inconsistent naming conventions, e.g. first-name, first_name, firstName or "first name"
 let str_1 = "Do you spell hip-hop with a hyphen?";
 if str_1.contains_ci_alphanum("hiphop") {
@@ -190,7 +190,7 @@ let sample_str = "2.500 grammi di farina costa 9,90€ al supermercato.".to_stri
   }
 ```
 
-##### Extract three float values from a longer string that may derive from another API
+##### Extract three float values from a longer string
 ```rust
 
 let input_str = "-78.29826, 34.15 160.9";
@@ -255,9 +255,9 @@ let (head, tail) = sample_string.pattern_split_pair_cs(pattern);
 - **WordBounds**:	Has options for *Start*, *End* and *Both* with a method to render regular expression subpatterns with the correct word boundaries
 
 ### Dev Notes
-This crate is still in its alpha stage, but has already been used in 3 API projects. Since version 2.14 the code base has been organised into separate files for each set of traits with related implementations.
+This crate is still in its alpha stage, but has already been used in 3 API projects. Since version 0.2.14 the code base has been organised into separate files for each set of traits with related implementations. 
 
 #### Recent Version Notes
-Version 2.17 makes the *build_regex(pattern: &str, case_insensitive: bool)* available to implementors. This is a wrapper *for Regex::new(re: &str)*, but has a convenient case_insensitive parameter and avoids having to explicity import the *regex* crate*. 
-In version 2.19 default implementations have been added for many variant methods in PatternMatch, PatternReplace, PatternMatchMany and PatternReplaceMany. The last two traits depend on *PatternMatch* and *PatternReplace* respectively. For *PatternMatch* only the base method *pattern_match_result* needs to be implemented and for *PatternReplace* only *pattern_replace_result* and *pattern_replace* need custom implementations, the latter only because the fallback value may have different trait and lifetimes constraints for arrays and vectors. 
+Version 0.2.17 makes the *build_regex(pattern: &str, case_insensitive: bool)* available to implementors. This is a wrapper *for Regex::new(re: &str)*, but has a convenient case_insensitive parameter and avoids having to explicity import the *regex* crate*. 
+In version 0.2.19 default implementations have been added for many variant methods in PatternMatch, PatternReplace, PatternMatchMany and PatternReplaceMany. The last two traits depend on *PatternMatch* and *PatternReplace* respectively. For *PatternMatch* only the base method *pattern_match_result* needs to be implemented and for *PatternReplace* only *pattern_replace_result* and *pattern_replace* need custom implementations, the latter only because the fallback value may have different trait and lifetimes constraints for arrays and vectors. 
 Some updates only reflect minor corrections to these notes and comments in other files.
