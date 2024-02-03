@@ -233,6 +233,21 @@ fn test_replace_many_words() {
 }
 
 #[test]
+fn test_replace_many() {
+  let sample_text = "I have five lions and twelve wolves in my safari park.".to_string();
+  let replacement_pairs = [("lions", "cats"), ("wolves", "dogs"), ("safari park", "garden")];
+  let expected_text = "I have five cats and twelve dogs in my garden.".to_string();
+  assert_eq!(sample_text.pattern_replace_pairs_ci(&replacement_pairs), expected_text);
+  // now test multiple replacements on vectors of strings
+  let sample_strings = ["sheepwolves", "wild lions", "safari parks"].to_strings();
+  let converted_strings = sample_strings.pattern_replace_pairs_ci(&replacement_pairs);
+  let expected_strings = ["sheepdogs", "wild cats", "gardens"].to_strings();
+  for i in 0..converted_strings.len() {
+    assert_eq!(converted_strings.get(i).unwrap().to_owned(), expected_strings.get(i).unwrap().to_owned());
+  }
+}
+
+#[test]
 fn test_simple_pattern_matches() {
   let str1 = "Picture_of my cat-2018.PNG";
 

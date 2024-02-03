@@ -10,7 +10,7 @@ Version 0.2.0 introduced additional methods to capture and count matched strings
 
 The is_numeric() method in the *IsNumeric* trait applies a strict regex-free check on compatibility with the *parse()* method. It differs from char::is_numeric which checks for digit-like characters only and does not match minus or decimal points. There are parallel *has_digits* and *has_digits_only* methods to test only for unsigned integers. An example below shows you how to combine *pattern_split* and *to_first_number* to capture numbers within longer texts as floats.
 
-Many *match* and *replace* methods have variants ending in _ci (case-insensitive) or _cs (case-sensitive) as wrappers for the equivalent plain methods that require a boolean *case_insensitive* parameter. In case-insensitive mode the non-capturing /(?i)/ flag is prepended automatically. This will not be prepended if you add another non-capturing group at the start of your regex. In every other way, the pattern-prefixed methods behave in the same way as *re.is_match*, *re.replace_all*, *re.find* and *re.capture_iter* methods in the Regex library. String-patterns unleashes most of the core functionality of the Regex crate, on which it depends, to cover most common use cases in text processing and to act as a building block for specific validators (e.g. email validation) and text transformers. 
+Many *match* and *replace* methods have variants ending in _ci (case-insensitive) or _cs (case-sensitive) as wrappers for the equivalent plain methods that require a boolean *case_insensitive* parameter. In case-insensitive mode the non-capturing /(?i)/ flag is prepended automatically, but omitted if you add another non-capturing group at the start of your regular expression pattern. In every other way, the pattern-prefixed methods behave like *re.is_match*, *re.replace_all*, *re.find* and *re.capture_iter* methods in the Regex crate. String-patterns unleashes most of the core functionality of the Regex crate, on which it depends, to cover most common use cases in text processing and to act as a building block for specific validators (e.g. email validation) and text transformers. 
 
 Most of the *match* methods will work on *&str* and *String*, while the replacement methods are only implemented for *owned strings*. Likewise, match methods are implemented for arrays and vectors of strings, while replacement methods are only implemented for vectors of *owned strings*. The traits may be implemented for structs or tuples with a string field. Version 2.10 added PatternSplit with results as String vectors or tuples.
 
@@ -115,7 +115,9 @@ let source_str = "Colourful fishing boats adorned the island's harbours.".to_str
     ("harbour", "harbor"),
   ];
 /// Should read "Colorful fishing boats adorned the island's harbors"
-let target_str = source_str.pattern_replace_pairs(&pattern_replacements); 
+let target_str = source_str.pattern_replace_pairs_cs(&pattern_replacements); 
+// NB: Prior to version 0.2.19  this was pattern_replace_pairs()
+// which now requires a second parameter
 ```
 
 ##### Replace multiple word pairs in case-sensitive mode
@@ -243,7 +245,7 @@ let (head, tail) = sample_string.pattern_split_pair_cs(pattern);
 - **PatternReplace**:	Core regular expression replacement methods
 - **PatternReplaceMany**:	Provides methods to replace with multiple patterns expressed as arrays of tuples
 - **PatternSplit**:	Methods to split strings to vectors or head/tail tuples of strings
-- **MatchWord**: Has convenience methods to match words with various word boundary rules. New to 0.2.0
+- **MatchWord**: Has convenience methods to match words with various word boundary rules. New to 0.2.5
 - **ReplaceWord**: Provides methods to replace one or more words with clean syntax. New to 0.2.5
 - **PatternCapture**: Returns captures or vectors of each match, whether overlapping or not, and counts of matching patterns or words. New to version 0.2.0
 - **ToSegments**:	Methods to split a longer string on a separator and return a vector of strings, a tuple of two strings or single optional string segment Note some methods may return empty segments in the case of leading, trailing or repeated separators.
@@ -252,5 +254,10 @@ let (head, tail) = sample_string.pattern_split_pair_cs(pattern);
 ### Enums
 - **WordBounds**:	Has options for *Start*, *End* and *Both* with a method to render regular expression subpatterns with the correct word boundaries
 
-NB: This crate is still in its alpha stage, but has already been used in 3 API projects. Since version 2.14 the code base has been organised into separate files for each set of traits with related implementations. Version 2.17 makes the *build_regex(pattern: &str, case_insensitive: bool)* available to implementors. This is a wrapper *for Regex::new(re: &str)*, but has a convenient case_insensitive parameter and avoids having to explicity import the *regex* crate*.
+### Dev Notes
+This crate is still in its alpha stage, but has already been used in 3 API projects. Since version 2.14 the code base has been organised into separate files for each set of traits with related implementations.
+
+#### Recent Version Notes
+Version 2.17 makes the *build_regex(pattern: &str, case_insensitive: bool)* available to implementors. This is a wrapper *for Regex::new(re: &str)*, but has a convenient case_insensitive parameter and avoids having to explicity import the *regex* crate*. 
+In version 2.19 default implementations have been added for many variant methods in PatternMatch, PatternReplace, PatternMatchMany and PatternReplaceMany. The last two traits depend on *PatternMatch* and *PatternReplace* respectively. For *PatternMatch* only the base method *pattern_match_result* needs to be implemented and for *PatternReplace* only *pattern_replace_result* and *pattern_replace* need custom implementations, the latter only because the fallback value may have different trait and lifetimes constraints for arrays and vectors. 
 Some updates only reflect minor corrections to these notes and comments in other files.
