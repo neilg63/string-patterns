@@ -1,6 +1,7 @@
 
 /// Defines the start, end and both bounds of a word
 pub enum WordBounds {
+  None,
   Start,
   End,
   Both,
@@ -13,6 +14,7 @@ impl WordBounds {
       WordBounds::Start => [r#"\b"#, word].concat(),
       WordBounds::End => [word, r#"\b"#].concat(),
       WordBounds::Both => [r#"\b"#, word, r#"\b"#].concat(),
+      _ => word.to_owned(),
     }
   }
 }

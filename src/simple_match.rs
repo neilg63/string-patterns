@@ -21,6 +21,7 @@ pub trait SimpleMatch {
   fn contains_ci_alphanum(&self, pattern: &str) -> bool;
 }
 
+/// Implementation for &str/String 
 impl SimpleMatch for str {
   /// Starts with a case-insensitive sequence
   fn starts_with_ci(&self, pattern: &str) -> bool {

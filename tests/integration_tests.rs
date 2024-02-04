@@ -510,3 +510,41 @@ fn test_build_regex() {
   let regex_2 = build_regex(pattern_2, true);
   assert!(regex_2.is_err());
 }
+
+#[test]
+fn test_pattern_match_many_conditional() {
+  
+  // contains "android" and "linux", but does not conatain iphone: Must be Android
+  let pattern_sets_android = [
+    (true, r#"android"#, true),
+    (true, r#"linux"#, true),
+    (false, r#"iphone"#, true),
+  ];
+
+  // contains "iphone", but does not conatain linux
+  let pattern_sets_apple = [
+    (true, r#"iphone"#, true),
+    (false, r#"linux"#, true),
+  ];
+
+  let sample_1 = "Mozilla/5.0 (Linux; Android 13; SM-S908U) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Mobile Safari/537.36";
+
+  let sample_2 = "Mozilla/5.0 (iPhone14,6; U; CPU iPhone OS 15_4 like Mac OS X) AppleWebKit/602.1.50 (KHTML, like Gecko) Version/10.0 Mobile/19E241 Safari/602.1";
+  
+  assert!(sample_1.pattern_match_many_conditional(&pattern_sets_android));
+
+  assert!(sample_2.pattern_match_many_conditional(&pattern_sets_apple));
+
+  let pattern_sets = [
+    (r#"android"#, true),
+    (r#"linux"#, true),
+    (r#"iphone"#, true),
+    (r#"mac"#, true),
+  ];
+
+  assert_eq!(sample_1.pattern_word_matches_conditional(&pattern_sets), vec![true, true, false, false]);
+
+  assert_eq!(sample_2.pattern_word_matches_conditional(&pattern_sets), vec![false, false, true, true]);
+
+}
+

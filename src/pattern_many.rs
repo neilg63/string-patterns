@@ -1,4 +1,4 @@
-use crate::{PatternMatch, PatternReplace};
+use crate::{utils::build_whole_word_pattern, PatternMatch, PatternReplace, WordBounds};
 
 /// Provides methods to match with multiple patterns 
 /// expressed as arrays of tuples or simple strs (for pattern_match_many_ci and pattern_match_many_cs)
@@ -115,6 +115,49 @@ impl PatternMatchMany for str {
 
 /// Implement PatternMatchMany for vectors of strings.
 impl PatternMatchMany for [String] {  
+}
+
+/// Test multiple false or positive patterns and return vector of booleans with the results for each item
+pub trait PatternMatchesMany where Self:PatternMatch {
+  fn pattern_matches_conditional(&self, pattern_sets: &[(&str, bool)], bounds:WordBounds) -> Vec<bool>;
+
+  fn pattern_word_matches_conditional(&self, pattern_sets: &[(&str, bool)]) -> Vec<bool> {
+    self.pattern_matches_conditional(&pattern_sets, WordBounds::Both)
+  }
+
+  fn pattern_matches_conditional_ci(&self, patterns: &[&str]) -> Vec<bool> {
+    let pattern_sets: Vec<(&str, bool)> = patterns.into_iter().map(|s| (*s, true)).collect();
+    self.pattern_matches_conditional(&pattern_sets, WordBounds::None)
+  }
+
+  fn pattern_matches_conditional_cs(&self, patterns: &[&str]) -> Vec<bool> {
+    let pattern_sets: Vec<(&str, bool)> = patterns.into_iter().map(|s| (*s, false)).collect();
+    self.pattern_matches_conditional(&pattern_sets, WordBounds::None)
+  }
+
+  fn pattern_word_matches_conditional_ci(&self, patterns: &[&str]) -> Vec<bool> {
+    let pattern_sets: Vec<(&str, bool)> = patterns.into_iter().map(|s| (*s, true)).collect();
+    self.pattern_matches_conditional(&pattern_sets, WordBounds::Both)
+  }
+
+  fn pattern_word_matches_conditional_cs(&self, patterns: &[&str]) -> Vec<bool> {
+    let pattern_sets: Vec<(&str, bool)> = patterns.into_iter().map(|s| (*s, false)).collect();
+    self.pattern_matches_conditional(&pattern_sets, WordBounds::Both)
+  }
+}
+
+impl PatternMatchesMany for str {
+  /// test for multiple conditions
+  fn pattern_matches_conditional(&self, pattern_sets: &[(&str, bool)], bounds:WordBounds) -> Vec<bool> {
+    let mut matched_items: Vec<bool> = Vec::with_capacity(pattern_sets.len());
+    for pattern_set in pattern_sets {
+       let (pattern, case_insensitive) = *pattern_set;
+       let bounded_pat = bounds.to_pattern(pattern);
+       let is_matched = self.pattern_match(&bounded_pat, case_insensitive);
+       matched_items.push(is_matched);
+     }
+     matched_items
+   }
 }
 
 /// Provides methods to replace with multiple patterns 
