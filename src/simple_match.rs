@@ -1,4 +1,4 @@
-use crate::{enums::StringBounds, utils::{pairs_to_string_bounds, strs_to_str_bool_pairs, strs_to_string_bounds}, StripCharacters};
+use crate::{enums::StringBounds, utils::{pairs_to_string_bounds, strs_to_string_bounds}, StripCharacters};
 
 /// Regex-free matcher methods for common use cases
 pub trait SimpleMatch {
