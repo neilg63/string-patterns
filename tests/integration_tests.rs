@@ -578,15 +578,15 @@ fn test_matched_conditional() {
   assert_eq!(folder_4.contains_all_conditional_ci(&test_strs), false);
 
   let mixed_conditions = [
-    StringBounds::StartsWith("jan", true),
-    StringBounds::NotEndsWith("videos", true),
+    StringBounds::Contains("nepal", true),
+    StringBounds::NotEndsWith(".jpg", true),
   ];
 
-  let folder_5 = "january_1997-Thailand-Videos";
-  let folder_6 = "Jan_2003-Peru-Images";
+  let file_name_1 = "img-Nepal-Feb-2003.png";
+  let file_name_2 = "pic_nepal_Dec-2004.jpg";
 
-  assert!(folder_5.match_all_conditional(&mixed_conditions) == false);
+  assert!(file_name_1.match_all_conditional(&mixed_conditions) == false);
 
-  assert!(folder_6.match_all_conditional(&mixed_conditions));
+  assert!(file_name_2.match_all_conditional(&mixed_conditions));
 
 }
