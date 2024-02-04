@@ -6,14 +6,27 @@
 
 This library makes it easier to process strings in Rust. It builds on Rust's standard library with help from its default regular expression crate, *[regex](https://crates.io/crates/regex)*. It has no other dependencies. It aims to make working with strings as easy in Rust as it is Javascript or Python with cleaner syntax. Simpler string matching methods such as starts_with, contains or ends_with will always perform better, especially when processing large data sets. To this end, the crate provides methods such as *starts_with_ci* and *starts_with_ci_alphanum* for basic string validation without regular expressions as well as extension methods to split strings into vectors of strings or a *head* and *tail* components.
 
+### Method overview
 - All pattern-prefixed method use regular expressions via the Regex crate
 - All other extension methods use standard library functions only to match, remove or extract character sequences.
+- Methods ending in _result return a Result with a regex::Error if the regular expression fails
+- Many methods without *_ci* or *_cs* suffixes require boolean *case_insensitive* parameter
+- Methods ending in *_cs* are case-sensitive
+- Methods ending in *_ci* are case-insensitive
+- Methods containing *_word_* and *_words_* matching whole or partial words depending word bound rules
+- Methods containing *_match_many_* require all patterns within an array to match
+- Methods containing *_match_any_* return true if any of the patterns within an array match
+- Methods containing *split* return either a vector or tuple pair.
+- Methods containing *_part(s)* always include leading or trailing separators and may return empty elements in vectors
+- Methods containing *segment(s)* ignore leading, trailing, repeated consecutive separators and thus exclude empty elements
+- In tuples returned from *segment(s)* and *part(s)* methods, *head* means the segment before the first split and tail the remainder, while *start* means the whole string before the last split and *end* only the last part of the last matched separator.
+- In 
 
 Version 0.2.0 introduced additional methods to capture and count matched strings with offsets and version 0.2.5 added methods to match, replace, capture and count words without intrusive word boundary anchors.
 
 The is_numeric() method, in the *IsNumeric* trait, applies a strict regex-free check on compatibility with the *parse()* method. It differs from char::is_numeric which checks for digit-like characters only and does not match minus or decimal points. Parallel *has_digits* and *has_digits_only* methods are implemented for the *CharGroupMatch* trait to test only for unsigned integers. An example below shows you how to combine *pattern_split* and *to_first_number* to capture numbers within longer texts as floats.
 
-Many *match* and *replace* methods have variants ending in _ci (case-insensitive) or _cs (case-sensitive) as wrappers for the equivalent plain methods that require a boolean *case_insensitive* parameter. In case-insensitive mode the non-capturing **/(?i)/** flag is prepended automatically, but omitted if you add another non-capturing group at the start of your regular expression. In every other way, the pattern-prefixed methods behave like *re.is_match*, *re.replace_all*, *re.find* and *re.capture_iter* methods in the Regex crate. String-patterns unleashes most of the core functionality of the Regex crate, on which it depends, to cover most common use cases in text processing and to act as a building block for specific validators (e.g. email validation) and text transformers. 
+In case-insensitive mode the non-capturing **/(?i)/** flag is prepended automatically, but omitted if you add another non-capturing group at the start of your regular expression. In every other way, the pattern-prefixed methods behave like *re.is_match*, *re.replace_all*, *re.find* and *re.capture_iter* methods in the Regex crate. String-patterns unleashes most of the core functionality of the Regex crate, on which it depends, to cover most common use cases in text processing and to act as a building block for specific validators (e.g. email validation) and text transformers. 
 
 Most of the *match* methods will work on *&str* and *String*, while the replacement methods are only implemented for *owned strings*. Likewise, match methods are implemented for arrays and vectors of strings, while replacement methods are only implemented for vectors of *owned strings*. The traits may be implemented for structs or tuples with a string field. Version 2.10 added PatternSplit with results as String vectors or tuples.
 
@@ -244,6 +257,7 @@ let (head, tail) = sample_string.pattern_split_pair_cs(pattern);
 - **MatchOccurrences**:	Returns the indices of all ocurrences of an exact string
 - **PatternMatch**	Core regular expression match methods, wrappers for re.is_match with case-insensitive (_ci) and case-sensitive (_cs) variants
 - **PatternMatchMany**:	Provides methods to match with multiple patterns expressed as arrays of tuples or simple strs
+- **PatternMatchesMany**: As above but return a vector of booleans with the results for each pattern with variant method for whole word matches. New to 0.2.20
 - **PatternMatches**:	Pattern methods for arrays or vectors only, returns vectors of booleans matching each input string
 - **PatternReplace**:	Core regular expression replacement methods
 - **PatternReplaceMany**:	Provides methods to replace with multiple patterns expressed as arrays of tuples

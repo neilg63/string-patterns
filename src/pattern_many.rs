@@ -1,4 +1,4 @@
-use crate::{utils::build_whole_word_pattern, PatternMatch, PatternReplace, WordBounds};
+use crate::{PatternMatch, PatternReplace, WordBounds};
 
 /// Provides methods to match with multiple patterns 
 /// expressed as arrays of tuples or simple strs (for pattern_match_many_ci and pattern_match_many_cs)

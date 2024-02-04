@@ -516,15 +516,15 @@ fn test_pattern_match_many_conditional() {
   
   // contains "android" and "linux", but does not conatain iphone: Must be Android
   let pattern_sets_android = [
-    (true, r#"android"#, true),
-    (true, r#"linux"#, true),
-    (false, r#"iphone"#, true),
+    (true, "android", true),
+    (true, "linux", true),
+    (false, "iphone", true),
   ];
 
   // contains "iphone", but does not conatain linux
   let pattern_sets_apple = [
-    (true, r#"iphone"#, true),
-    (false, r#"linux"#, true),
+    (true, "iphone", true),
+    (false, "linux", true),
   ];
 
   let sample_1 = "Mozilla/5.0 (Linux; Android 13; SM-S908U) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Mobile Safari/537.36";
@@ -535,16 +535,16 @@ fn test_pattern_match_many_conditional() {
 
   assert!(sample_2.pattern_match_many_conditional(&pattern_sets_apple));
 
-  let pattern_sets = [
-    (r#"android"#, true),
-    (r#"linux"#, true),
-    (r#"iphone"#, true),
-    (r#"mac"#, true),
+  // Alternatively test the boolean results of arrays of case-insensitive whole words 
+  let words = [
+    "android",
+    "linux",
+    "iphone",
+    "mac",
   ];
+  assert_eq!(sample_1.pattern_word_matches_conditional_ci(&words), vec![true, true, false, false]);
 
-  assert_eq!(sample_1.pattern_word_matches_conditional(&pattern_sets), vec![true, true, false, false]);
-
-  assert_eq!(sample_2.pattern_word_matches_conditional(&pattern_sets), vec![false, false, true, true]);
+  assert_eq!(sample_2.pattern_word_matches_conditional_ci(&words), vec![false, false, true, true]);
 
 }
 
