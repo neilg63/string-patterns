@@ -23,7 +23,10 @@ impl WordBounds {
 pub enum StringBounds<'a> {
   StartsWith(&'a str, bool),
   EndsWith(&'a str, bool),
-  Contains(&'a str, bool)
+  Contains(&'a str, bool),
+  NotStartsWith(&'a str, bool),
+  NotEndsWith(&'a str, bool),
+  NotContains(&'a str, bool)
 }
 
 impl<'a> StringBounds<'a> {
@@ -32,6 +35,9 @@ impl<'a> StringBounds<'a> {
     match mode {
       0 => StringBounds::StartsWith(txt, case_insensitive),
       1 => StringBounds::EndsWith(txt, case_insensitive),
+      5 => StringBounds::Contains(txt, case_insensitive),
+      3 => StringBounds::NotStartsWith(txt, case_insensitive),
+      4 => StringBounds::NotEndsWith(txt, case_insensitive),
       _ => StringBounds::Contains(txt, case_insensitive),
     }
   }
@@ -41,6 +47,9 @@ impl<'a> StringBounds<'a> {
       Self::StartsWith(_, val) => val,
       Self::EndsWith(_, val) => val,
       Self::Contains(_, val) => val,
+      Self::NotStartsWith(_, val) => val,
+      Self::NotEndsWith(_, val) => val,
+      Self::NotContains(_, val) => val,
     }.to_owned()
   }
 
@@ -49,6 +58,9 @@ impl<'a> StringBounds<'a> {
       Self::StartsWith(txt, _) => txt,
       Self::EndsWith(txt, _) => txt,
       Self::Contains(txt, _) => txt,
+      Self::NotStartsWith(txt, _) => txt,
+      Self::NotEndsWith(txt, _) => txt,
+      Self::NotContains(txt, _) => txt,
     }.to_owned()
   }
 

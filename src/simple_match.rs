@@ -137,6 +137,9 @@ impl SimpleMatchesMany for str {
         StringBounds::StartsWith(_1, _2) => base.starts_with(&pattern),
         StringBounds::EndsWith(_1, _2) => base.ends_with(&pattern),
         StringBounds::Contains(_1, _2) => base.contains(&pattern),
+        StringBounds::NotStartsWith(_1, _2) => !base.starts_with(&pattern),
+        StringBounds::NotEndsWith(_1, _2) => !base.ends_with(&pattern),
+        StringBounds::NotContains(_1, _2) => !base.contains(&pattern),
       };
        matched_items.push(is_matched);
      }

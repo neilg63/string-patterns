@@ -577,4 +577,16 @@ fn test_matched_conditional() {
   // the second folder should not match all conditions
   assert_eq!(folder_4.contains_all_conditional_ci(&test_strs), false);
 
+  let mixed_conditions = [
+    StringBounds::StartsWith("jan", true),
+    StringBounds::NotEndsWith("videos", true),
+  ];
+
+  let folder_5 = "january_1997-Thailand-Videos";
+  let folder_6 = "Jan_2003-Peru-Images";
+
+  assert!(folder_5.match_all_conditional(&mixed_conditions) == false);
+
+  assert!(folder_6.match_all_conditional(&mixed_conditions));
+
 }
