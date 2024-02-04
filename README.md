@@ -14,7 +14,7 @@ This library makes it easier to process strings in Rust. It builds on Rust's sta
 - Methods ending in *_cs* are case-sensitive
 - Methods ending in *_ci* are case-insensitive
 - Methods containing *_word(s)_* match whole or partial words depending on boundary rules
-- Methods containing *_match_all_* require all patterns within an array to match. In a future version. The _many_ variants are deprecated
+- Methods containing *_match_all_* require all patterns within an array to match. In a future version, the _many_ variants are deprecated
 - Methods containing *_match_any_* return true if any of the patterns within an array match
 - Methods containing *split* return either a vector or tuple pair.
 - Methods containing *_part(s)* always include leading or trailing separators and may return empty elements in vectors
