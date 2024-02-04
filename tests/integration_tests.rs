@@ -542,8 +542,10 @@ fn test_pattern_match_many_conditional() {
     "iphone",
     "mac",
   ];
+  // test if the user agent string matches an Android phone
   assert_eq!(sample_1.pattern_word_matches_conditional_ci(&words), vec![true, true, false, false]);
 
+  // test if the user agent string matches an Apple iPhone
   assert_eq!(sample_2.pattern_word_matches_conditional_ci(&words), vec![false, false, true, true]);
 
 }

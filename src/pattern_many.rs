@@ -108,7 +108,7 @@ pub trait PatternMatchMany where Self:PatternMatch {
   }
 }
 
-
+/// Implement PatternMatchMany for &str/String
 impl PatternMatchMany for str {
 }
 
@@ -147,7 +147,7 @@ pub trait PatternMatchesMany where Self:PatternMatch {
 }
 
 impl PatternMatchesMany for str {
-  /// test for multiple conditions
+  /// test for multiple conditions. All other trait methods are derived from this
   fn pattern_matches_conditional(&self, pattern_sets: &[(&str, bool)], bounds:WordBounds) -> Vec<bool> {
     let mut matched_items: Vec<bool> = Vec::with_capacity(pattern_sets.len());
     for pattern_set in pattern_sets {
