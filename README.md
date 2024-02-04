@@ -7,13 +7,13 @@
 This library makes it easier to process strings in Rust. It builds on Rust's standard library with help from its default regular expression crate, *[regex](https://crates.io/crates/regex)*. It has no other dependencies. It aims to make working with strings as easy in Rust as it is Javascript or Python with cleaner syntax. Simpler string matching methods such as starts_with, contains or ends_with will always perform better, especially when processing large data sets. To this end, the crate provides methods such as *starts_with_ci* and *starts_with_ci_alphanum* for basic string validation without regular expressions as well as extension methods to split strings into vectors of strings or a *head* and *tail* components.
 
 ### Method overview
-- All pattern-prefixed method use regular expressions via the Regex crate
+- All pattern-prefixed methods use regular expressions via the Regex crate
 - All other extension methods use standard library functions only to match, remove or extract character sequences.
 - Methods ending in _result return a Result with a regex::Error if the regular expression fails
-- Many methods without *_ci* or *_cs* suffixes require boolean *case_insensitive* parameter
+- Many methods without *_ci* or *_cs* suffixes require a boolean *case_insensitive* parameter
 - Methods ending in *_cs* are case-sensitive
 - Methods ending in *_ci* are case-insensitive
-- Methods containing *_word_* and *_words_* matching whole or partial words depending word bound rules
+- Methods containing *_word(s)_* match whole or partial words depending on boundary rules
 - Methods containing *_match_many_* require all patterns within an array to match
 - Methods containing *_match_any_* return true if any of the patterns within an array match
 - Methods containing *split* return either a vector or tuple pair.
