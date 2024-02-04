@@ -256,7 +256,7 @@ let (head, tail) = sample_string.pattern_split_pair_cs(pattern);
 - **MatchOccurrences**:	Returns the indices of all ocurrences of an exact string
 - **PatternMatch**	Core regular expression match methods, wrappers for re.is_match with case-insensitive (_ci) and case-sensitive (_cs) variants
 - **PatternMatchMany**:	Provides methods to match with multiple patterns expressed as arrays of tuples or simple strs
-- **PatternMatchesMany**: As above but return a vector of booleans with the results for each pattern with variant method for whole word matches. New to 0.2.20
+- **PatternMatchesMany**: As above but returns a vector of booleans with the results for each pattern with variant method for whole word matches. New to 0.2.20
 - **PatternMatches**:	Pattern methods for arrays or vectors only, returns vectors of booleans matching each input string
 - **PatternReplace**:	Core regular expression replacement methods
 - **PatternReplaceMany**:	Provides methods to replace with multiple patterns expressed as arrays of tuples
