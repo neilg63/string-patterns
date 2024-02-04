@@ -1,5 +1,5 @@
 use regex::{Regex, Error};
-use crate::enums::WordBounds;
+use crate::enums::{StringBounds, WordBounds};
 
 /// Build a regular expression with an optional case-insenistive non-capturing group
 /// If the source pattern starts with a non-capturing group, this will be ignored irrespective of the case_insenistive flag
@@ -39,4 +39,32 @@ pub(crate) fn build_whole_word_pattern(word: &str) -> String {
 pub(crate) fn build_optional_whole_word_pattern(words: &[&str]) -> String {
   let word_pattern = ["(", &words.join("|"), ")"].concat();
   build_word_pattern(&word_pattern, WordBounds::Both)
+}
+
+/*
+* Convert an str array to vector of tuple pairs with the second element having the same boolean value
+* as used in many multple match methods where the boolean element indicates case-sensitivity
+*/
+pub(crate) fn strs_to_str_bool_pairs<'a>(strs: &'a [&str], bool_val: bool) -> Vec<(&'a str, bool)> {
+  strs.into_iter().map(|s| (*s, bool_val)).collect()
+}
+
+/*
+* Convert an array of strs to a vector of SimpleBounds with start/end/contains and case-sensity rules
+* as used in matched_conditional
+* Only used internally with interger mode
+* 0 = Start, 1 = End, 2+ = Contains
+*/
+pub(crate) fn strs_to_string_bounds<'a>(strs: &'a [&str], case_sensitive: bool, mode: u8) -> Vec<StringBounds<'a>> {
+  strs.into_iter().map(|txt| StringBounds::new(mode, *txt, case_sensitive)).collect()
+}
+
+/*
+* Convert an array of str/boolean tuples to a vector of SimpleBounds with start/end/contains
+* as used in matched_conditional
+* Only used internally with interger mode
+* 0 = Start, 1 = End, 2+ = Contains
+*/
+pub(crate) fn pairs_to_string_bounds<'a>(pairs: &'a [(&str, bool)], mode: u8) -> Vec<StringBounds<'a>> {
+  pairs.into_iter().map(|(txt, ci)| StringBounds::new(mode, *txt, *ci)).collect()
 }

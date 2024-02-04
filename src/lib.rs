@@ -26,7 +26,7 @@ pub mod words;
 /// Complex regular expressions, e.g. with look behind (?<=foo) or look ahead, work best after isolating a sample text snippet via simpler text-matching methods.
 /// Always consider the simplest strategy for extracting text, e.g. via to_head_tail(), to_segments(), before resorting to the regex-enabled pattern-prefixed methods.
 
-pub use crate::enums::WordBounds;
+pub use crate::enums::*;
 pub use crate::alphanumeric::*;
 pub use crate::segments::*;
 pub use crate::simple_match::*;
@@ -37,3 +37,4 @@ pub use crate::pattern_split::*;
 pub use crate::pattern_capture::*;
 pub use crate::words::*;
 pub use crate::utils::build_regex;
+pub use regex::Error;

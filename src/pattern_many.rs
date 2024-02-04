@@ -1,11 +1,11 @@
-use crate::{PatternMatch, PatternReplace, WordBounds};
+use crate::{utils::strs_to_str_bool_pairs, PatternMatch, PatternReplace, WordBounds};
 
 /// Provides methods to match with multiple patterns 
 /// expressed as arrays of tuples or simple strs (for pattern_match_many_ci and pattern_match_many_cs)
 pub trait PatternMatchMany where Self:PatternMatch {
   /// Matches all of the patterns in case-sensitivity flag
   /// with an array of tuples (patterns, case_insensitive)
-  fn pattern_match_many(&self, patterns: &[&str], case_insensitive: bool) -> bool {
+  fn pattern_match_all(&self, patterns: &[&str], case_insensitive: bool) -> bool {
     let mut num_matched:usize = 0;
     let num_patterns = patterns.len();
     for pattern in patterns {
@@ -19,7 +19,8 @@ pub trait PatternMatchMany where Self:PatternMatch {
   /// Matches all of the patterns with case-insensitive flag
   /// e.g. ```(r#"a[ck]"#, true)``` "ac" or "ak" whether upper, lower or mixed case
   /// with an array of tuples (pattern, replacement, case_insensitive)
-  fn pattern_match_many_mixed(&self, pattern_sets: &[(&str, bool)]) -> bool {
+  /// Consider renaming with _all_
+  fn pattern_match_all_mixed(&self, pattern_sets: &[(&str, bool)]) -> bool {
     let mut num_matched:usize = 0;
     let num_patterns = pattern_sets.len();
     for pair in pattern_sets {
@@ -31,10 +32,15 @@ pub trait PatternMatchMany where Self:PatternMatch {
     num_matched == num_patterns
   }
 
+  /// Deprecated variant
+  fn pattern_match_many_mixed(&self, pattern_sets: &[(&str, bool)]) -> bool {
+    self.pattern_match_all_mixed(pattern_sets)
+  }
+
   /// Matches all of the patterns with positivity condition and case-insensitive flag
   /// e.g. ```(false, "a[ck]", true)``` does not contain "ac" or "ak" whether upper, lower or mixed case
   /// with an array of tuples (positive, pattern, case_insensitive)
-  fn pattern_match_many_conditional(&self, pattern_sets: &[(bool, &str, bool)]) -> bool {
+  fn pattern_match_all_conditional(&self, pattern_sets: &[(bool, &str, bool)]) -> bool {
     let mut num_matched:usize = 0;
     let num_patterns = pattern_sets.len();
     for pattern_set in pattern_sets {
@@ -47,16 +53,31 @@ pub trait PatternMatchMany where Self:PatternMatch {
     num_matched == num_patterns
   }
 
+  /// Deprecated variant
+  fn pattern_match_many_conditional(&self, pattern_sets: &[(bool, &str, bool)]) -> bool {
+    self.pattern_match_all_conditional(pattern_sets)
+  }
+
   /// Matches all of the patterns in case-insensitive mode
   /// with an array of str patterns
+  fn pattern_match_all_ci(&self, patterns: &[&str]) -> bool {
+    self.pattern_match_all(patterns, true)
+  }
+
+  /// Deprecated variant
   fn pattern_match_many_ci(&self, patterns: &[&str]) -> bool {
-    self.pattern_match_many(patterns, true)
+    self.pattern_match_all_ci(patterns)
   }
 
   /// Matches all of the patterns in case-sensitive mode
-  /// with an array of str patterns
+  /// with an array of str patterns 
+  fn pattern_match_all_cs(&self, patterns: &[&str]) -> bool {
+    self.pattern_match_all(patterns, false)
+  }
+
+  /// Deprecated variant
   fn pattern_match_many_cs(&self, patterns: &[&str]) -> bool {
-    self.pattern_match_many(patterns, false)
+    self.pattern_match_all_cs(patterns)
   }
   
   /// Matches one or more of the patterns in case-sensitivity flag
@@ -126,22 +147,22 @@ pub trait PatternMatchesMany where Self:PatternMatch {
   }
 
   fn pattern_matches_conditional_ci(&self, patterns: &[&str]) -> Vec<bool> {
-    let pattern_sets: Vec<(&str, bool)> = patterns.into_iter().map(|s| (*s, true)).collect();
+    let pattern_sets: Vec<(&str, bool)> = strs_to_str_bool_pairs(patterns, true);
     self.pattern_matches_conditional(&pattern_sets, WordBounds::None)
   }
 
   fn pattern_matches_conditional_cs(&self, patterns: &[&str]) -> Vec<bool> {
-    let pattern_sets: Vec<(&str, bool)> = patterns.into_iter().map(|s| (*s, false)).collect();
+    let pattern_sets: Vec<(&str, bool)> = strs_to_str_bool_pairs(patterns, false);
     self.pattern_matches_conditional(&pattern_sets, WordBounds::None)
   }
 
   fn pattern_word_matches_conditional_ci(&self, patterns: &[&str]) -> Vec<bool> {
-    let pattern_sets: Vec<(&str, bool)> = patterns.into_iter().map(|s| (*s, true)).collect();
+    let pattern_sets: Vec<(&str, bool)> = strs_to_str_bool_pairs(patterns, true);
     self.pattern_matches_conditional(&pattern_sets, WordBounds::Both)
   }
 
   fn pattern_word_matches_conditional_cs(&self, patterns: &[&str]) -> Vec<bool> {
-    let pattern_sets: Vec<(&str, bool)> = patterns.into_iter().map(|s| (*s, false)).collect();
+    let pattern_sets: Vec<(&str, bool)> = strs_to_str_bool_pairs(patterns, false);
     self.pattern_matches_conditional(&pattern_sets, WordBounds::Both)
   }
 }

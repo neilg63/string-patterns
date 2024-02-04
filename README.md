@@ -14,7 +14,7 @@ This library makes it easier to process strings in Rust. It builds on Rust's sta
 - Methods ending in *_cs* are case-sensitive
 - Methods ending in *_ci* are case-insensitive
 - Methods containing *_word(s)_* match whole or partial words depending on boundary rules
-- Methods containing *_match_many_* require all patterns within an array to match
+- Methods containing *_match_all_* require all patterns within an array to match. In a future version. The _many_ variants are deprecated
 - Methods containing *_match_any_* return true if any of the patterns within an array match
 - Methods containing *split* return either a vector or tuple pair.
 - Methods containing *_part(s)* always include leading or trailing separators and may return empty elements in vectors
@@ -247,12 +247,35 @@ let (head, tail) = sample_string.pattern_split_pair_cs(pattern);
 // should yield => head: "first" and tail: "second - third ; fourth"
 ```
 
+### Sample implementation of PatternMatch for a custom struct
+```rust
+use string_patterns::PatternMatch;
+
+// Simple struct with a core text field
+#[derive(Debug, Clone)]
+pub struct Message {
+  text: String,
+  timestamp: i64,
+  from: String,
+  to: String,
+}
+
+impl PatternMatch for Message {
+  // All other pattern_match variants with a single regular expression are implemented automatically
+  fn pattern_match_result(&self, pattern: &str, case_sensitive: bool) -> Result<bool, Error> {
+    self.text.pattern_match_result(pattern, case_sensitive)
+  }
+}
+```
+
 ### Traits
 
 - **CharGroupMatch**:	Has methods to validate strings with character classes, has_digits, has_alphanumeric, has_alphabetic
 - **IsNumeric**	Provides a method to check if the string may be parsed to an integer or float
 - **StripCharacters**:	Set of methods to strip unwanted characters by type or extract vectors of numeric strings, integers or floats without regular expressions
-- **SimpleMatch**:	Regex-free matcher methods for common validation rules, e.g. starts_with_ci_alphanum checks if the first letters or numerals in a sample string in case-insensitive mode without regular expressions.
+- **SimpleMatch**:	Regex-free *match* methods for common validation rules, e.g. starts_with_ci_alphanum checks if the first letters or numerals in a sample string in case-insensitive mode without regular expressions.
+- **SimpleMatchesMany**:	Regex-free multiple *match* methods accepting an array of StringBounds items, tuples or patterns and returning a vector of boolean results. matched_conditional
+- **SimpleMatchAll**:	Regex-free multiple *match* methods accepting an array of StringBounds items, tuples or patterns and returning a boolean if all are matched
 - **MatchOccurrences**:	Returns the indices of all ocurrences of an exact string
 - **PatternMatch**	Core regular expression match methods, wrappers for re.is_match with case-insensitive (_ci) and case-sensitive (_cs) variants
 - **PatternMatchMany**:	Provides methods to match with multiple patterns expressed as arrays of tuples or simple strs
@@ -269,11 +292,13 @@ let (head, tail) = sample_string.pattern_split_pair_cs(pattern);
 
 ### Enums
 - **WordBounds**:	Has options for *Start*, *End* and *Both* with a method to render regular expression subpatterns with the correct word boundaries
+- **StringBounds**: Defines simple match rules with the pattern and case_sensitivity flag, e.g. StringBounds::Ends("images", true)
 
 ### Dev Notes
 This crate is still in its alpha stage, but has already been used in 3 API projects. Since version 0.2.14 the code base has been organised into separate files for each set of traits with related implementations. 
 
 #### Recent Version Notes
 Version 0.2.17 makes the *build_regex(pattern: &str, case_insensitive: bool)* available to implementors. This is a wrapper *for Regex::new(re: &str)*, but has a convenient case_insensitive parameter and avoids having to explicity import the *regex* crate*. 
-In version 0.2.19 default implementations have been added for many variant methods in PatternMatch, PatternReplace, PatternMatchMany and PatternReplaceMany. The last two traits depend on *PatternMatch* and *PatternReplace* respectively. For *PatternMatch* only the base method *pattern_match_result* needs to be implemented and for *PatternReplace* only *pattern_replace_result* and *pattern_replace* need custom implementations, the latter only because the fallback value may have different trait and lifetimes constraints for arrays and vectors. Version 0.2.20 adds *PatternMatchesMany*, which returns a vector of matched patterns, expressed as arrays.
+In version 0.2.19 default implementations have been added for many variant methods in PatternMatch, PatternReplace, PatternMatchMany and PatternReplaceMany. The last two traits depend on *PatternMatch* and *PatternReplace* respectively. For *PatternMatch* only the base method *pattern_match_result* needs to be implemented and for *PatternReplace* only *pattern_replace_result* and *pattern_replace* need custom implementations, the latter only because the fallback value may have different trait and lifetimes constraints for arrays and vectors. Version 0.2.20 adds *PatternMatchesMany*, which returns a vector of matched patterns, expressed as arrays of booleans.
+Version 0.2.21 adds SimpleMatchesMany and SimpleMatchAll to evaluate multiple patterns without regular expressions with simple *StartsWith, EndsWith and contains* condition sets via the new *StringBounds* enum.
 Some updates only reflect minor corrections to these notes and comments in other files.

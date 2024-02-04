@@ -1,4 +1,4 @@
-use string_patterns::*;
+use string_patterns::{enums::StringBounds, *};
 
 #[cfg(test)]
 
@@ -209,16 +209,16 @@ fn test_char_group_matches() {
 }
 
 #[test]
-fn test_match_many() {
+fn test_match_all() {
   let str1 = "The 1950s proved to be a regeneration for Armstrong as both a musician and a public figure.";
 
   let match_patterns = [r#"\bmusician\b"#, r#"\bpublic\b"#];
-  assert!(str1.pattern_match_many_ci(&match_patterns));
+  assert!(str1.pattern_match_all_ci(&match_patterns));
 
   let match_patterns_2 = [r#"\bmusician\b"#, r#"\bjazz\b"#];
   // Does not contains all of the above
   
-  assert_eq!(str1.pattern_match_many_ci(&match_patterns_2), false);
+  assert_eq!(str1.pattern_match_all_ci(&match_patterns_2), false);
 
   // Contains at least one of the above
   assert!(str1.pattern_match_any_ci(&match_patterns_2));
@@ -550,3 +550,31 @@ fn test_pattern_match_many_conditional() {
 
 }
 
+#[test]
+fn test_matched_conditional() {
+  let conditions = [
+    StringBounds::StartsWith("jan", true),
+    StringBounds::EndsWith("images", true),
+    StringBounds::Contains("2023", true),
+  ];
+
+  let folder_1 = "Jan_2023_IMAGES";
+
+  let folder_2 = "january_2024_Images";
+
+  assert_eq!(folder_1.matched_conditional(&conditions), vec![true, true, true]);
+
+  assert!(folder_1.match_all_conditional(&conditions));
+
+  assert_eq!(folder_2.matched_conditional(&conditions), vec![true, true, false]);
+
+  let test_strs = ["image", "cat", "garden"];
+
+  let folder_3 = "cat-IMAGES_Garden";
+  let folder_4 = "images-of-cats-and-dogs-in-the-park";
+
+  assert!(folder_3.contains_all_conditional_ci(&test_strs));
+  // the second folder should not match all conditions
+  assert_eq!(folder_4.contains_all_conditional_ci(&test_strs), false);
+
+}

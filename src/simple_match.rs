@@ -1,4 +1,4 @@
-use crate::StripCharacters;
+use crate::{enums::StringBounds, utils::{pairs_to_string_bounds, strs_to_str_bool_pairs, strs_to_string_bounds}, StripCharacters};
 
 /// Regex-free matcher methods for common use cases
 pub trait SimpleMatch {
@@ -87,4 +87,94 @@ impl MatchOccurrences for str {
   fn find_matched_indices(&self, pat: &str) -> Vec<usize> {
     self.match_indices(pat).into_iter().map(|pair| pair.0).collect::<Vec<usize>>()
   }
+}
+
+
+/// Test multiple patterns and return vector of booleans with the results for each item
+pub trait SimpleMatchesMany where Self:SimpleMatch {
+
+  /// test for multiple conditions. All other trait methods are derived from this
+  fn matched_conditional(&self, pattern_sets: &[StringBounds]) -> Vec<bool>;
+
+  /// test for multiple conditions with simple tuple pairs of pattern + case-insenitive flag
+  fn contains_conditional(&self, pattern_sets: &[(&str, bool)]) -> Vec<bool> {
+    let pattern_sets: Vec<StringBounds> = pairs_to_string_bounds(pattern_sets, 2);
+    self.matched_conditional(&pattern_sets)
+   }
+
+  /// Test for presecnce of simple patterns in case-insensitive mode
+  fn contains_conditional_ci(&self, patterns: &[&str]) -> Vec<bool> {
+    let pattern_sets: Vec<StringBounds> = strs_to_string_bounds(patterns, true, 2);
+    self.matched_conditional(&pattern_sets)
+  }
+
+  /// Test for presecnce of simple patterns in case-sensitive mode
+  fn contains_conditional_cs(&self, patterns: &[&str]) -> Vec<bool> {
+    let pattern_sets: Vec<StringBounds> = strs_to_string_bounds(patterns, false, 2);
+    self.matched_conditional(&pattern_sets)
+  }
+  
+}
+
+impl SimpleMatchesMany for str {
+
+  // test for multiple conditions. All other trait methods are derived from this
+  fn matched_conditional(&self, pattern_sets: &[StringBounds]) -> Vec<bool> {
+    let mut matched_items: Vec<bool> = Vec::with_capacity(pattern_sets.len());
+    for item in pattern_sets {
+      let ci = item.case_insensitive();
+      let base = if ci {
+        self.to_lowercase()
+      } else {
+        self.to_owned()
+      };
+      let pattern = if ci {
+        item.pattern().to_lowercase()
+      } else {
+        item.pattern().to_owned()
+      };
+      let is_matched = match item {
+        StringBounds::StartsWith(_1, _2) => base.starts_with(&pattern),
+        StringBounds::EndsWith(_1, _2) => base.ends_with(&pattern),
+        StringBounds::Contains(_1, _2) => base.contains(&pattern),
+      };
+       matched_items.push(is_matched);
+     }
+     matched_items
+   }
+}
+
+/// Test multiple patterns and return boolean
+pub trait SimpleMatchAll where Self:SimpleMatchesMany {
+
+  /// test for multiple conditions. All other trait methods are derived from this
+  fn match_all_conditional(&self, pattern_sets: &[StringBounds]) -> bool;
+
+  /// test for multiple conditions with simple tuple pairs of pattern + case-insenitive flag
+  fn contains_all_conditional(&self, pattern_sets: &[(&str, bool)]) -> bool {
+    let pattern_sets: Vec<StringBounds> = pairs_to_string_bounds(pattern_sets, 2);
+    self.match_all_conditional(&pattern_sets)
+   }
+
+  /// Test for presecnce of simple patterns in case-insensitive mode
+  fn contains_all_conditional_ci(&self, patterns: &[&str]) -> bool {
+    let pattern_sets: Vec<StringBounds> = strs_to_string_bounds(patterns, true, 2);
+    self.match_all_conditional(&pattern_sets)
+  }
+
+  /// Test for presecnce of simple patterns in case-sensitive mode
+  fn contains_all_conditional_cs(&self, patterns: &[&str]) -> bool {
+    let pattern_sets: Vec<StringBounds> = strs_to_string_bounds(patterns, false, 2);
+    self.match_all_conditional(&pattern_sets)
+  }
+  
+}
+
+impl SimpleMatchAll for str {
+
+  // test for multiple conditions. All other 'many' trait methods are derived from this
+  fn match_all_conditional(&self, pattern_sets: &[StringBounds]) -> bool {
+    self.matched_conditional(pattern_sets).into_iter().all(|matched| matched)
+  }
+
 }
