@@ -72,7 +72,7 @@ fn replace_final_os(input: &str) -> String {
 }
 ```
 
-##### Simple case-insensitive match on string value
+##### Simple case-insensitive match
 ```rust
 let str_1 = "Dog food";
 if str_1.starts_with_ci("dog") {
@@ -80,7 +80,7 @@ if str_1.starts_with_ci("dog") {
 }
 ```
 
-##### Simple case-insensitive match on the alphanumeric characters only in a longer string
+##### Simple case-insensitive match on the alphanumeric characters only in a longer text
 ```rust
 // This method is handy for validating text values from external data sources with
 // inconsistent naming conventions, e.g. first-name, first_name, firstName or "first name"
@@ -235,7 +235,7 @@ let sample_string = "books, records and videotapes";
 let pattern = r#"\s*(,|and)\s"#;
  // case-insensitive split
 let items = sample_string.pattern_split_ci(pattern);
-// should yield a vector of strings: "books", "records", "videotapes"
+// should yield a vector of strings: vec!["books", "records", "videotapes"]
 ```
 
 ##### Split a string into head / tail pair (case-sensitively)
@@ -319,7 +319,7 @@ impl PatternMatch for Message {
   - Start: From word start
   - End: To word end
   - Both: Whole word, but spaces or other punctuation may occur within the pattern to match one or more words
-- **StringBounds**: Defines simple positive and negative match rules with the pattern and case_sensitivity flag, e.g. StringBounds::Contains("report", true) or StringBounds::NotEndsWith(".docx", true)
+- **StringBounds**: Defines simple positive and negative match rules with the pattern and case-sensitivity flag, e.g. StringBounds::ContainsCi("report") or StringBounds::NotEndsWithCi(".docx")
   Options:
   - StartsWith(&str, bool) starts with + case-insensitivity flag
   - EndsWith(&str, bool) ends with + case-insensitivity flag
