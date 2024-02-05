@@ -309,7 +309,7 @@ impl PatternMatch for Message {
 - **MatchWord**: Has convenience methods to match words with various word boundary rules. New to 0.2.5
 - **ReplaceWord**: Provides methods to replace one or more words with clean syntax. New to 0.2.5
 - **PatternCapture**: Returns captures or vectors of each match, whether overlapping or not, and counts of matching patterns or words. New to version 0.2.0
-- **ToSegments**:	Methods to split a longer string on a separator and return a vector of strings, a tuple of two strings or single optional string segment Note some methods may return empty segments in the case of leading, trailing or repeated separators.
+- **ToSegments**:	Methods to split a longer string on a separator and return a vector of strings, a tuple of two strings or single optional string segment.
 - **ToStrings**:	Converts arrays or vectors of strs to a vector of owned strings
 
 ### Enums
@@ -321,24 +321,24 @@ impl PatternMatch for Message {
   - Both: Whole word, but spaces or other punctuation may occur within the pattern to match one or more words
 - **StringBounds**: Defines simple positive and negative match rules with the pattern and case-sensitivity flag, e.g. StringBounds::ContainsCi("report") or StringBounds::NotEndsWithCi(".docx")
   Options:
-  - StartsWith(&str, bool) starts with + case-insensitivity flag
-  - EndsWith(&str, bool) ends with + case-insensitivity flag
-  - Contains(&str, bool) contains + case-insensitivity flag
-  - NotStartsWith(&str, bool) does not start with + case-insensitivity flag
-  - NotEndsWith(&str, bool) does not end with + case-insensitivity flag
-  - NotContains(&str, bool) does not contain + case-insensitivity flag
-  - StartsWithCi(&str, bool) starts with in case-insensitive mode
-  - EndsWithCi(&str) ends with in case-insensitive mode
-  - ContainsCi(&str) contains in case-insensitive mode
-  - NotStartsWithCi(&str) does not end with in case-insensitive mode
-  - NotEndsWithCi(&str) does not end with in case-insensitive mode
-  - NotContainsCi(&str) does not contain in case-insensitive mode
-  - StartsWithCs(&str, bool) starts with in case-sensitive mode
-  - EndsWithCs(&str) ends with in case-sensitive mode
-  - ContainsCs(&str) contains in case-sensitive mode
-  - NotStartsWithCs(&str) does not end with in case-sensitive mode
-  - NotEndsWithCs(&str) does not end with in case-sensitive mode
-  - NotContainsCs(&str) does not contain in case-sensitive mode
+  - StartsWith(&str, bool) *starts with* + boolean case-insensitivity flag
+  - EndsWith(&str, bool) *ends with* + ci flag
+  - Contains(&str, bool) *contains* + ci flag
+  - NotStartsWith(&str, bool) *does not start with* + ci flag
+  - NotEndsWith(&str, bool) *does not end with* + ci flag
+  - NotContains(&str, bool) *does not contain* + ci flag
+  - StartsWithCi(&str, bool) *starts with* in case-insensitive mode
+  - EndsWithCi(&str) case-insensitive *ends with* 
+  - ContainsCi(&str) case-insensitive *contains*
+  - NotStartsWithCi(&str) case-insensitive *does not end with*
+  - NotEndsWithCi(&str) case-insensitive *does not end with*
+  - NotContainsCi(&str) case-insensitive *does not contain*
+  - StartsWithCs(&str, bool) case-sensitive *starts with*
+  - EndsWithCs(&str) case-sensitive *ends with*
+  - ContainsCs(&str) case-sensitive *contains*
+  - NotStartsWithCs(&str) case-sensitive *does not end with*
+  - NotEndsWithCs(&str) case-sensitive *does not end with*
+  - NotContainsCs(&str) case-sensitive *does not contain*
 
 ### Dev Notes
 This crate is still in its alpha stage, but has already been used in 3 API projects. Since version 0.2.14 the code base has been organised into separate files for each set of traits with related implementations. 
