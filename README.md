@@ -327,18 +327,18 @@ impl PatternMatch for Message {
   - NotStartsWith(&str, bool) does not start with + case-insensitivity flag
   - NotEndsWith(&str, bool) does not end with + case-insensitivity flag
   - NotContains(&str, bool) does not contain + case-insensitivity flag
-  - StartsWithCi(&str, bool) starts with in case-insensitivity mode
-  - EndsWithCi(&str) ends with in case-insensitivity mode
-  - ContainsCi(&str) contains in case-insensitivity mode
-  - NotStartsWithCi(&str) does not end with in case-insensitivity mode
-  - NotEndsWithCi(&str) does not end with in case-insensitivity mode
-  - NotContainsCi(&str) does not contain in case-insensitivity mode
-  - StartsWithCs(&str, bool) starts with in case-sensitivity mode
-  - EndsWithCs(&str) ends with in case-sensitivity mode
-  - ContainsCs(&str) contains in case-sensitivity mode
-  - NotStartsWithCs(&str) does not end with in case-sensitivity mode
-  - NotEndsWithCs(&str) does not end with in case-sensitivity mode
-  - NotContainsCs(&str) does not contain in case-sensitivity mode
+  - StartsWithCi(&str, bool) starts with in case-insensitive mode
+  - EndsWithCi(&str) ends with in case-insensitive mode
+  - ContainsCi(&str) contains in case-insensitive mode
+  - NotStartsWithCi(&str) does not end with in case-insensitive mode
+  - NotEndsWithCi(&str) does not end with in case-insensitive mode
+  - NotContainsCi(&str) does not contain in case-insensitive mode
+  - StartsWithCs(&str, bool) starts with in case-sensitive mode
+  - EndsWithCs(&str) ends with in case-sensitive mode
+  - ContainsCs(&str) contains in case-sensitive mode
+  - NotStartsWithCs(&str) does not end with in case-sensitive mode
+  - NotEndsWithCs(&str) does not end with in case-sensitive mode
+  - NotContainsCs(&str) does not contain in case-sensitive mode
 
 ### Dev Notes
 This crate is still in its alpha stage, but has already been used in 3 API projects. Since version 0.2.14 the code base has been organised into separate files for each set of traits with related implementations. 
