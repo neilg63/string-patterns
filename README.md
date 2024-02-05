@@ -247,6 +247,28 @@ let (head, tail) = sample_string.pattern_split_pair_cs(pattern);
 // should yield => head: "first" and tail: "second - third ; fourth"
 ```
 
+##### Match multiple patterns without regular expressions
+```rust
+// Match only file names that contain the character sequence "nepal" (upper lower or mixed case) and so not end in .psd 
+// This is very useful for prefiltering large sets of simple strings representing things like file names.
+// Ci, Cs suffixes mean case-insensitive and case-sensitive respectively
+  let mixed_conditions = [
+    StringBounds::ContainsCi("nepal"),
+    StringBounds::NotEndsWithCi(".psd"),
+  ];
+
+  let file_names = [
+    "edited-img-Nepal-Feb-2003.psd",
+    "image-Thailand-Mar-2003.jpg",
+    "photo_Nepal_Jan-2005.jpg",
+    "image-India-Mar-2003.jpg",
+    "pic_nepal_Dec-2004.png"
+  ];
+  
+  let nepal_jpg_files: Vec<&str> = file_names.into_iter().filter(|s| s.match_all_conditional(&mixed_conditions)).collect();
+  /// should yield two file names: ["photo_Nepal_Jan-2005.jpg", "pic_nepal_Dec-2004.png"]
+```
+
 ### Sample implementation of PatternMatch for a custom struct
 ```rust
 use string_patterns::PatternMatch;
@@ -292,13 +314,40 @@ impl PatternMatch for Message {
 
 ### Enums
 - **WordBounds**:	Has options for *Start*, *End* and *Both* with a method to render regular expression subpatterns with the correct word boundaries
-- **StringBounds**: Defines simple match rules with the pattern and case_sensitivity flag, e.g. StringBounds::Ends("images", true)
+  Options:
+  - None: No bounds
+  - Start: From word start
+  - End: To word end
+  - Both: Whole word, but spaces or other punctuation may occur within the pattern to match one or more words
+- **StringBounds**: Defines simple positive and negative match rules with the pattern and case_sensitivity flag, e.g. StringBounds::Contains("report", true) or StringBounds::NotEndsWith(".docx", true)
+  Options:
+  - StartsWith(&str, bool) starts with + case-insensitivity flag
+  - EndsWith(&str, bool) ends with + case-insensitivity flag
+  - Contains(&str, bool) contains + case-insensitivity flag
+  - NotStartsWith(&str, bool) does not start with + case-insensitivity flag
+  - NotEndsWith(&str, bool) does not end with + case-insensitivity flag
+  - NotContains(&str, bool) does not contain + case-insensitivity flag
+  - StartsWithCi(&str, bool) starts with in case-insensitivity mode
+  - EndsWithCi(&str) ends with in case-insensitivity mode
+  - ContainsCi(&str) contains in case-insensitivity mode
+  - NotStartsWithCi(&str) does not end with in case-insensitivity mode
+  - NotEndsWithCi(&str) does not end with in case-insensitivity mode
+  - NotContainsCi(&str) does not contain in case-insensitivity mode
+  - StartsWithCs(&str, bool) starts with in case-sensitivity mode
+  - EndsWithCs(&str) ends with in case-sensitivity mode
+  - ContainsCs(&str) contains in case-sensitivity mode
+  - NotStartsWithCs(&str) does not end with in case-sensitivity mode
+  - NotEndsWithCs(&str) does not end with in case-sensitivity mode
+  - NotContainsCs(&str) does not contain in case-sensitivity mode
 
 ### Dev Notes
 This crate is still in its alpha stage, but has already been used in 3 API projects. Since version 0.2.14 the code base has been organised into separate files for each set of traits with related implementations. 
 
 #### Recent Version Notes
 Version 0.2.17 makes the *build_regex(pattern: &str, case_insensitive: bool)* available to implementors. This is a wrapper *for Regex::new(re: &str)*, but has a convenient case_insensitive parameter and avoids having to explicity import the *regex* crate*. 
+
 In version 0.2.19 default implementations have been added for many variant methods in PatternMatch, PatternReplace, PatternMatchMany and PatternReplaceMany. The last two traits depend on *PatternMatch* and *PatternReplace* respectively. For *PatternMatch* only the base method *pattern_match_result* needs to be implemented and for *PatternReplace* only *pattern_replace_result* and *pattern_replace* need custom implementations, the latter only because the fallback value may have different trait and lifetimes constraints for arrays and vectors. Version 0.2.20 adds *PatternMatchesMany*, which returns a vector of matched patterns, expressed as arrays of booleans.
-Version 0.2.21 adds SimpleMatchesMany and SimpleMatchAll to evaluate multiple patterns without regular expressions with simple *StartsWith, EndsWith and contains* condition sets via the new *StringBounds* enum.
+
+Version 0.2.21 adds SimpleMatchesMany and SimpleMatchAll to evaluate multiple patterns without regular expressions with simple *StartsWith, EndsWith and contains* condition sets via the new *StringBounds* enum. Version: 0.2.23 adds more versatile StringBounds options
+
 Some updates only reflect minor corrections to these notes and comments in other files.

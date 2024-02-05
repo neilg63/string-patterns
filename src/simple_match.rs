@@ -123,24 +123,26 @@ impl SimpleMatchesMany for str {
     let mut matched_items: Vec<bool> = Vec::with_capacity(pattern_sets.len());
     for item in pattern_sets {
       let ci = item.case_insensitive();
+      // cast the sample string to lowercase for case-insenitive matches
       let base = if ci {
         self.to_lowercase()
       } else {
         self.to_owned()
       };
+      // cast the simple pattern to lowercase for case-insenitive matches
       let pattern = if ci {
         item.pattern().to_lowercase()
       } else {
         item.pattern().to_owned()
       };
-      let is_matched = match item {
-        StringBounds::StartsWith(_1, _2) => base.starts_with(&pattern),
-        StringBounds::EndsWith(_1, _2) => base.ends_with(&pattern),
-        StringBounds::Contains(_1, _2) => base.contains(&pattern),
-        StringBounds::NotStartsWith(_1, _2) => !base.starts_with(&pattern),
-        StringBounds::NotEndsWith(_1, _2) => !base.ends_with(&pattern),
-        StringBounds::NotContains(_1, _2) => !base.contains(&pattern),
-      };
+      // check if outcome of starts_with, ends_with or contains test matches the positivity value
+      let is_matched = if item.starts_with() {
+        base.starts_with(&pattern)
+      } else if item.ends_with() {
+        base.ends_with(&pattern)
+      } else {
+        base.contains(&pattern)
+      } == item.is_positive();
        matched_items.push(is_matched);
      }
      matched_items

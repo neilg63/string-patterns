@@ -553,9 +553,9 @@ fn test_pattern_match_many_conditional() {
 #[test]
 fn test_matched_conditional() {
   let conditions = [
-    StringBounds::StartsWith("jan", true),
-    StringBounds::EndsWith("images", true),
-    StringBounds::Contains("2023", true),
+    StringBounds::StartsWithCi("jan"),
+    StringBounds::EndsWithCi("images"),
+    StringBounds::ContainsCi("2023"),
   ];
 
   let folder_1 = "Jan_2023_IMAGES";
@@ -585,8 +585,8 @@ fn test_matched_conditional() {
   let file_name_1 = "img-Nepal-Feb-2003.png";
   let file_name_2 = "pic_nepal_Dec-2004.jpg";
 
-  assert!(file_name_1.match_all_conditional(&mixed_conditions) == false);
+  assert!(file_name_1.match_all_conditional(&mixed_conditions));
 
-  assert!(file_name_2.match_all_conditional(&mixed_conditions));
+  assert!(file_name_2.match_all_conditional(&mixed_conditions) == false);
 
 }
