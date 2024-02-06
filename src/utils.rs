@@ -56,7 +56,7 @@ pub(crate) fn strs_to_str_bool_pairs<'a>(strs: &'a [&str], bool_val: bool) -> Ve
 * 0 = Start, 1 = End, 2+ = Contains
 */
 pub(crate) fn strs_to_string_bounds<'a>(strs: &'a [&str], case_sensitive: bool, mode: u8) -> Vec<StringBounds<'a>> {
-  strs.into_iter().map(|txt| StringBounds::new(mode, *txt, case_sensitive)).collect()
+  strs.into_iter().map(|txt| StringBounds::new(mode, *txt, true, case_sensitive)).collect()
 }
 
 /*
@@ -66,5 +66,5 @@ pub(crate) fn strs_to_string_bounds<'a>(strs: &'a [&str], case_sensitive: bool, 
 * 0 = Start, 1 = End, 2+ = Contains
 */
 pub(crate) fn pairs_to_string_bounds<'a>(pairs: &'a [(&str, bool)], mode: u8) -> Vec<StringBounds<'a>> {
-  pairs.into_iter().map(|(txt, ci)| StringBounds::new(mode, *txt, *ci)).collect()
+  pairs.into_iter().map(|(txt, ci)| StringBounds::new(mode, *txt, true, *ci)).collect()
 }

@@ -319,26 +319,14 @@ impl PatternMatch for Message {
   - Start: From word start
   - End: To word end
   - Both: Whole word, but spaces or other punctuation may occur within the pattern to match one or more words
-- **StringBounds**: Defines simple positive and negative match rules with the pattern and case-sensitivity flag, e.g. StringBounds::ContainsCi("report") or StringBounds::NotEndsWithCi(".docx")
+- **StringBounds**: Defines simple positive and negative match rules with the pattern and is positivty flag, e.g. StringBounds::ContainsCi("report", true) or StringBounds::EndsWithCi(".docx", false).
   Options:
-  - StartsWith(&str, bool) *starts with* + boolean case-insensitivity flag
-  - EndsWith(&str, bool) *ends with* + ci flag
-  - Contains(&str, bool) *contains* + ci flag
-  - NotStartsWith(&str, bool) *does not start with* + ci flag
-  - NotEndsWith(&str, bool) *does not end with* + ci flag
-  - NotContains(&str, bool) *does not contain* + ci flag
-  - StartsWithCi(&str, bool) *starts with* in case-insensitive mode
-  - EndsWithCi(&str) case-insensitive *ends with* 
-  - ContainsCi(&str) case-insensitive *contains*
-  - NotStartsWithCi(&str) case-insensitive *does not end with*
-  - NotEndsWithCi(&str) case-insensitive *does not end with*
-  - NotContainsCi(&str) case-insensitive *does not contain*
-  - StartsWithCs(&str, bool) case-sensitive *starts with*
-  - EndsWithCs(&str) case-sensitive *ends with*
-  - ContainsCs(&str) case-sensitive *contains*
-  - NotStartsWithCs(&str) case-sensitive *does not end with*
-  - NotEndsWithCs(&str) case-sensitive *does not end with*
-  - NotContainsCs(&str) case-sensitive *does not contain*
+  - StartsWithCi(&str, bool) case-insensitive *starts with* + boolean positivity flags
+  - EndsWithCi(&str) case-insensitive *ends with* + is_positive flags
+  - ContainsCi(&str) case-insensitive *contains* + is_positive flags
+  - StartsWithCs(&str, bool) case-sensitive *starts with* + is_positive flags
+  - EndsWithCs(&str) case-sensitive *ends with* + is_positive flags
+  - ContainsCs(&str) case-sensitive *contains* + is_positive flags
 
 ### Dev Notes
 This crate is still in its alpha stage, but has already been used in 3 API projects. Since version 0.2.14 the code base has been organised into separate files for each set of traits with related implementations. 
@@ -346,8 +334,8 @@ This crate is still in its alpha stage, but has already been used in 3 API proje
 #### Recent Version Notes
 Version 0.2.17 makes the *build_regex(pattern: &str, case_insensitive: bool)* available to implementors. This is a wrapper *for Regex::new(re: &str)*, but has a convenient case_insensitive parameter and avoids having to explicity import the *regex* crate*. 
 
-In version 0.2.19 default implementations have been added for many variant methods in PatternMatch, PatternReplace, PatternMatchMany and PatternReplaceMany. The last two traits depend on *PatternMatch* and *PatternReplace* respectively. For *PatternMatch* only the base method *pattern_match_result* needs to be implemented and for *PatternReplace* only *pattern_replace_result* and *pattern_replace* need custom implementations, the latter only because the fallback value may have different trait and lifetimes constraints for arrays and vectors. Version 0.2.20 adds *PatternMatchesMany*, which returns a vector of matched patterns, expressed as arrays of booleans.
+In version 0.2.19 default implementations were added for many variant methods in PatternMatch, PatternReplace, PatternMatchMany and PatternReplaceMany. The last two traits depend on *PatternMatch* and *PatternReplace* respectively. For *PatternMatch* only the base method *pattern_match_result* needs to be implemented and for *PatternReplace* only *pattern_replace_result* and *pattern_replace* need custom implementations, the latter only because the fallback value may have different trait and lifetimes constraints for arrays and vectors. Version 0.2.20 adds *PatternMatchesMany*, which returns a vector of matched patterns, expressed as arrays of booleans.
 
-Version 0.2.21 adds SimpleMatchesMany and SimpleMatchAll to evaluate multiple patterns without regular expressions with simple *StartsWith, EndsWith and contains* condition sets via the new *StringBounds* enum. Version: 0.2.23 adds more versatile StringBounds options
+Version 0.2.21 added SimpleMatchesMany and SimpleMatchAll to evaluate multiple patterns without regular expressions with simple *StartsWith, EndsWith and contains* condition sets via the new *StringBounds* enum. Version: 0.2.23 added more versatile StringBounds options, which were reviewed in 0.2.24 to have two sets of case-insensitive and case-sensitive 
 
 Some updates only reflect minor corrections to these notes and comments in other files.

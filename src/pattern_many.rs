@@ -1,7 +1,7 @@
 use crate::{utils::strs_to_str_bool_pairs, PatternMatch, PatternReplace, WordBounds};
 
 /// Provides methods to match with multiple patterns 
-/// expressed as arrays of tuples or simple strs (for pattern_match_many_ci and pattern_match_many_cs)
+/// expressed as arrays of tuples or simple strs (for pattern_match_all_ci and pattern_match_all_cs)
 pub trait PatternMatchMany where Self:PatternMatch {
   /// Matches all of the patterns in case-sensitivity flag
   /// with an array of tuples (patterns, case_insensitive)
@@ -33,6 +33,7 @@ pub trait PatternMatchMany where Self:PatternMatch {
   }
 
   /// Deprecated variant
+  #[deprecated(since="0.2.20", note="please use `pattern_match_all_mixed` instead")]
   fn pattern_match_many_mixed(&self, pattern_sets: &[(&str, bool)]) -> bool {
     self.pattern_match_all_mixed(pattern_sets)
   }
@@ -54,6 +55,7 @@ pub trait PatternMatchMany where Self:PatternMatch {
   }
 
   /// Deprecated variant
+  #[deprecated(since="0.2.20", note="please use `pattern_match_all_conditional` instead")]
   fn pattern_match_many_conditional(&self, pattern_sets: &[(bool, &str, bool)]) -> bool {
     self.pattern_match_all_conditional(pattern_sets)
   }
@@ -65,6 +67,7 @@ pub trait PatternMatchMany where Self:PatternMatch {
   }
 
   /// Deprecated variant
+  #[deprecated(since="0.2.20", note="please use `pattern_match_all_ci` instead")]
   fn pattern_match_many_ci(&self, patterns: &[&str]) -> bool {
     self.pattern_match_all_ci(patterns)
   }
@@ -76,6 +79,7 @@ pub trait PatternMatchMany where Self:PatternMatch {
   }
 
   /// Deprecated variant
+  #[deprecated(since="0.2.20", note="please use `pattern_match_all_cs` instead")]
   fn pattern_match_many_cs(&self, patterns: &[&str]) -> bool {
     self.pattern_match_all_cs(patterns)
   }

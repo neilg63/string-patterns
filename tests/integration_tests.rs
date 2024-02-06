@@ -512,7 +512,7 @@ fn test_build_regex() {
 }
 
 #[test]
-fn test_pattern_match_many_conditional() {
+fn test_pattern_match_all_conditional() {
   
   // contains "android" and "linux", but does not conatain iphone: Must be Android
   let pattern_sets_android = [
@@ -531,9 +531,9 @@ fn test_pattern_match_many_conditional() {
 
   let sample_2 = "Mozilla/5.0 (iPhone14,6; U; CPU iPhone OS 15_4 like Mac OS X) AppleWebKit/602.1.50 (KHTML, like Gecko) Version/10.0 Mobile/19E241 Safari/602.1";
   
-  assert!(sample_1.pattern_match_many_conditional(&pattern_sets_android));
+  assert!(sample_1.pattern_match_all_conditional(&pattern_sets_android));
 
-  assert!(sample_2.pattern_match_many_conditional(&pattern_sets_apple));
+  assert!(sample_2.pattern_match_all_conditional(&pattern_sets_apple));
 
   // Alternatively test the boolean results of arrays of case-insensitive whole words 
   let words = [
@@ -553,9 +553,9 @@ fn test_pattern_match_many_conditional() {
 #[test]
 fn test_matched_conditional() {
   let conditions = [
-    StringBounds::StartsWithCi("jan"),
-    StringBounds::EndsWithCi("images"),
-    StringBounds::ContainsCi("2023"),
+    StringBounds::StartsWithCi("jan", true),
+    StringBounds::EndsWithCi("images", true),
+    StringBounds::ContainsCi("2023", true),
   ];
 
   let folder_1 = "Jan_2023_IMAGES";
@@ -578,8 +578,8 @@ fn test_matched_conditional() {
   assert_eq!(folder_4.contains_all_conditional_ci(&test_strs), false);
 
   let mixed_conditions = [
-    StringBounds::Contains("nepal", true),
-    StringBounds::NotEndsWith(".jpg", true),
+    StringBounds::ContainsCi("nepal", true),
+    StringBounds::EndsWithCi(".jpg", false),
   ];
 
   let file_name_1 = "img-Nepal-Feb-2003.png";
