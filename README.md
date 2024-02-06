@@ -27,7 +27,7 @@ The is_numeric() method, in the *IsNumeric* trait, applies a strict regex-free c
 
 In case-insensitive mode the non-capturing **/(?i)/** flag is prepended automatically, but omitted if you add another non-capturing group at the start of your regular expression. In every other way, the pattern-prefixed methods behave like *re.is_match*, *re.replace_all*, *re.find* and *re.capture_iter* methods in the Regex crate. String-patterns unleashes most of the core functionality of the Regex crate, on which it depends, to cover most common use cases in text processing and to act as a building block for specific validators (e.g. email validation) and text transformers. 
 
-Most of the *match* methods will work on *&str* and *String*, while the replacement methods are only implemented for *owned strings*. Likewise, match methods are implemented for arrays and vectors of strings, while replacement methods are only implemented for vectors of *owned strings*. The traits may be implemented for structs or tuples with a string field. Version 2.10 added PatternSplit with results as String vectors or tuples.
+Most *match* methods will work on *&str* and *String*, while replacement methods are only implemented for *owned strings*. Likewise, match methods are implemented for arrays and vectors of strings, while replacement methods are only implemented for vectors of *owned strings*. The traits may be implemented for structs or tuples with a string field. 
 
 ##### Regular expression match in standard Rust with the Regex library
 ```rust
@@ -332,6 +332,8 @@ impl PatternMatch for Message {
 This crate is still in its alpha stage, but has already been used in 3 API projects. Since version 0.2.14 the code base has been organised into separate files for each set of traits with related implementations. 
 
 #### Recent Version Notes
+Version 2.10 added PatternSplit with results as String vectors or tuples.
+
 Version 0.2.17 makes the *build_regex(pattern: &str, case_insensitive: bool)* available to implementors. This is a wrapper *for Regex::new(re: &str)*, but has a convenient case_insensitive parameter and avoids having to explicity import the *regex* crate*. 
 
 In version 0.2.19 default implementations were added for many variant methods in PatternMatch, PatternReplace, PatternMatchMany and PatternReplaceMany. The last two traits depend on *PatternMatch* and *PatternReplace* respectively. For *PatternMatch* only the base method *pattern_match_result* needs to be implemented and for *PatternReplace* only *pattern_replace_result* and *pattern_replace* need custom implementations, the latter only because the fallback value may have different trait and lifetimes constraints for arrays and vectors. Version 0.2.20 adds *PatternMatchesMany*, which returns a vector of matched patterns, expressed as arrays of booleans.
