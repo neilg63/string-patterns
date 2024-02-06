@@ -319,14 +319,14 @@ impl PatternMatch for Message {
   - Start: From word start
   - End: To word end
   - Both: Whole word, but spaces or other punctuation may occur within the pattern to match one or more words
-- **StringBounds**: Defines simple positive and negative match rules with the pattern and is positivty flag, e.g. StringBounds::ContainsCi("report", true) or StringBounds::EndsWithCi(".docx", false).
+- **StringBounds**: Defines simple match rules with the pattern and a positivty flag, e.g. StringBounds::ContainsCi("report", true) or StringBounds::EndsWithCi(".docx", false). The *Ci* and *Cs* variants affect case-sensitivity.
   Options:
-  - StartsWithCi(&str, bool) case-insensitive *starts with* + boolean positivity flags
-  - EndsWithCi(&str) case-insensitive *ends with* + is_positive flags
-  - ContainsCi(&str) case-insensitive *contains* + is_positive flags
-  - StartsWithCs(&str, bool) case-sensitive *starts with* + is_positive flags
-  - EndsWithCs(&str) case-sensitive *ends with* + is_positive flags
-  - ContainsCs(&str) case-sensitive *contains* + is_positive flags
+  - StartsWithCi(&str, bool) case-insensitive *starts with* + boolean positivity flag
+  - EndsWithCi(&str) case-insensitive *ends with* + is_positive flag
+  - ContainsCi(&str) case-insensitive *contains* + is_positive flag
+  - StartsWithCs(&str, bool) case-sensitive *starts with* + is_positive flag
+  - EndsWithCs(&str) case-sensitive *ends with* + is_positive flag
+  - ContainsCs(&str) case-sensitive *contains* + is_positive flag
 
 ### Dev Notes
 This crate is still in its alpha stage, but has already been used in 3 API projects. Since version 0.2.14 the code base has been organised into separate files for each set of traits with related implementations. 
@@ -336,6 +336,6 @@ Version 0.2.17 makes the *build_regex(pattern: &str, case_insensitive: bool)* av
 
 In version 0.2.19 default implementations were added for many variant methods in PatternMatch, PatternReplace, PatternMatchMany and PatternReplaceMany. The last two traits depend on *PatternMatch* and *PatternReplace* respectively. For *PatternMatch* only the base method *pattern_match_result* needs to be implemented and for *PatternReplace* only *pattern_replace_result* and *pattern_replace* need custom implementations, the latter only because the fallback value may have different trait and lifetimes constraints for arrays and vectors. Version 0.2.20 adds *PatternMatchesMany*, which returns a vector of matched patterns, expressed as arrays of booleans.
 
-Version 0.2.21 added SimpleMatchesMany and SimpleMatchAll to evaluate multiple patterns without regular expressions with simple *StartsWith, EndsWith and contains* condition sets via the new *StringBounds* enum. Version: 0.2.23 added more versatile StringBounds options, which were reviewed in 0.2.24 to have two sets of case-insensitive and case-sensitive 
+Version 0.2.21 added SimpleMatchesMany and SimpleMatchAll to evaluate multiple patterns without regular expressions with simple *StartsWith, EndsWith and contains* condition sets via the new *StringBounds* enum. Version: 0.2.23 added more versatile StringBounds options, which were standardised in 0.2.24 to with pairs of case-insensitive and case-sensitive fields, all accepting the pattern and positivity flag, e.f EndsWithCi(".pdf", false) means *does not end with '.pdf' in any case*.
 
 Some updates only reflect minor corrections to these notes and comments in other files.

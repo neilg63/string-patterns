@@ -159,7 +159,7 @@ pub trait SimpleMatchAll where Self:SimpleMatchesMany {
   fn contains_all_conditional(&self, pattern_sets: &[(&str, bool)]) -> bool {
     let pattern_sets: Vec<StringBounds> = pairs_to_string_bounds(pattern_sets, 2);
     self.match_all_conditional(&pattern_sets)
-   }
+  }
 
   /// Test for presecnce of simple patterns in case-insensitive mode
   fn contains_all_conditional_ci(&self, patterns: &[&str]) -> bool {
