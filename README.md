@@ -253,8 +253,8 @@ let (head, tail) = sample_string.pattern_split_pair_cs(pattern);
 // This is very useful for prefiltering large sets of simple strings representing things like file names.
 // Ci, Cs suffixes mean case-insensitive and case-sensitive respectively
   let mixed_conditions = [
-    StringBounds::ContainsCi("nepal"),
-    StringBounds::NotEndsWithCi(".psd"),
+    StringBounds::ContainsCi("nepal", true),
+    StringBounds::EndsWithCi(".psd", false),
   ];
 
   let file_names = [
@@ -338,4 +338,4 @@ In version 0.2.19 default implementations were added for many variant methods in
 
 Version 0.2.21 added SimpleMatchesMany and SimpleMatchAll to evaluate multiple patterns without regular expressions with simple *StartsWith, EndsWith and contains* condition sets via the new *StringBounds* enum. Version: 0.2.23 added more versatile StringBounds options, which were standardised in 0.2.24 to with pairs of case-insensitive and case-sensitive fields, all accepting the pattern and positivity flag, e.f EndsWithCi(".pdf", false) means *does not end with '.pdf' in any case*.
 
-Some updates only reflect minor corrections to these notes and comments in other files.
+Some updates only reflect minor corrections to these notes and comments in other files.strs_to_string_bounds
