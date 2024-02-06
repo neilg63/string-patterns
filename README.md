@@ -322,11 +322,11 @@ impl PatternMatch for Message {
 - **StringBounds**: Defines simple match rules with the pattern and a positivty flag, e.g. StringBounds::ContainsCi("report", true) or StringBounds::EndsWithCi(".docx", false). The *Ci* and *Cs* variants affect case-sensitivity.
   Options:
   - StartsWithCi(&str, bool) case-insensitive *starts with* + boolean positivity flag
-  - EndsWithCi(&str) case-insensitive *ends with* + is_positive flag
-  - ContainsCi(&str) case-insensitive *contains* + is_positive flag
+  - EndsWithCi(&str, bool) case-insensitive *ends with* + is_positive flag
+  - ContainsCi(&str, bool) case-insensitive *contains* + is_positive flag
   - StartsWithCs(&str, bool) case-sensitive *starts with* + is_positive flag
-  - EndsWithCs(&str) case-sensitive *ends with* + is_positive flag
-  - ContainsCs(&str) case-sensitive *contains* + is_positive flag
+  - EndsWithCs(&str, bool) case-sensitive *ends with* + is_positive flag
+  - ContainsCs(&str, bool) case-sensitive *contains* + is_positive flag
 
 ### Dev Notes
 This crate is still in its alpha stage, but has already been used in 3 API projects. Since version 0.2.14 the code base has been organised into separate files for each set of traits with related implementations. 
