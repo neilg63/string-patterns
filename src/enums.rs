@@ -19,7 +19,8 @@ impl WordBounds {
   }
 }
 
-
+/// Defines the matching bounds of simple string matches with case-insensitive/sensitive variants
+/// and accepting the string pattern and positivity flag as arguments
 #[derive(Debug, Clone)]
 pub enum StringBounds<'a> {
   StartsWithCi(&'a str, bool),
