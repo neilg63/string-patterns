@@ -23,8 +23,8 @@ impl IsNumeric for str {
   fn is_numeric(&self) -> bool {
     let num_chars = self.chars().count();
     let last_index = num_chars - 1;
-    let mut num_valid = 0usize;
-    let mut index = 0usize;
+    let mut num_valid: usize = 0;
+    let mut index: usize = 0;
     let mut num_decimal_separators = 0usize;
     for c in self.chars().into_iter() {
       let is_digit = c.is_digit(10);
@@ -61,10 +61,14 @@ pub trait StripCharacters {
   fn strip_non_digits(&self) -> String;
 
   /// Extracts valid numeric string components from a longer string
-  fn to_numeric_strings(&self) -> Vec<String>;
+  fn to_numeric_strings(&self) -> Vec<String> {
+    self.to_numeric_strings_conditional(false)
+  }
 
   /// Always interpret numeric strings with dots as thousand separators and commas as decimal separators
-  fn to_numeric_strings_euro(&self) -> Vec<String>;
+  fn to_numeric_strings_euro(&self) -> Vec<String> {
+    self.to_numeric_strings_conditional(true)
+  }
 
   fn to_numeric_strings_conditional(&self, enforce_comma_separator: bool) -> Vec<String>;
 
@@ -110,7 +114,9 @@ pub trait StripCharacters {
   }
 
   /// Removes all characters no used in valid numeric sequences
-  fn strip_non_numeric(&self) -> String;
+  fn strip_non_numeric(&self) -> String {
+    self.to_numeric_strings().join(" ")
+  }
 
 }
 
@@ -194,24 +200,12 @@ impl StripCharacters for str {
     output
   }
 
-  fn to_numeric_strings(&self) -> Vec<String> {
-    self.to_numeric_strings_conditional(false)
-  }
-
-  fn to_numeric_strings_euro(&self) -> Vec<String> {
-    self.to_numeric_strings_conditional(true)
-  }
-
   fn to_numbers_conditional<T: FromStr>(&self, enforce_comma_separator: bool) -> Vec<T> {
     self.to_numeric_strings_conditional(enforce_comma_separator).into_iter()
       .map(|s| s.parse::<T>())
       .filter(|s| s.is_ok())
       .map(|s| s.ok().unwrap())
       .collect()
-  }
-
-  fn strip_non_numeric(&self) -> String {
-    self.to_numeric_strings().join(" ")
   }
 
 }
