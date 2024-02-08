@@ -284,10 +284,10 @@ fn test_is_numeric() {
   let num_str_2 = "-1,227.75"; // will not validate with commas, unless corrected
   assert_eq!(num_str_2.is_numeric(), false);
   // &str has to be cast to an owned String first
-  assert!(num_str_2.to_owned().correct_numeric_string(false).is_numeric());
+  assert!(num_str_2.correct_numeric_string(false).is_numeric());
 
   let num_str_3 = "-1.227,75"; // European-style with commas as decimal separators
-  assert!(num_str_3.to_owned().correct_numeric_string(true).is_numeric());
+  assert!(num_str_3.correct_numeric_string(true).is_numeric());
 
   let num_str_4 = "$19.99 each"; // Should fail, as this will not parse directly to a float
   assert!(!num_str_4.is_numeric());
@@ -324,7 +324,7 @@ fn test_match_ocurrences() {
 
 #[test]
 fn test_strip_non_numeric() {
-  let source_str = "I spent £9999.99 on 2 motorbikes at the age of 72.".to_string();
+  let source_str = "I spent £9999.99 on 2 motorbikes at the age of 72.";
   let target_str = "9999.99 2 72".to_string();
   assert_eq!(source_str.strip_non_numeric(), target_str);
   // check if ythe above numbers parse successfully to numbers
@@ -332,17 +332,17 @@ fn test_strip_non_numeric() {
 
   assert_eq!(source_str.to_first_number::<f32>().unwrap_or(0f32), 9999.99f32);
 
-  let input_text = "I'd like 2.5lb of flour please".to_string();
+  let input_text = "I'd like 2.5lb of flour please";
 
   assert_eq!(input_text.to_first_number::<f32>().unwrap_or(0f32), 2.5f32);
   
   // Standard European price format. This is not ambiguous because both a dot and comma are both present
-  let input_text = "Il conto è del 1.999,50€. Come vuole pagare?".to_string();
+  let input_text = "Il conto è del 1.999,50€. Come vuole pagare?";
   assert_eq!(input_text.to_first_number::<f32>().unwrap_or(0f32), 1999.5f32);
 
   // Rounded amount in the European format. The absence of a secondary separator makes this
   // value ambigiuous
-  let input_text = "Il furgone pesa 1.500kg".to_string();
+  let input_text = "Il furgone pesa 1.500kg";
   assert_eq!(input_text.to_first_number_euro::<u32>().unwrap_or(0), 1500);
 }
 

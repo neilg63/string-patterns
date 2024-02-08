@@ -13,10 +13,10 @@ This library makes it easier to process strings in Rust. It builds on Rust's sta
 - Many methods without *_ci* or *_cs* suffixes require a boolean *case_insensitive* parameter
 - Methods ending in *_cs* are case-sensitive
 - Methods ending in *_ci* are case-insensitive
-- Methods containing *_word(s)_* match whole or partial words depending on boundary rules
-- Methods containing *_match_all_* require all patterns within an array to match. In a future version, the _many_ variants are deprecated
-- Methods containing *_match_any_* return true if any of the patterns within an array match
-- Methods containing *split* return either a vector or tuple pair.
+- Methods containing *_word(s)* match whole or partial words depending on boundary rules
+- Methods containing *_match_all* require all patterns within an array to match.
+- Methods containing *_match_any* return true if any of the patterns within an array match
+- Methods containing *_split* return either a vector or tuple pair.
 - Methods containing *_part(s)* always include leading or trailing separators and may return empty elements in vectors
 - Methods containing *segment(s)* ignore leading, trailing, repeated consecutive separators and thus exclude empty elements
 - In tuples returned from *segment(s)* and *part(s)* methods, *head* means the segment before the first split and tail the remainder, while *start* means the whole string before the last split and *end* only the last part of the last matched separator.
@@ -163,7 +163,7 @@ if source_str.match_any_words_ci(&cat_like_words) {
 
 ##### Extract the third non-empty segment of a long path name
 ```rust
-let path_string = "/var/www/mysite.com/web/uploads".to_string();
+let path_string = "/var/www/mysite.com/web/uploads";
 if let Some(domain) = path_string.to_segment("/", 2) {
   println!("The domain folder name is: {}", domain); // "mysite.com" is an owned string
 }
@@ -171,7 +171,7 @@ if let Some(domain) = path_string.to_segment("/", 2) {
 
 ##### Extract the *head and tail* or *start and end* from a longer string 
 ```rust
-let test_string = "long-list-of-technical-words".to_string();
+let test_string = "long-list-of-technical-words"
 let (head, tail) = test_string.to_head_tail("-");
 println!("Head: {}, tail: {}", head, tail); // Head: long, tail: list-of-technical-words
 
@@ -183,7 +183,7 @@ println!("Start: {}, end: {}", start, end); // Start: long-list-of-technical, en
 ```rust
 const GBP_TO_EURO: f64 = 0.835;
 
-let sample_str = "Price £12.50 each".to_string();
+let sample_str = "Price £12.50 each";
 if let Some(price_gbp) = sample_str.to_first_number::<f64>() {
     let price_eur = price_gbp / GBP_TO_EURO;
     println!("The price in euros is {:.2}", price_eur);
@@ -193,7 +193,7 @@ if let Some(price_gbp) = sample_str.to_first_number::<f64>() {
 ##### Extract numeric sequences from phrases and convert them to a vector of floats
 ```rust
 // extract European-style numbers with commas as decimal separators and points as thousand separators
-let sample_str = "2.500 grammi di farina costa 9,90€ al supermercato.".to_string();
+let sample_str = "2.500 grammi di farina costa 9,90€ al supermercato.";
   let numbers: Vec<f32> = sample_str.to_numbers_euro();
   // If two valid numbers are matched assume the first is the weight
   if numbers.len() > 1 {
@@ -339,5 +339,6 @@ Version 0.2.17 makes the *build_regex(pattern: &str, case_insensitive: bool)* av
 In version 0.2.19 default implementations were added for many variant methods in PatternMatch, PatternReplace, PatternMatchMany and PatternReplaceMany. The last two traits depend on *PatternMatch* and *PatternReplace* respectively. For *PatternMatch* only the base method *pattern_match_result* needs to be implemented and for *PatternReplace* only *pattern_replace_result* and *pattern_replace* need custom implementations, the latter only because the fallback value may have different trait and lifetimes constraints for arrays and vectors. Version 0.2.20 adds *PatternMatchesMany*, which returns a vector of matched patterns, expressed as arrays of booleans.
 
 Version 0.2.21 added SimpleMatchesMany and SimpleMatchAll to evaluate multiple patterns without regular expressions with simple *StartsWith, EndsWith and contains* condition sets via the new *StringBounds* enum. Version: 0.2.23 added more versatile StringBounds options, which were standardised in 0.2.24 to with pairs of case-insensitive and case-sensitive fields, all accepting the pattern and positivity flag, e.f EndsWithCi(".pdf", false) means *does not end with '.pdf' in any case*.
+Version 0.2.26 allows simple alphanumeric corrections and captures on &str, returning owned string, with default implementations for 4 variant methods.
 
-Some updates only reflect minor corrections to these notes and comments in other files.strs_to_string_bounds
+Some updates only reflect minor corrections to these notes and comments in other files.

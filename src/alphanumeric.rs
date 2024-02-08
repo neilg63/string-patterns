@@ -8,7 +8,7 @@ use crate::{MatchOccurrences, utils::add_sanitized_numeric_string, ToSegments};
 pub trait IsNumeric {
   /// strict check on a numeric string before using ```.parse::<T>()```
   /// use trim() or correct_numeric_string() first for looser number validation
-  /// This mirrors a similar function in the PHP standard library, which is more useful than only checking for digits.
+  /// This mirrors a similar function in jQuery or the PHP standard library, which is more useful than only checking for digits.
   /// It will fail with spaces or any non-numeric characters other than a leading minus or a single decimal point
   /// For characters, is_numeric checks for decimal digit-equivalent characters
   fn is_numeric(&self) -> bool;
@@ -55,10 +55,10 @@ pub trait StripCharacters {
 
   /// Removes all characters that any are not letters or digits, such as punctuation or symobols
   /// Letters include those used in most non-Latin alphabets
-  fn strip_non_alphanum(&self) -> Self where Self:Sized;
+  fn strip_non_alphanum(&self) -> String;
 
   // Remove all characters except digits, including punctuation such as decmimal points
-  fn strip_non_digits(&self) -> Self where Self:Sized;
+  fn strip_non_digits(&self) -> String;
 
   /// Extracts valid numeric string components from a longer string
   fn to_numeric_strings(&self) -> Vec<String>;
@@ -76,29 +76,46 @@ pub trait StripCharacters {
   fn to_numbers_conditional<T: FromStr>(&self, enforce_comma_separator: bool) -> Vec<T>;
 
   /// Extracts valid integers or floats from a longer string
-  fn to_numbers<T: FromStr>(&self) -> Vec<T>;
+  fn to_numbers<T: FromStr>(&self) -> Vec<T> {
+    self.to_numbers_conditional::<T>(false)
+  }
 
-  fn to_numbers_euro<T: FromStr>(&self) -> Vec<T>;
+  /// Extract numeric string using European-style decimal commas
+  fn to_numbers_euro<T: FromStr>(&self) -> Vec<T> {
+    self.to_numbers_conditional::<T>(true)
+  }
 
   /// Correct numbers to conform to use dots (periods, full-stops) only as decimal separators
   /// Works only on the first number encountered and used with to_numeric_strings or to_numeric_strings_euro
   /// to correct multiple numbers in a longer string
-  fn correct_numeric_string(&self, enforce_comma_separator: bool) -> Self;
+  fn correct_numeric_string(&self, enforce_comma_separator: bool) -> String;
 
   /// Extracts the first valid integer or float from a longer string if present
-  fn to_first_number<T: FromStr + Copy>(&self) -> Option<T>;
+  fn to_first_number<T: FromStr + Copy>(&self) -> Option<T> {
+    if let Some(number) = self.to_numbers::<T>().first() {
+      Some(*number)
+    } else {
+      None
+    }
+  }
 
   /// Extracts the first valid integer or float from a longer string
-  /// if commas are used for decimals and dots for thousand separators
-  fn to_first_number_euro<T: FromStr + Copy>(&self) -> Option<T>;
+  /// if commas are used for decimals and dots for thousand separators  
+  fn to_first_number_euro<T: FromStr + Copy>(&self) -> Option<T> {
+    if let Some(number) = self.to_numbers_euro::<T>().first() {
+      Some(*number)
+    } else {
+      None
+    }
+  }
 
   /// Removes all characters no used in valid numeric sequences
-  fn strip_non_numeric(&self) -> Self where Self:Sized;
+  fn strip_non_numeric(&self) -> String;
 
 }
 
 
-impl StripCharacters for String {
+impl StripCharacters for str {
     
   /// Remove all characters that are not letters or numerals for later string comparison. Does not use a regular expression
   fn strip_non_alphanum(&self) -> String {
@@ -113,7 +130,7 @@ impl StripCharacters for String {
   /// Correct numeric strings with commas as thousand separators or as decimal separators
   /// to a regular format with punctuation only for decimal points before being parsed to an integer or float
   /// This is best used only with numeric strings as it will strip commas and dots not used as decimal separators
-  fn correct_numeric_string(&self, enforce_comma_separator: bool) -> Self {
+  fn correct_numeric_string(&self, enforce_comma_separator: bool) -> String {
       let commas = self.find_matched_indices(",");
       let last_comma_index = commas.last().unwrap_or(&0).to_owned();
       let points = self.find_matched_indices(".");
@@ -190,31 +207,7 @@ impl StripCharacters for String {
       .map(|s| s.parse::<T>())
       .filter(|s| s.is_ok())
       .map(|s| s.ok().unwrap())
-      .collect::<Vec<T>>()
-  }
-
-  fn to_numbers<T: FromStr>(&self) -> Vec<T> {
-    self.to_numbers_conditional(false)
-  }
-
-  fn to_numbers_euro<T: FromStr>(&self) -> Vec<T> {
-    self.to_numbers_conditional(true)
-  }
-
-  fn to_first_number<T: FromStr + Copy>(&self) -> Option<T> {
-    if let Some(number) = self.to_numbers::<T>().first() {
-      Some(*number)
-    } else {
-      None
-    }
-  }
-
-  fn to_first_number_euro<T: FromStr + Copy>(&self) -> Option<T> {
-    if let Some(number) = self.to_numbers_euro::<T>().first() {
-      Some(*number)
-    } else {
-      None
-    }
+      .collect()
   }
 
   fn strip_non_numeric(&self) -> String {
