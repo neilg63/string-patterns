@@ -249,8 +249,9 @@ let (head, tail) = sample_string.pattern_split_pair_cs(pattern);
 
 ##### Match multiple patterns without regular expressions
 ```rust
-// Match only file names that contain the character sequence "nepal" (upper lower or mixed case) and so not end in .psd 
-// This is very useful for prefiltering large sets of simple strings representing things like file names.
+// Match only file names that contain the character sequence "nepal" and do not end in .psd 
+// This is very useful for prefiltering large sets of simple strings 
+// representing things like file names.
 // Ci, Cs suffixes mean case-insensitive and case-sensitive respectively
   let mixed_conditions = [
     StringBounds::ContainsCi("nepal", true),
