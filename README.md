@@ -341,4 +341,4 @@ In version 0.2.19 default implementations were added for many variant methods in
 Version 0.2.21 added SimpleMatchesMany and SimpleMatchAll to evaluate multiple patterns without regular expressions with simple *StartsWith, EndsWith and contains* condition sets via the new *StringBounds* enum. Version: 0.2.23 added more versatile StringBounds options, which were standardised in 0.2.24 to with pairs of case-insensitive and case-sensitive fields, all accepting the pattern and positivity flag, e.f EndsWithCi(".pdf", false) means *does not end with '.pdf' in any case*.
 Version 0.2.26 allows simple alphanumeric corrections and captures on &str, returning owned string, with default implementations for 4 variant methods.
 
-Some updates only reflect minor corrections to these notes and comments in other files.
+Some updates only reflect minor corrections to these notes and comments in other files or revised tests.
