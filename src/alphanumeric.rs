@@ -114,6 +114,7 @@ pub trait StripCharacters {
   }
 
   /// Removes all characters no used in valid numeric sequences
+  /// with single spaces between numbers
   fn strip_non_numeric(&self) -> String {
     self.to_numeric_strings().join(" ")
   }
@@ -124,11 +125,14 @@ pub trait StripCharacters {
 impl StripCharacters for str {
     
   /// Remove all characters that are not letters or numerals for later string comparison. Does not use a regular expression
+  /// Will remove all spaces separating words
   fn strip_non_alphanum(&self) -> String {
     self.chars().into_iter().filter(|c| c.is_alphanumeric()).collect::<String>()
   }
 
   /// Remove all characters that are not numerals for later string comparison. Does not use a regular expression
+  /// Will remove all spaces separating numbers
+  /// Use strip_non_numeric to extract a string with valid numbers only separated by spaces
   fn strip_non_digits(&self) -> String {
     self.chars().into_iter().filter(|c| c.is_digit(10)).collect::<String>()
   }

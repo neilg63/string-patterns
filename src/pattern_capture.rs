@@ -56,13 +56,20 @@ impl PatternCapture for str {
   }
 
   /// Yields a vector of Match objects with start and end index + the captured string. Accepts a boolean case_insensitive flag
+  /// Unlike pattern_captures, this method will only return unique matches
   fn pattern_matches_vec(&self, pattern: &str, case_insensitive: bool) -> Vec<Match> {
     if let Ok(re) = build_regex(pattern, case_insensitive) {
       let mut matched_items: Vec<Match> = Vec::new();
+      let mut item_keys: Vec<(&str, usize, usize)> = Vec::new();
       for capture in re.captures_iter(self)  {
         for matched_opt in capture.iter() {
           if let Some(matched_item) = matched_opt {
-            matched_items.push(matched_item);
+            let item_str = matched_item.as_str();
+            let item_key = (item_str, matched_item.start(), matched_item.end());
+            if !item_keys.contains(&item_key) {
+              matched_items.push(matched_item);
+              item_keys.push(item_key);
+            }
           }
         }
       }

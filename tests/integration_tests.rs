@@ -327,6 +327,10 @@ fn test_strip_non_numeric() {
   let source_str = "I spent £9999.99 on 2 motorbikes at the age of 72.";
   let target_str = "9999.99 2 72".to_string();
   assert_eq!(source_str.strip_non_numeric(), target_str);
+
+  
+  let target_str = "Ispent999999on2motorbikesattheageof72".to_string();
+  assert_eq!(source_str.strip_non_alphanum(), target_str);
   // check if ythe above numbers parse successfully to numbers
   assert_eq!(source_str.to_numbers::<f64>(), vec![9999.99f64, 2f64, 72f64]);
 
@@ -509,6 +513,22 @@ fn test_build_regex() {
   let pattern_2 = r#"\bb[aeiou]llsh[aeiout\b"#;
   let regex_2 = build_regex(pattern_2, true);
   assert!(regex_2.is_err());
+}
+
+#[test]
+fn test_pattern_capture() {
+  let sample_str = "We sat on the sofa together like couch potatoes.";
+  let pattern = r#"\b(couch|sofa)\b"#;
+  let captures = sample_str.pattern_matches_vec(pattern, true);
+  assert_eq!(captures.len(), 2);
+ let first_match = captures.get(0).unwrap(); 
+ let second_match = captures.get(1).unwrap(); 
+ assert_eq!(first_match.start(), 14);
+ assert_eq!(first_match.end(), 18);
+ assert_eq!(first_match.as_str(), "sofa");
+ assert_eq!(second_match.start(), 33);
+ assert_eq!(second_match.end(), 38);
+ assert_eq!(second_match.as_str(), "couch");
 }
 
 #[test]
