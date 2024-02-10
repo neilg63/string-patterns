@@ -610,16 +610,32 @@ fn test_matched_conditional() {
   // the second folder should not match all conditions
   assert_eq!(folder_4.contains_all_conditional_ci(&test_strs), false);
 
-  let mixed_conditions = [
-    StringBounds::ContainsCi("nepal", true),
-    StringBounds::EndsWithCi(".jpg", false),
+  let file_names = [
+    "edited-img-Nepal-Feb-2003.psd",
+    "image-Thailand-Mar-2003.jpg",
+    "photo_Nepal_Jan-2005.jpg",
+    "image-India-Mar-2003.jpg",
+    "pic_nepal_Dec-2004.png"
   ];
 
-  let file_name_1 = "img-Nepal-Feb-2003.png";
-  let file_name_2 = "pic_nepal_Dec-2004.jpg";
+  let mixed_conditions = [
+    StringBounds::ContainsCi("nepal", true),
+    StringBounds::EndsWithCi(".psd", false),
+  ];
 
-  assert!(file_name_1.match_all_conditional(&mixed_conditions));
+  let file_name_a = file_names[0];
+  let file_name_b = file_names[2];
 
-  assert!(file_name_2.match_all_conditional(&mixed_conditions) == false);
+  assert!(file_name_a.match_all_conditional(&mixed_conditions) == false);
+
+  assert!(file_name_b.match_all_conditional(&mixed_conditions));
+
+
+  
+  let nepal_jpg_files: Vec<&str> = file_names.filter_all_conditional(&mixed_conditions);
+
+  assert_eq!(nepal_jpg_files.len(), 2);
+
+  assert_eq!(nepal_jpg_files[0], file_name_b);
 
 }

@@ -183,3 +183,21 @@ impl SimpleMatchAll for str {
   }
 
 }
+
+
+/// Test multiple patterns and return boolean
+pub trait SimplFilterAll {
+
+  /// test for multiple conditions. All other trait methods are derived from this
+  fn filter_all_conditional(&self, pattern_sets: &[StringBounds]) -> Vec<&str>;
+  
+}
+
+impl SimplFilterAll for [&str] {
+
+  // test for multiple conditions. All other 'many' trait methods are derived from this
+  fn filter_all_conditional(&self, pattern_sets: &[StringBounds]) -> Vec<&str> {
+    self.into_iter().map(|s| s.to_owned()).filter(|s| s.match_all_conditional(pattern_sets)).collect::<Vec<&str>>()
+  }
+
+}

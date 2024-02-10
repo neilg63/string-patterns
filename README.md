@@ -287,7 +287,7 @@ let (head, tail) = sample_string.pattern_split_pair_cs(pattern);
     "pic_nepal_Dec-2004.png"
   ];
   
-  let nepal_jpg_files: Vec<&str> = file_names.into_iter().filter(|s| s.match_all_conditional(&mixed_conditions)).collect();
+  let nepal_source_files: Vec<&str> = file_names.filter_all_conditional(&mixed_conditions);
   /// should yield two file names: ["photo_Nepal_Jan-2005.jpg", "pic_nepal_Dec-2004.png"]
 ```
 
