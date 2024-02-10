@@ -114,7 +114,9 @@ if sample_strs.pattern_match_ci(test_pattern) {
 
 // The regular expression will only be compiled once
 let match_results = sample_strs.pattern_matches_ci(test_pattern);
-
+for let i in 0..match_results.len() {
+  if let i = match_results
+}
 ```
 
 ##### Count matches of a pattern
