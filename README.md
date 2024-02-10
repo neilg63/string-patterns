@@ -320,6 +320,7 @@ impl PatternMatch for Message {
 - **SimpleMatch**:	Regex-free *match* methods for common validation rules, e.g. starts_with_ci_alphanum checks if the first letters or numerals in a sample string in case-insensitive mode without regular expressions.
 - **SimpleMatchesMany**:	Regex-free multiple *match* methods accepting an array of StringBounds items, tuples or patterns and returning a vector of boolean results. matched_conditional
 - **SimpleMatchAll**:	Regex-free multiple *match* methods accepting an array of StringBounds items, tuples or patterns and returning a boolean if all are matched
+- **SimplFilterAll**: Applies simple Regex-free multiple *match* methods to an array or vector of strings and returns a filtered vector of string slices
 - **MatchOccurrences**:	Returns the indices of all ocurrences of an exact string
 - **PatternMatch**	Core regular expression match methods, wrappers for re.is_match with case-insensitive (_ci) and case-sensitive (_cs) variants
 - **PatternMatchMany**:	Provides methods to match with multiple patterns expressed as arrays of tuples or simple strs
@@ -363,7 +364,7 @@ In version 0.2.19 default implementations were added for many variant methods in
 Version 0.2.21 added SimpleMatchesMany and SimpleMatchAll to evaluate multiple patterns without regular expressions with simple *StartsWith, EndsWith and contains* condition sets via the new *StringBounds* enum. Version: 0.2.23 added more versatile StringBounds options, which were standardised in 0.2.24 to with pairs of case-insensitive and case-sensitive fields, all accepting the pattern and positivity flag, e.f EndsWithCi(".pdf", false) means *does not end with '.pdf' in any case*.
 Version 0.2.26 allows simple alphanumeric corrections and captures on &str, returning owned string, with default implementations for 4 variant methods.
 
-Version 0.2.28 implements *PatternMatch* and *PatternMatches* for arrays of string slices too as well as adding handy two new sets of methods.
+Version 0.2.28 addes a new single-method Trait *SimpleFilterAll* to filter arrays of strings and implements *PatternMatch* and *PatternMatches* for arrays of string slices too as well as adding handy two new sets of methods.
 - *pattern_matched_pairs* returns a vector of tuples with the matched status and referenced string slice
 - *pattern_matches_filter* returns a vector of matched string slices only.
 These methods work on arrays or vector of strings or string slices, but will only ever compile each regular expression once.

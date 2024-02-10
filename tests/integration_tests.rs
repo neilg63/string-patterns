@@ -629,13 +629,17 @@ fn test_matched_conditional() {
   assert!(file_name_a.match_all_conditional(&mixed_conditions) == false);
 
   assert!(file_name_b.match_all_conditional(&mixed_conditions));
-
-
   
   let nepal_jpg_files: Vec<&str> = file_names.filter_all_conditional(&mixed_conditions);
 
   assert_eq!(nepal_jpg_files.len(), 2);
 
   assert_eq!(nepal_jpg_files[0], file_name_b);
+
+  let file_names_vector = file_names.to_strings();
+
+  let nepal_jpg_files_vector: Vec<&str> = file_names_vector.filter_all_conditional(&mixed_conditions);
+  
+  assert_eq!(nepal_jpg_files_vector.len(), 2);
 
 }
