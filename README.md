@@ -98,6 +98,25 @@ if let Some(matched_item) = str_1.pattern_first_match(r#"\bspotted\s+\w+\b"#, tr
 }
 ```
 
+##### Match within an array of strings
+```rust
+let sample_strs = [
+  "pictures_Italy-1997",
+  "photos-portugal-2002",
+  "imagini-italia_2001",
+  "images-france-2003",
+];
+let test_pattern = r#"\bital(y|ia)\b"#; // matches 'italy' or 'italia'
+// The regular expression will only be compiled once
+if sample_strs.pattern_match_ci(test_pattern) {
+  println!("Some of these folders are related to Italy");
+}
+
+// The regular expression will only be compiled once
+let match_results = sample_strs.pattern_matches_ci(test_pattern);
+
+```
+
 ##### Count matches of a pattern
 ```rust
 let sample_text = r#"Humpty Dumpty sat on a wall,

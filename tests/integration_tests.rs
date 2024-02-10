@@ -38,11 +38,11 @@ fn test_case_insensitive_replacement() {
 
 #[test]
 fn test_match_in_string_array() {
-  let source_strs: Vec<String>  = [
+  let source_strs = [
     "fisherman",
     "obbudsman", 
     "handyman"
-  ].to_strings();
+  ];
   let pattern = r#"\bhand\w"#; 
   assert!(source_strs.pattern_match(pattern, true));
   // should not match any of the above patterns
@@ -262,7 +262,6 @@ fn test_simple_pattern_matches() {
   
 }
 
-
 #[test]
 fn test_pattern_matches_in_arrays() {
   let phrases = [
@@ -271,11 +270,23 @@ fn test_pattern_matches_in_arrays() {
     "The heat cycle of the female lasts from 18 to 21 days",
     "Most bitches whelp normally."
   ];
-
+  let good_regex = "puppy";
   let expected_matches = vec![false, true, false, false];
-  assert_eq!(phrases.pattern_matches_ci("puppy"), expected_matches);
+  assert_eq!(phrases.pattern_matches_ci(good_regex), expected_matches);
   let owned_phrases = phrases.to_strings();
-  assert_eq!(owned_phrases.pattern_matches_ci("puppy"), expected_matches);
+  assert_eq!(owned_phrases.pattern_matches_ci(good_regex), expected_matches);
+  
+  let bad_regex = r#"(eye"#;
+  assert!(phrases.pattern_matches_result(bad_regex, true).is_err());
+  // show return a vector of false results with the same length as the original array or vector
+  assert_eq!(phrases.pattern_matches_ci(bad_regex).len(), phrases.len());
+  // works on a vector of &str values too
+  let letter_pattern = "[ao]g";
+  let sample_str_vec = vec!["cat", "BAG", "dog", "frog", "leg", "twig", "brag"];
+  let expected_matches = vec![false, true, true, true, false, false, true];
+  assert_eq!(sample_str_vec.pattern_matches_ci(letter_pattern), expected_matches);
+  let expected_matched_items = vec!["BAG", "dog", "frog", "brag"];
+  assert_eq!(sample_str_vec.pattern_matches_filtered_ci(letter_pattern), expected_matched_items);
 }
 
 #[test]
