@@ -53,7 +53,7 @@ impl IsNumeric for str {
 /// Set of methods to strip unwanted characters by type or extract vectors of numeric strings, integers or floats
 pub trait StripCharacters {
 
-  /// Removes all characters that any are not letters or digits, such as punctuation or symobols
+  /// Removes all characters that any are not letters or digits, such as punctuation or symbols
   /// Letters include those used in most non-Latin alphabets
   fn strip_non_alphanum(&self) -> String;
 
