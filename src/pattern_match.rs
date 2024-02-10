@@ -72,7 +72,7 @@ impl PatternMatch for [String] {
 /// Pattern methods for arrays or vectors only, return vectors of booleans matching each input string
 pub trait PatternMatches {
 
-  /// Returns result with a vector of tuples with matched status and sampled string reference
+  /// Returns result with a vector of tuples with matched status and string slice
   /// for an array or vector of strings with a case-insensitive flag
   /// or an error if the regex does not compile
   fn pattern_matched_pairs_result(&self, pattern: &str, case_insensitive: bool) -> Result<Vec<(bool, &str)>, Error>;
@@ -82,7 +82,7 @@ pub trait PatternMatches {
   /// This has to implemented separately for all other derived methods returning vectors to work correctly
   fn pattern_matched_pairs_default(&self) -> Vec<(bool, &str)>;
 
-  /// Returns a vector of tuples with matched status and sampled string reference
+  /// Returns a vector of tuples with matched status and string slice
   /// for an array or vector of strings with a case-insensitive flag
   /// If the regular expression fails all items will be false
   fn pattern_matched_pairs(&self, pattern: &str, case_insensitive: bool) -> Vec<(bool, &str)> {
@@ -101,17 +101,17 @@ pub trait PatternMatches {
     }
   }
 
-  /// Returns a filtered vector of matched string references (&str) with case-insensitive flag
+  /// Returns a filtered vector of matched string slices (&str) with case-insensitive flag
   fn pattern_matches_filtered(&self, pattern: &str, case_insensitive: bool) -> Vec<&str> {
     self.pattern_matched_pairs(pattern, case_insensitive).into_iter().filter(|(is_matched, _item)| *is_matched).map(|(_is_matched, item)| item).collect()
   }
 
-  /// Returns a filtered vector of matched string references (&str) in case-insensitive mode
+  /// Returns a filtered vector of matched string slices (&str) in case-insensitive mode
   fn pattern_matches_filtered_ci(&self, pattern: &str) -> Vec<&str> {
     self.pattern_matched_pairs(pattern, true).into_iter().filter(|(is_matched, _item)| *is_matched).map(|(_is_matched, item)| item).collect()
   }
 
-  /// Returns a filtered vector of matched string references (&str) in case-sensitive mode
+  /// Returns a filtered vector of matched string slices (&str) in case-sensitive mode
   fn pattern_matches_filtered_cs(&self, pattern: &str) -> Vec<&str> {
     self.pattern_matched_pairs(pattern, false).into_iter().filter(|(is_matched, _item)| *is_matched).map(|(_is_matched, item)| item).collect()
   }

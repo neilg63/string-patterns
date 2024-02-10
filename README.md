@@ -16,6 +16,8 @@ This library makes it easier to process strings in Rust. It builds on Rust's sta
 - Methods containing *_word(s)* match whole or partial words depending on boundary rules
 - Methods containing *_match_all* require all patterns within an array to match.
 - Methods containing *_match_any* return true if any of the patterns within an array match
+- Methods containing *_matches* or *_matched_items* work on arrays or vectors of string or string slices
+- Methods with *_matches_filtered* return filtered vectors of matched strings slices
 - Methods containing *_split* return either a vector or tuple pair.
 - Methods containing *_part(s)* always include leading or trailing separators and may return empty elements in vectors
 - Methods containing *segment(s)* ignore leading, trailing, repeated consecutive separators and thus exclude empty elements
@@ -27,7 +29,7 @@ The is_numeric() method, in the *IsNumeric* trait, applies a strict regex-free c
 
 In case-insensitive mode the non-capturing **/(?i)/** flag is prepended automatically, but omitted if you add another non-capturing group at the start of your regular expression. In every other way, the pattern-prefixed methods behave like *re.is_match*, *re.replace_all*, *re.find* and *re.capture_iter* methods in the Regex crate. String-patterns unleashes most of the core functionality of the Regex crate, on which it depends, to cover most common use cases in text processing and to act as a building block for specific validators (e.g. email validation) and text transformers. 
 
-Most *match* methods will work on *&str* and *String*, while replacement methods are only implemented for *owned strings*. Likewise, match methods are implemented for arrays and vectors of strings, while replacement methods are only implemented for vectors of *owned strings*. The traits may be implemented for structs or tuples with a string field. 
+Most *match* methods will work on *&str* and *String*, while replacement methods are only implemented for *owned strings*. Likewise, match methods are implemented for arrays and vectors of strings or *string slices*, while replacement methods are only implemented for vectors of *owned strings*. The traits may be implemented for structs or tuples with a string field. 
 
 ##### Regular expression match in standard Rust with the Regex library
 ```rust
@@ -102,21 +104,19 @@ if let Some(matched_item) = str_1.pattern_first_match(r#"\bspotted\s+\w+\b"#, tr
 ```rust
 let sample_strs = [
   "pictures_Italy-1997",
-  "photos-portugal-2002",
-  "imagini-italia_2001",
+  "photos-portugal-2001",
+  "imagini-italia_2002",
   "images-france-2003",
 ];
-let test_pattern = r#"\bital(y|ia)\b"#; // matches 'italy' or 'italia'
+let test_pattern = r#"[^a-z]ital(y|ia)"#; // matches 'italy' or 'italia'
 // The regular expression will only be compiled once
 if sample_strs.pattern_match_ci(test_pattern) {
   println!("Some of these folders are related to Italy");
 }
 
-// The regular expression will only be compiled once
-let match_results = sample_strs.pattern_matches_ci(test_pattern);
-for let i in 0..match_results.len() {
-  if let i = match_results
-}
+// Filter the above array
+let filtered_strs = sample_strs.pattern_matches_filtered_ci(test_pattern);
+// should yield ["pictures_Italy-1997","imagini-italia_2002"]
 ```
 
 ##### Count matches of a pattern
