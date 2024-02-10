@@ -270,10 +270,12 @@ fn test_pattern_matches_in_arrays() {
     "The fourth critical stage in a puppy’s development is between 12 and 16 weeks",
     "The heat cycle of the female lasts from 18 to 21 days",
     "Most bitches whelp normally."
-  ].to_strings();
+  ];
 
   let expected_matches = vec![false, true, false, false];
   assert_eq!(phrases.pattern_matches_ci("puppy"), expected_matches);
+  let owned_phrases = phrases.to_strings();
+  assert_eq!(owned_phrases.pattern_matches_ci("puppy"), expected_matches);
 }
 
 #[test]

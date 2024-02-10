@@ -139,7 +139,7 @@ impl PatternMatchMany for str {
 
 
 /// Implement PatternMatchMany for vectors of strings.
-impl PatternMatchMany for [String] {  
+impl PatternMatchMany for [&str] {  
 }
 
 /// Test multiple false or positive patterns and return vector of booleans with the results for each item

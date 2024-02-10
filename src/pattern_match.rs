@@ -1,4 +1,5 @@
 use regex::Error;
+use std::iter;
 use crate::utils::build_regex;
 
 /// Core regular expression match methods
@@ -48,6 +49,17 @@ impl PatternMatch for str {
 }
 
 /// Boolean methods to match a pattern within an array of strings
+impl PatternMatch for [&str] {
+  /// The regex is only compiled when validating an array of strings
+  fn pattern_match_result(&self, pattern: &str, case_insensitive: bool) -> Result<bool, Error> {
+    match build_regex(pattern, case_insensitive) {
+      Ok(re) => Ok(self.into_iter().any(|segment| re.is_match(*segment))),
+      Err(error) => Err(error)
+    }
+  }
+}
+
+/// Boolean methods to match a pattern within an array of strings
 impl PatternMatch for [String] {
   /// The regex is only compiled when validating an array of strings
   fn pattern_match_result(&self, pattern: &str, case_insensitive: bool) -> Result<bool, Error> {
@@ -59,7 +71,7 @@ impl PatternMatch for [String] {
 }
 
 /// Pattern methods for arrays or vectors only, return vectors of booleans matching each input string
-pub trait PatternMatches where Self: {
+pub trait PatternMatches {
   /// Returns result with a vector of boolean matches for an array or vector of strings with case-insensitive flag
   /// or an error if the regex does not compile
   fn pattern_matches_result(&self, pattern: &str, case_insensitive: bool) -> Result<Vec<bool>, Error>;
@@ -67,6 +79,7 @@ pub trait PatternMatches where Self: {
   /// Returns vector of boolean matches for an array or vector of strings with case-insensitive flag
   /// must be reimplemented from pattern_matches_result owing to trait bound constraints on unsized arrays
   fn pattern_matches(&self, pattern: &str, case_insensitive: bool) -> Vec<bool>;
+  
 
   /// Returns vector of boolean matches for an array or vector of strings in case-insensitive mode
   fn pattern_matches_ci(&self, pattern: &str) -> Vec<bool> {
@@ -79,7 +92,30 @@ pub trait PatternMatches where Self: {
   }
 }
 
+/// Multiple match methods for arrays or vectors of &str values
+impl PatternMatches for [&str] {
+
+  /// Returns an Ok result with a vector of boolean matches for an array or vector of strings with a case-insensitive flag
+  /// and an error only if the regex fails to compile.
+  fn pattern_matches_result(&self, pattern: &str, case_insensitive: bool) -> Result<Vec<bool>, Error> {
+    match build_regex(pattern, case_insensitive) {
+      Ok(re) => Ok(self.into_iter().map(|segment| re.is_match(*segment)).collect::<Vec<bool>>()),
+      Err(error) => Err(error)
+    }
+  }
+
+   /// Returns vector of boolean matches for an array or vector of strings with case-insensitive flag
+  fn pattern_matches(&self, pattern: &str, case_insensitive: bool) -> Vec<bool> {
+    match self.pattern_matches_result(pattern, case_insensitive) {
+      Ok(results) => results,
+      Err(_error) => iter::repeat(false).take(self.len()).collect()
+    }
+  }
+
+}
+
 /// Multiple match methods for arrays or vectors of strings
+/// Implemented separately because of irresolvable Iterator trait bounds rules
 impl PatternMatches for [String] {
 
   /// Returns an Ok result with a vector of boolean matches for an array or vector of strings with a case-insensitive flag
@@ -95,8 +131,7 @@ impl PatternMatches for [String] {
    fn pattern_matches(&self, pattern: &str, case_insensitive: bool) -> Vec<bool> {
     match self.pattern_matches_result(pattern, case_insensitive) {
       Ok(results) => results,
-      Err(_error) => self.into_iter().map(|_segment| false).collect::<Vec<bool>>()
+      Err(_error) => iter::repeat(false).take(self.len()).collect()
     }
   }
-
 }
