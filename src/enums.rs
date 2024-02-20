@@ -9,7 +9,7 @@ pub enum WordBounds {
 
 impl WordBounds {
   /// Convert word bounds 
-  pub fn to_pattern(&self, word: &str) -> String {
+  pub fn to_pattern<'a>(&'a self, word: &'a str) -> String {
     match self {
       WordBounds::Start => [r#"\b"#, word].concat(),
       WordBounds::End => [word, r#"\b"#].concat(),
@@ -17,6 +17,7 @@ impl WordBounds {
       _ => word.to_owned(),
     }
   }
+
 }
 
 /// Defines the matching bounds of simple string matches with case-insensitive/sensitive variants

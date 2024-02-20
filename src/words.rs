@@ -4,7 +4,7 @@ use crate::{PatternReplace, utils::{build_whole_word_pattern, build_word_pattern
 // with various word boundary and case-sensitivity rules
 
 /// Provides methods to match words with differnt word boundary and case-semsitivity rules 
-pub trait MatchWord where Self:PatternMatch, Self:PatternCapture {
+pub trait MatchWord<'a> where Self:PatternMatch, Self:PatternCapture<'a> {
 
   /// Match a word with bounds options and case_insensitive flag
   fn match_word_bounds(&self, word: &str, bounds: WordBounds, case_insensitive: bool) -> bool {
@@ -147,10 +147,11 @@ pub trait MatchWord where Self:PatternMatch, Self:PatternCapture {
   /// Check if whole word patterns occur in close proximity as defined by their min and max values
   /// If the second word may occur before the first the min value should negative
   /// The distance between the end of the first and start of the second word is measured
-  fn match_words_by_proximity(&self, first: &str, second: &str, min: i16, max: i16, case_insensitive: bool) -> bool {
+  fn match_words_by_proximity(&'a self, first: &str, second: &str, min: i16, max: i16, case_insensitive: bool) -> bool {
     let word_pattern_1 = build_whole_word_pattern(first);
-    let word_pattern_2 = build_whole_word_pattern(second);
-    if let Some((first_first,first_last)) = self.pattern_first_last_matches(&word_pattern_1, case_insensitive) {
+    let first_last_opt = self.pattern_first_last_matches(&word_pattern_1, case_insensitive);
+    if let Some((first_first,first_last)) =  first_last_opt {
+      let word_pattern_2 = build_whole_word_pattern(second);
       if let Some((second_first, second_last)) = self.pattern_first_last_matches(&word_pattern_2, case_insensitive) {
         let diff_i64 = second_last.start() as i64 - first_first.end() as i64;
         // although indices are usize and convert to i64 for negative values, only consider differences in i16 range (-32768 to 32767)
@@ -174,7 +175,7 @@ pub trait MatchWord where Self:PatternMatch, Self:PatternCapture {
 }
 
 /// Automatic implementation for str/String as both implement PatternMatch and PatternCapture in this crate
-impl MatchWord for str {
+impl<'a> MatchWord<'a> for str {
 }
 
 /// Methods for whole or partial word replacements

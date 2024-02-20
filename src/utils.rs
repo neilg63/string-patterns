@@ -23,20 +23,20 @@ pub(crate) fn add_sanitized_numeric_string(output: &mut Vec<String>, num_string:
 // internal utility methods
 
 /// build regex pattern with word boundaries and WordBounds options
-pub(crate) fn build_word_pattern(word: &str, bounds: WordBounds) -> String {
+pub(crate) fn build_word_pattern<'a>(word: &'a str, bounds: WordBounds) -> String {
   bounds.to_pattern(word)
 }
 
 /// build regex pattern with whole word matches only. Does allow multiple word matches
 /// if wildcards allowing spaces or punctuation are in the regex patterm
-pub(crate) fn build_whole_word_pattern(word: &str) -> String {
+pub(crate) fn build_whole_word_pattern<'a>(word: &'a str) -> String {
   build_word_pattern(word, WordBounds::Both)
 }
 
 /// constructs an optional match group for whole words from an array of strs
 /// e.g. &["cat?", "dog"] will match strings where cat and/or dog appear as whole words.
 /// should be used with build_regex above or pattern_match / pattern_replace
-pub(crate) fn build_optional_whole_word_pattern(words: &[&str]) -> String {
+pub(crate) fn build_optional_whole_word_pattern<'a>(words: &[&str]) -> String {
   let word_pattern = ["(", &words.join("|"), ")"].concat();
   build_word_pattern(&word_pattern, WordBounds::Both)
 }
@@ -67,4 +67,31 @@ pub(crate) fn strs_to_string_bounds<'a>(strs: &'a [&str], case_sensitive: bool, 
 */
 pub(crate) fn pairs_to_string_bounds<'a>(pairs: &'a [(&str, bool)], mode: u8) -> Vec<StringBounds<'a>> {
   pairs.into_iter().map(|(txt, ci)| StringBounds::new(mode, *txt, true, *ci)).collect()
+}
+
+pub(crate) fn to_optional_pattern(sample: &str, end: bool) -> String {
+  let mut cs: Vec<char> = Vec::new();
+  let mut index: usize = 0;
+  if !end {
+    cs.push('^');
+  }
+  for c in sample.chars() {
+    cs.push(c);
+    if index > 0 {
+      cs.push('?');
+    }
+    index += 1;
+  }
+  if end {
+    cs.push('$');
+  }
+  cs.into_iter().collect::<String>()
+}
+
+pub(crate) fn to_optional_start_pattern(sample: &str) -> String {
+  to_optional_pattern(sample, false)
+}
+
+pub(crate) fn to_optional_end_pattern(sample: &str) -> String {
+  to_optional_pattern(sample, true)
 }

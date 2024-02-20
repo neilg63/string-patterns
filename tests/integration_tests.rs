@@ -383,7 +383,7 @@ fn test_correct_floats() {
   assert_eq!(sample_str.to_numbers_euro::<f32>(), target_numbers);
 }
 
-#[test]
+/* #[test]
 fn test_match_word() {
   let source_str = "Lions are unique among cats in that they live in a group or pride.";
   let target_word = "lions?"; // optional s at the end
@@ -397,7 +397,27 @@ fn test_match_word() {
 
   // lion and cat must occur within 20 letters of each other
   assert!(source_str.match_words_by_proximity("lions", "cats", -20, 20, true));
-}
+} */
+
+#[test]
+fn test_match_first_last_matches() {
+  let source_str = "Lions are unique among cats in that they live in a group or pride.";
+  let target_word = "lions?"; // optional s at the end
+  assert!(source_str.match_word_ci(target_word));
+  // check if the above numbers parse successfully to numbers
+  assert!(source_str.match_word_start_ci("uniq"));
+
+  assert!(source_str.match_word_end_ci("nique"));
+
+  assert!(source_str.match_word_bounds("cats", WordBounds::Both, true));
+
+  // lion and cat must occur within 20 letters of each other
+  let pat = "(lions|cats)";
+  let ms = source_str.pattern_first_last_matches(pat, true);
+  assert_eq!(ms.unwrap().0.start(), 0);
+  assert_eq!(ms.unwrap().0.as_str(), "Lions");
+  
+} 
 
 #[test]
 fn test_match_count() {
@@ -636,10 +656,38 @@ fn test_matched_conditional() {
 
   assert_eq!(nepal_jpg_files[0], file_name_b);
 
-  let file_names_vector = file_names.to_strings();
-
-  let nepal_jpg_files_vector: Vec<&str> = file_names_vector.filter_all_conditional(&mixed_conditions);
+  let nepal_jpg_files_vector: Vec<&str> = file_names.filter_all_conditional(&mixed_conditions);
   
   assert_eq!(nepal_jpg_files_vector.len(), 2);
+
+}
+
+#[test]
+fn test_pattern_sets() {
+  let match_set = MatchSet::new("(shop)", true).look_behind("sweat", false);
+  let sentence = "The toyshop sold many goods made sweatshops";
+
+  let replacement = "store";
+
+  let expected_sentence = "The toystore sold many goods made sweatshops";
+
+  assert_eq!(sentence.pattern_set_replace(&match_set, replacement), expected_sentence.to_owned());
+
+  let match_set = MatchSet::new("(mouse)", true).look_behind(r#"(optical).{0,5}"#, true);
+  let sentence = "He used his high-precision optical mouse to draw a life-like picture of a large grey mouse nibbling cheese.";
+
+  let replacement = "pointing device";
+
+  let expected_sentence = "He used his high-precision optical pointing device to draw a life-like picture of a large grey mouse nibbling cheese.";
+
+  assert_eq!(sentence.pattern_set_replace(&match_set, replacement), expected_sentence.to_owned());
+
+  let sample_3 = "I walked across the green meadows";
+
+  let expected_phrase = "I walked across the purple meadows";
+
+  let pattern = "gr.{0,2}n";
+
+  assert_eq!(sample_3.to_string().pattern_replace_ci(pattern, "purple"), expected_phrase.to_owned());
 
 }

@@ -211,3 +211,36 @@ impl SimplFilterAll for [String] {
   }
 
 }
+
+
+pub trait SimpleEnclode {
+  fn is_enclosed(&self, start: &str, end: &str) -> bool;
+
+  fn enclose(&self, start: &str, end: &str) -> String;
+
+  fn has_parentheses(&self) -> bool;
+
+}
+
+impl SimpleEnclode for str {
+  fn is_enclosed(&self, start: &str, end: &str) -> bool {
+    self.starts_with(start) && self.ends_with(end)
+  }
+
+  fn enclose(&self, start: &str, end: &str) -> String {
+    if self.is_enclosed(start, end) {
+      self.to_string()
+    } else {
+      [start, self, end].concat()
+    }
+  }
+
+  fn has_parentheses(&self) -> bool {
+     let start_indices = self.find_matched_indices("(");
+     let end_indices = self.find_matched_indices(")");
+     let first_index = start_indices.get(0).unwrap_or(&0usize).to_owned();
+     let next_index = end_indices.get(1).unwrap_or(&0usize).to_owned();
+     next_index > first_index + 1
+  }
+
+}

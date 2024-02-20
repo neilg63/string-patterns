@@ -10,6 +10,7 @@ pub mod pattern_replace;
 pub mod pattern_many;
 pub mod pattern_split;
 pub mod pattern_capture;
+pub mod pattern_sets;
 pub mod words;
 
 /// This library provides a set of traits and extension methods for &str and/or String
@@ -35,6 +36,7 @@ pub use crate::pattern_replace::*;
 pub use crate::pattern_many::*;
 pub use crate::pattern_split::*;
 pub use crate::pattern_capture::*;
+pub use crate::pattern_sets::*;
 pub use crate::words::*;
 pub use crate::utils::build_regex;
 pub use regex::Error;
