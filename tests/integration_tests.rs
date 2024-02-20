@@ -27,6 +27,27 @@ fn test_simple_replacement() {
   assert_eq!(source_str.pattern_replace(pattern, replacement,true), target_str);
 }
 
+
+#[test]
+fn test_simple_filter_all() {
+  let source_strs = [
+    "Cat image",
+    "dog picture",
+    "elephant image",
+    "CAT_Video",
+    "cat Picture",
+  ];
+  let target_strs = [
+    "Cat image",
+    "cat Picture",
+  ];
+  let conditions = [
+    StringBounds::StartsWithCi("cat", true),
+    StringBounds::ContainsCi("video", false)
+  ];
+  assert_eq!(source_strs.filter_all_conditional(&conditions), target_strs);
+}
+
 #[test]
 fn test_case_insensitive_replacement() {
   let source_str = "I bought two apples in Africa".to_string();

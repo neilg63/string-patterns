@@ -186,7 +186,7 @@ impl SimpleMatchAll for str {
 
 
 /// Test multiple patterns and return a filtered vector of string slices
-pub trait SimplFilterAll {
+pub trait SimpleFilterAll {
 
   /// test for multiple conditions. All other trait methods are derived from this
   fn filter_all_conditional(&self, pattern_sets: &[StringBounds]) -> Vec<&str>;
@@ -194,7 +194,7 @@ pub trait SimplFilterAll {
 }
 
 /// Filter strings by one or more StringBounds rules
-impl SimplFilterAll for [&str] {
+impl SimpleFilterAll for [&str] {
 
   // filter string slices by multiple conditions
   fn filter_all_conditional(&self, pattern_sets: &[StringBounds]) -> Vec<&str> {
@@ -204,7 +204,7 @@ impl SimplFilterAll for [&str] {
 }
 
 
-impl SimplFilterAll for [String] {
+impl SimpleFilterAll for [String] {
   // filter strings by multiple conditions
   fn filter_all_conditional(&self, pattern_sets: &[StringBounds]) -> Vec<&str> {
     self.into_iter().filter(|s| s.match_all_conditional(pattern_sets)).map(|s| s.as_str()).collect::<Vec<&str>>()
