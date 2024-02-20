@@ -369,7 +369,7 @@ Version 0.2.28 addes a new single-method Trait *SimpleFilterAll* to filter array
 - *pattern_matches_filter* returns a vector of matched string slices only.
 These methods work on arrays or vector of strings or string slices, but will only ever compile each regular expression once.
 
-Version 0.2.29 corrects only the name of a new trait *SimpleFilterAll*. This would only affect users who had implemented that traits and extensions methods remain the same. I sdded a new test for the method *filter_all_conditional* with an array of conditions defined by StringBounds enum.
+Version 0.2.29 corrects only the name of a new trait *SimpleFilterAll*. This would only potentially affect users who had implemented that trait. I added a new test for the method *filter_all_conditional* with an array of conditions defined by StringBounds enum.
 
 Some updates only reflect minor corrections to these notes and comments in other files or revised tests.
 
