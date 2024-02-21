@@ -374,4 +374,10 @@ Version 0.2.29 corrected only the name of a new trait *SimpleFilterAll*. This wo
 Some updates only reflect minor corrections to these notes and comments in other files or revised tests.
 
 ## Future Development
-The next major version (0.3.0) will split the library into two, one for simple string manipulation (SimpleMatch, SimpleReplace, SimpleFilterAll, ToSegments, IsNumeric) and one for regular expressions via the *regex* crate. The IsNumeric trait will have more options for different number formats (e.g. with spaces or other characters as thousand separators) and number bases (radices).
+The next major version (0.3.0) will split the library into two crates, one for simple string manipulation with no extra dependencies and one building the regex crate and the former.
+
+The crates will be
+- simple-string-patterns (SimpleMatch, SimpleReplace, SimpleFilterAll, ToSegments, StripCharacters, IsNumeric). The IsNumeric trait will have more options for different number formats (e.g. with spaces or other characters as thousand separators) and number bases (radices). Extra methods will allow matching and filtering by arbitrary character sets.
+- string-patterns: Will depend on simple-string-patterns, but focus on the core extensions that build on the regex library.
+
+A potential third crate, called string-patterns-extras, may include a regular expression builder with support for negative and positive *look-behind* and *look-ahead* groups via conditional matches on captured substrings.
