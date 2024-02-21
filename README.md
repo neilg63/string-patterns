@@ -376,8 +376,8 @@ Some updates only reflect minor corrections to these notes and comments in other
 ## Future Development
 The next major version (0.3.0) will split the library into two crates, one for simple string manipulation with no extra dependencies and one building the regex crate and the former.
 
-The crates will be
-- simple-string-patterns (SimpleMatch, SimpleReplace, SimpleFilterAll, ToSegments, StripCharacters, IsNumeric). The IsNumeric trait will have more options for different number formats (e.g. with spaces or other characters as thousand separators) and number bases (radices). Extra methods will allow matching and filtering by arbitrary character sets.
-- string-patterns: Will depend on simple-string-patterns, but focus on the core extensions that build on the regex library.
+The crates will be:
+- *simple-string-patterns*: (SimpleMatch, SimpleReplace, SimpleFilterAll, ToSegments, StripCharacters, IsNumeric). The IsNumeric trait will have more options for different number formats (e.g. with spaces or other characters as thousand separators) and number bases (radices). Extra methods will allow matching and filtering by arbitrary character sets.
+- *string-patterns*: Will depend on simple-string-patterns, but focus on the core extensions that build on the regex library.
 
-A potential third crate, called string-patterns-extras, may include a regular expression builder with support for negative and positive *look-behind* and *look-ahead* groups via conditional matches on captured substrings.
+A potential third crate, called *string-patterns-extras*, may include a regular expression builder with support for negative and positive *look-behind* and *look-ahead* groups via conditional matches on captured substrings. Some of the more esoteric or experimental methods in the simple-patterns may move to *string-patterns-extras* to keep the core libraries leaner for most users. That said, even in its current state, *string-patterns* adds mimimal overhead to the Regex crate.
