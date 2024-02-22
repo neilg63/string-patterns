@@ -162,25 +162,25 @@ fn test_to_inner_segment() {
 
 #[test]
 fn test_to_first() {
-  let source_str = "/path/with/a/leading/slash".to_string();
+  let source_str = "/path/with/a/leading/slash";
   let target_str = "path".to_string();
   assert_eq!(source_str.to_first("/"), target_str );
-  let source_str2 = "path/without/a/leading/slash".to_string();
+  let source_str2 = "path/without/a/leading/slash";
   assert_eq!(source_str2.to_first("/"), target_str );
 }
 
 #[test]
 fn test_to_last() {
-  let source_str = "/path/with/a/trailing/slash/".to_string();
+  let source_str = "/path/with/a/trailing/slash/";
   let target_str = "slash".to_string();
   assert_eq!(source_str.to_last("/"), target_str );
-  let source_str2 = "/path/without/a/trailing/slash".to_string();
+  let source_str2 = "/path/without/a/trailing/slash";
   assert_eq!(source_str2.to_last("/"), target_str );
 }
 
 #[test]
 fn test_to_head_tail() {
-  let source_str = "comma,separated,string".to_string();
+  let source_str = "comma,separated,string";
   let start = "comma";
   let end = "separated,string";
   assert_eq!(source_str.to_head_tail(","), (start.to_string(), end.to_string()) );
