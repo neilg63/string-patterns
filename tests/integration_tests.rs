@@ -181,9 +181,14 @@ fn test_to_last() {
 #[test]
 fn test_to_head_tail() {
   let source_str = "comma,separated,string".to_string();
-  let start = "comma".to_string();
-  let end = "separated,string".to_string();
-  assert_eq!(source_str.to_head_tail(","), (start, end) );
+  let start = "comma";
+  let end = "separated,string";
+  assert_eq!(source_str.to_head_tail(","), (start.to_string(), end.to_string()) );
+  let head = source_str.to_head(",");
+  assert_eq!(head, start.to_string() );
+
+  let end_part = source_str.to_end(",");
+  assert_eq!(end_part, "string".to_string() );
 }
 
 #[test]
@@ -563,6 +568,9 @@ fn test_pattern_capture() {
  assert_eq!(second_match.start(), 33);
  assert_eq!(second_match.end(), 38);
  assert_eq!(second_match.as_str(), "couch");
+
+ let captures = sample_str.pattern_captures(pattern, true);
+  assert_eq!(captures.unwrap().len(), 2);
 }
 
 #[test]

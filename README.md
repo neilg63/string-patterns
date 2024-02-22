@@ -240,16 +240,6 @@ let numbers: Vec<f64> = input_str.pattern_split_cs(split_pattern)
 // yields a vector of three f64 numbers [-78.29826, 34.15, 160.9];
 ```
 
-##### Test the proximity of two words
-```rust
-let source_str = "Lions are unique among cats in that they live in a group or pride.";
-// Do the words 'lion(s)' and 'cat(s)' occur within 20 characters of each other?
-if source_str.match_words_by_proximity("lions?", "cats?", -20, 20, true) {
-  println!("This sentence mentions lions in the context of cats");
-}
-```
-
-
 ##### Split a string on a pattern
 ```rust
 let sample_string = "books, records and videotapes";
@@ -309,6 +299,16 @@ impl PatternMatch for Message {
   fn pattern_match_result(&self, pattern: &str, case_sensitive: bool) -> Result<bool, Error> {
     self.text.pattern_match_result(pattern, case_sensitive)
   }
+}
+```
+
+
+##### Test the proximity of two words (will be moved to another crate in future versions). The functionality can be reproduced from **String.pattern_captures()**.
+```rust
+let source_str = "Lions are unique among cats in that they live in a group or pride.";
+// Do the words 'lion(s)' and 'cat(s)' occur within 20 characters of each other?
+if source_str.match_words_by_proximity("lions?", "cats?", -20, 20, true) {
+  println!("This sentence mentions lions in the context of cats");
 }
 ```
 
@@ -380,4 +380,4 @@ The crates will be:
 - *simple-string-patterns*: (SimpleMatch, SimpleReplace, SimpleFilterAll, ToSegments, StripCharacters, IsNumeric). The IsNumeric trait will have more options for different number formats (e.g. with spaces or other characters as thousand separators) and number bases (radices). Extra methods will allow matching and filtering by arbitrary character sets.
 - *string-patterns*: Will depend on simple-string-patterns, but focus on the core extensions that build on the regex library.
 
-A potential third crate, called *string-patterns-extras*, may include a regular expression builder with support for negative and positive *look-behind* and *look-ahead* groups via conditional matches on captured substrings. Some of the more esoteric or experimental methods may move to *string-patterns-extras* to keep the core libraries leaner for most users. That said, even in its current state, *string-patterns* adds mimimal overhead to the Regex crate.
+A potential third crate, called *string-patterns-extras*, may include a regular expression builder with support for negative and positive *look-behind* and *look-ahead* groups via conditional matches on captured substrings. Some of the more esoteric or experimental methods (such as *match_words_by_proximity*) will move to *string-patterns-extras* to keep the core libraries leaner for most users. That said, even in its current state, *string-patterns* adds mimimal overhead to the Regex crate.

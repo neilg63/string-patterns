@@ -85,8 +85,8 @@ impl ToSegments for str {
   /// extract the last segment whether empty or not
   fn to_end(&self, separator: &str) -> String {
     let parts = self.to_parts(separator);
-    if parts.len() > 0 {
-      parts.last().unwrap_or(&self.to_string()).to_owned()
+    if let Some(end) = parts.last() {
+      end.to_owned()
     } else {
       self.to_owned()
     }
