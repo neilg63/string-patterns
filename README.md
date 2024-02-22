@@ -303,7 +303,8 @@ impl PatternMatch for Message {
 ```
 
 
-##### Test the proximity of two words (will be moved to another crate in future versions). The functionality can be reproduced from **String.pattern_captures()**.
+##### Test the proximity of two words.
+NB: This will be moved to another crate in future versions. The functionality can be reproduced from **String.pattern_captures()**.
 ```rust
 let source_str = "Lions are unique among cats in that they live in a group or pride.";
 // Do the words 'lion(s)' and 'cat(s)' occur within 20 characters of each other?
