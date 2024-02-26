@@ -4,7 +4,7 @@
 
 # String Patterns
 
-This library makes it easier to work with regular expressions in Rust. It builds on the standard regular expression crate, *[regex](https://crates.io/crates/regex)*. It has no other dependencies, but supplements *[simple-text-patterns](https://crates.io/crates/simple-text-patterns)*, which provides an assortment of 
+This library makes it easier to work with regular expressions in Rust. It builds on the standard regular expression crate, *[regex](https://crates.io/crates/regex)*. It has no other dependencies, but supplements *[simple-string-patterns](https://crates.io/crates/simple-string-patterns)*, which provides an assortment of 
 
 Together with its sibliong crate, , It aims to make working with strings as easy in Rust as it is Javascript or Python with cleaner syntax. Simpler string matching methods such as starts_with, contains or ends_with will always perform better, especially when processing large data sets. To this end, the crate provides methods such as *starts_with_ci* and *starts_with_ci_alphanum* for basic string validation without regular expressions as well as extension methods to split strings into vectors of strings or a *head* and *tail* components.
 
@@ -22,7 +22,7 @@ Together with its sibliong crate, , It aims to make working with strings as easy
 - Methods with *_matches_filtered* return filtered vectors of matched strings slices
 - Methods containing *_split* return either a vector or tuple pair.
 
-Version 0.3.0 only includes the core text-processing extensions that rely on regular expressions. Other methods bundled with earlier versions of this crate have migrated to the simple-text-patterns](https://crates.io/crates/simple-text-patterns) crate. These crates supplement each other, but may be independently installed depending on your requirements.
+Version 0.3.0 only includes the core text-processing extensions that rely on regular expressions. Other methods bundled with earlier versions of this crate have migrated to the simple-string-patterns](https://crates.io/crates/simple-string-patterns) crate. These crates supplement each other, but may be independently installed depending on your requirements.
 
 ### Removed methods
 Only one *regex* method, **match_words_by_proximity*,  has been removed. However, it will reappear in the future *string-patterns-extras* crate. 
