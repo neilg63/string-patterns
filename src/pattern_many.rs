@@ -32,12 +32,6 @@ pub trait PatternMatchMany where Self:PatternMatch {
     num_matched == num_patterns
   }
 
-  /// Deprecated variant
-  #[deprecated(since="0.2.20", note="please use `pattern_match_all_mixed` instead")]
-  fn pattern_match_many_mixed(&self, pattern_sets: &[(&str, bool)]) -> bool {
-    self.pattern_match_all_mixed(pattern_sets)
-  }
-
   /// Matches all of the patterns with positivity condition and case-insensitive flag
   /// e.g. ```(false, "a[ck]", true)``` does not contain "ac" or "ak" whether upper, lower or mixed case
   /// with an array of tuples (positive, pattern, case_insensitive)
@@ -54,34 +48,16 @@ pub trait PatternMatchMany where Self:PatternMatch {
     num_matched == num_patterns
   }
 
-  /// Deprecated variant
-  #[deprecated(since="0.2.20", note="please use `pattern_match_all_conditional` instead")]
-  fn pattern_match_many_conditional(&self, pattern_sets: &[(bool, &str, bool)]) -> bool {
-    self.pattern_match_all_conditional(pattern_sets)
-  }
-
   /// Matches all of the patterns in case-insensitive mode
   /// with an array of str patterns
   fn pattern_match_all_ci(&self, patterns: &[&str]) -> bool {
     self.pattern_match_all(patterns, true)
   }
 
-  /// Deprecated variant
-  #[deprecated(since="0.2.20", note="please use `pattern_match_all_ci` instead")]
-  fn pattern_match_many_ci(&self, patterns: &[&str]) -> bool {
-    self.pattern_match_all_ci(patterns)
-  }
-
   /// Matches all of the patterns in case-sensitive mode
   /// with an array of str patterns 
   fn pattern_match_all_cs(&self, patterns: &[&str]) -> bool {
     self.pattern_match_all(patterns, false)
-  }
-
-  /// Deprecated variant
-  #[deprecated(since="0.2.20", note="please use `pattern_match_all_cs` instead")]
-  fn pattern_match_many_cs(&self, patterns: &[&str]) -> bool {
-    self.pattern_match_all_cs(patterns)
   }
   
   /// Matches one or more of the patterns in case-sensitivity flag

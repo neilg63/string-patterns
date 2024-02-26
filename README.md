@@ -4,7 +4,9 @@
 
 # String Patterns
 
-This library makes it easier to process strings in Rust. It builds on Rust's standard library with help from its default regular expression crate, *[regex](https://crates.io/crates/regex)*. It has no other dependencies. It aims to make working with strings as easy in Rust as it is Javascript or Python with cleaner syntax. Simpler string matching methods such as starts_with, contains or ends_with will always perform better, especially when processing large data sets. To this end, the crate provides methods such as *starts_with_ci* and *starts_with_ci_alphanum* for basic string validation without regular expressions as well as extension methods to split strings into vectors of strings or a *head* and *tail* components.
+This library makes it easier to work with regular expressions in Rust. It builds on the standard regular expression crate, *[regex](https://crates.io/crates/regex)*. It has no other dependencies, but supplements *[simple-text-patterns](https://crates.io/crates/simple-text-patterns)*, which provides an assortment of 
+
+Together with its sibliong crate, , It aims to make working with strings as easy in Rust as it is Javascript or Python with cleaner syntax. Simpler string matching methods such as starts_with, contains or ends_with will always perform better, especially when processing large data sets. To this end, the crate provides methods such as *starts_with_ci* and *starts_with_ci_alphanum* for basic string validation without regular expressions as well as extension methods to split strings into vectors of strings or a *head* and *tail* components.
 
 ### Method overview
 - All pattern-prefixed methods use regular expressions via the Regex crate
@@ -19,14 +21,13 @@ This library makes it easier to process strings in Rust. It builds on Rust's sta
 - Methods containing *_matches* or *_matched_items* work on arrays or vectors of string or string slices
 - Methods with *_matches_filtered* return filtered vectors of matched strings slices
 - Methods containing *_split* return either a vector or tuple pair.
-- Methods containing *_part(s)* always include leading or trailing separators and may return empty elements in vectors
-- Methods containing *segment(s)* ignore leading, trailing, repeated consecutive separators and thus exclude empty elements
-- In tuples returned from *segment(s)* and *part(s)* methods, *head* means the segment before the first split and tail the remainder, while *start* means the whole string before the last split and *end* only the last part of the last matched separator.
 
-Version 0.2.0 introduced additional methods to capture and count matched strings with offsets and version 0.2.5 added methods to match, replace, capture and count words without intrusive word boundary anchors.
+Version 0.3.0 only includes the core text-processing extensions that rely on regular expressions. Other methods bundled with earlier versions of this crate have migrated to the simple-text-patterns](https://crates.io/crates/simple-text-patterns) crate. These crates supplement each other, but may be independently installed depending on your requirements.
 
-The is_numeric() method, in the *IsNumeric* trait, applies a strict regex-free check on compatibility with the *parse()* method. It differs from char::is_numeric which checks for digit-like characters only and does not match minus or decimal points. Parallel *has_digits* and *has_digits_only* methods are implemented for the *CharGroupMatch* trait to test only for unsigned integers. An example below shows you how to combine *pattern_split* and *to_first_number* to capture numbers within longer texts as floats.
+### Removed methods
+Only one *regex* method, **match_words_by_proximity*,  has been removed. However, it will reappear in the future *string-patterns-extras* crate. 
 
+#### Case Sensitivity
 In case-insensitive mode the non-capturing **/(?i)/** flag is prepended automatically, but omitted if you add another non-capturing group at the start of your regular expression. In every other way, the pattern-prefixed methods behave like *re.is_match*, *re.replace_all*, *re.find* and *re.capture_iter* methods in the Regex crate. String-patterns unleashes most of the core functionality of the Regex crate, on which it depends, to cover most common use cases in text processing and to act as a building block for specific validators (e.g. email validation) and text transformers. 
 
 Most *match* methods will work on *&str* and *String*, while replacement methods are only implemented for *owned strings*. Likewise, match methods are implemented for arrays and vectors of strings or *string slices*, while replacement methods are only implemented for vectors of *owned strings*. The traits may be implemented for structs or tuples with a string field. 
@@ -182,64 +183,6 @@ if source_str.match_any_words_ci(&cat_like_words) {
 }
 ```
 
-##### Extract the third non-empty segment of a long path name
-```rust
-let path_string = "/var/www/mysite.com/web/uploads";
-if let Some(domain) = path_string.to_segment("/", 2) {
-  println!("The domain folder name is: {}", domain); // "mysite.com" is an owned string
-}
-```
-
-##### Extract the *head and tail* or *start and end* from a longer string 
-```rust
-let test_string = "long-list-of-technical-words"
-let (head, tail) = test_string.to_head_tail("-");
-println!("Head: {}, tail: {}", head, tail); // Head: long, tail: list-of-technical-words
-
-let (start, end) = test_string.to_start_end("-");
-println!("Start: {}, end: {}", start, end); // Start: long-list-of-technical, end: words
-```
-
-##### Extract the first decimal value as an f64 from a longer string
-```rust
-const GBP_TO_EURO: f64 = 0.835;
-
-let sample_str = "Price £12.50 each";
-if let Some(price_gbp) = sample_str.to_first_number::<f64>() {
-    let price_eur = price_gbp / GBP_TO_EURO;
-    println!("The price in euros is {:.2}", price_eur);
-}
-```
-
-##### Extract numeric sequences from phrases and convert them to a vector of floats
-```rust
-// extract European-style numbers with commas as decimal separators and points as thousand separators
-let sample_str = "2.500 grammi di farina costa 9,90€ al supermercato.";
-  let numbers: Vec<f32> = sample_str.to_numbers_euro();
-  // If two valid numbers are matched assume the first is the weight
-  if numbers.len() > 1 {
-    let weight_grams = numbers[0];
-    let price_euros = numbers[1];
-    let price_per_kg = price_euros / (weight_grams / 1000f32);
-    // the price in kg should be 3.96
-    println!("Flour costs €{:.2} per kilo", price_per_kg);
-  }
-```
-
-##### Extract three float values from a longer string
-```rust
-
-let input_str = "-78.29826, 34.15 160.9";
-// the pattern expects valid decimal numbers separated by commas and/or one or more spaces
-let split_pattern = r#"(\s*,\s*|\s+)"#;
-
-let numbers: Vec<f64> = input_str.pattern_split_cs(split_pattern)
-    .into_iter().map(|s| s.to_first_number::<f64>())
-    .filter(|nr| nr.is_some())
-    .map(|s| s.unwrap()).collect();
-// yields a vector of three f64 numbers [-78.29826, 34.15, 160.9];
-```
-
 ##### Split a string on a pattern
 ```rust
 let sample_string = "books, records and videotapes";
@@ -258,27 +201,20 @@ let (head, tail) = sample_string.pattern_split_pair_cs(pattern);
 // should yield => head: "first" and tail: "second - third ; fourth"
 ```
 
-##### Match multiple patterns without regular expressions
+##### Fetch a vector of pattern match objects with start and end indices as well as the captured substrings.
 ```rust
-// Match only file names that contain the character sequence "nepal" and do not end in .psd 
-// This is very useful for prefiltering large sets of simple strings 
-// representing things like file names.
-// Ci, Cs suffixes mean case-insensitive and case-sensitive respectively
-  let mixed_conditions = [
-    StringBounds::ContainsCi("nepal", true),
-    StringBounds::EndsWithCi(".psd", false),
-  ];
+let sample_string = "All the world's a stage, and all the men and women merely players.";
+// Words ending in 'men' with 0 to 4 preceding characters. the sequence in parentheses is an inner capture.
+let pattern = r#"\b\w{0,4}(men)\b"#;
+let outer_matches = sample_string.pattern_matches_outer(pattern,true);
+// should yield a vector with the outer matches only, but with with start and end offsets
+if let Some(second_match) = outer_matches.get(1) {
+  println!("the second match '{}'' starts at {} and ends at {}", second_match.as_str(), second_match.start(), second_match.end());
+  // should print the matched word 'woman' and its start and end indices
+}
 
-  let file_names = [
-    "edited-img-Nepal-Feb-2003.psd",
-    "image-Thailand-Mar-2003.jpg",
-    "photo_Nepal_Jan-2005.jpg",
-    "image-India-Mar-2003.jpg",
-    "pic_nepal_Dec-2004.png"
-  ];
-  
-  let nepal_source_files: Vec<&str> = file_names.filter_all_conditional(&mixed_conditions);
-  /// should yield two file names: ["photo_Nepal_Jan-2005.jpg", "pic_nepal_Dec-2004.png"]
+let all_captures = sample_string.pattern_captures(pattern, true);
+/// Yields an iterable regex::Captures object with all nested captured groups
 ```
 
 ### Sample implementation of PatternMatch for a custom struct
@@ -302,39 +238,34 @@ impl PatternMatch for Message {
 }
 ```
 
-
-##### Test the proximity of two words.
-NB: This will be moved to another crate in future versions. The functionality can be reproduced from **String.pattern_captures()**.
+##### Extract three float values from a longer string
+This example requires the *simple-string-patterns* crate.
 ```rust
-let source_str = "Lions are unique among cats in that they live in a group or pride.";
-// Do the words 'lion(s)' and 'cat(s)' occur within 20 characters of each other?
-if source_str.match_words_by_proximity("lions?", "cats?", -20, 20, true) {
-  println!("This sentence mentions lions in the context of cats");
-}
+
+let input_str = "-78.29826, 34.15 160.9";
+// the pattern expects valid decimal numbers separated by commas and/or one or more spaces
+let split_pattern = r#"(\s*,\s*|\s+)"#;
+
+let numbers: Vec<f64> = input_str.pattern_split_cs(split_pattern)
+    .into_iter().map(|s| s.to_first_number::<f64>())
+    .filter(|nr| nr.is_some())
+    .map(|s| s.unwrap()).collect();
+// yields a vector of three f64 numbers [-78.29826, 34.15, 160.9];
 ```
 
 ### Traits
 
-- **CharGroupMatch**:	Has methods to validate strings with character classes, has_digits, has_alphanumeric, has_alphabetic
-- **IsNumeric**	Provides a method to check if the string may be parsed to an integer or float
-- **StripCharacters**:	Set of methods to strip unwanted characters by type or extract vectors of numeric strings, integers or floats without regular expressions
-- **SimpleMatch**:	Regex-free *match* methods for common validation rules, e.g. starts_with_ci_alphanum checks if the first letters or numerals in a sample string in case-insensitive mode without regular expressions.
-- **SimpleMatchesMany**:	Regex-free multiple *match* methods accepting an array of StringBounds items, tuples or patterns and returning a vector of boolean results. matched_conditional
-- **SimpleMatchAll**:	Regex-free multiple *match* methods accepting an array of StringBounds items, tuples or patterns and returning a boolean if all are matched
-- **SimpleFilterAll**: Applies simple Regex-free multiple *match* methods to an array or vector of strings and returns a filtered vector of string slices
 - **MatchOccurrences**:	Returns the indices of all ocurrences of an exact string
 - **PatternMatch**	Core regular expression match methods, wrappers for re.is_match with case-insensitive (_ci) and case-sensitive (_cs) variants
 - **PatternMatchMany**:	Provides methods to match with multiple patterns expressed as arrays of tuples or simple strs
-- **PatternMatchesMany**: As above but returns a vector of booleans with the results for each pattern with variant method for whole word matches. New to 0.2.20
+- **PatternMatchesMany**: As above but returns a vector of booleans with the results for each pattern with variant method for whole word matches.
 - **PatternMatches**:	Pattern methods for arrays or vectors only, returns vectors of pairs of boolean outcomes and string slices, vectors of booleans matching each input string or filtered vectors of matched string slices
 - **PatternReplace**:	Core regular expression replacement methods
 - **PatternReplaceMany**:	Provides methods to replace with multiple patterns expressed as arrays of tuples
 - **PatternSplit**:	Methods to split strings to vectors or head/tail tuples of strings
-- **MatchWord**: Has convenience methods to match words with various word boundary rules. New to 0.2.5
-- **ReplaceWord**: Provides methods to replace one or more words with clean syntax. New to 0.2.5
-- **PatternCapture**: Returns captures or vectors of each match, whether overlapping or not, and counts of matching patterns or words. New to version 0.2.0
-- **ToSegments**:	Methods to split a longer string on a separator and return a vector of strings, a tuple of two strings or single optional string segment.
-- **ToStrings**:	Converts arrays or vectors of strs to a vector of owned strings
+- **MatchWord**: Has convenience methods to match words with various word boundary rules.
+- **ReplaceWord**: Provides methods to replace one or more words with clean syntax.
+- **PatternCapture**: Returns captures or vectors of each match, whether overlapping or not, and counts of matching patterns or words.
 
 ### Enums
 - **WordBounds**:	Has options for *Start*, *End* and *Both* with a method to render regular expression subpatterns with the correct word boundaries
@@ -343,42 +274,6 @@ if source_str.match_words_by_proximity("lions?", "cats?", -20, 20, true) {
   - Start: From word start
   - End: To word end
   - Both: Whole word, but spaces or other punctuation may occur within the pattern to match one or more words
-- **StringBounds**: Defines simple match rules with the pattern and a positivty flag, e.g. StringBounds::ContainsCi("report", true) or StringBounds::EndsWithCi(".docx", false). The *Ci* and *Cs* variants affect case-sensitivity.
-  Options:
-  - StartsWithCi(&str, bool) case-insensitive *starts with* + boolean positivity flag
-  - EndsWithCi(&str, bool) case-insensitive *ends with* + is_positive flag
-  - ContainsCi(&str, bool) case-insensitive *contains* + is_positive flag
-  - StartsWithCs(&str, bool) case-sensitive *starts with* + is_positive flag
-  - EndsWithCs(&str, bool) case-sensitive *ends with* + is_positive flag
-  - ContainsCs(&str, bool) case-sensitive *contains* + is_positive flag
 
 ### Dev Notes
-This crate is still in its alpha stage, but has already been used in 3 API projects. Since version 0.2.14 the code base has been organised into separate files for each set of traits with related implementations. 
-
-#### Recent Version Notes
-Version 2.10 added PatternSplit with results as String vectors or tuples.
-
-Version 0.2.17 makes the *build_regex(pattern: &str, case_insensitive: bool)* available to implementors. This is a wrapper *for Regex::new(re: &str)*, but has a convenient case_insensitive parameter and avoids having to explicity import the *regex* crate*. 
-
-In version 0.2.19 default implementations were added for many variant methods in PatternMatch, PatternReplace, PatternMatchMany and PatternReplaceMany. The last two traits depend on *PatternMatch* and *PatternReplace* respectively. For *PatternMatch* only the base method *pattern_match_result* needs to be implemented and for *PatternReplace* only *pattern_replace_result* and *pattern_replace* need custom implementations, the latter only because the fallback value may have different trait and lifetimes constraints for arrays and vectors. Version 0.2.20 adds *PatternMatchesMany*, which returns a vector of matched patterns, expressed as arrays of booleans.
-
-Version 0.2.21 added SimpleMatchesMany and SimpleMatchAll to evaluate multiple patterns without regular expressions with simple *StartsWith, EndsWith and contains* condition sets via the new *StringBounds* enum. Version: 0.2.23 added more versatile StringBounds options, which were standardised in 0.2.24 to with pairs of case-insensitive and case-sensitive fields, all accepting the pattern and positivity flag, e.f EndsWithCi(".pdf", false) means *does not end with '.pdf' in any case*.
-Version 0.2.26 allows simple alphanumeric corrections and captures on &str, returning owned string, with default implementations for 4 variant methods.
-
-Version 0.2.28 addes a new single-method Trait *SimpleFilterAll* to filter arrays of strings and implements *PatternMatch* and *PatternMatches* for arrays of string slices too as well as adding two new handy sets of methods to *PatternMatches*.
-- *pattern_matched_pairs* returns a vector of tuples with the matched status and referenced string slice
-- *pattern_matches_filter* returns a vector of matched string slices only.
-These methods work on arrays or vector of strings or string slices, but will only ever compile each regular expression once.
-
-Version 0.2.29 corrected only the name of a new trait *SimpleFilterAll*. This would only potentially affect users who had implemented that trait. I added a new test for the method *filter_all_conditional* with an array of conditions defined by StringBounds enum.
-
-Some updates only reflect minor corrections to these notes and comments in other files or revised tests.
-
-## Future Development
-The next major version (0.3.0) will split the library into two crates, one for simple string manipulation with no extra dependencies and one building on the regex crate to supplement the former.
-
-The crates will be:
-- *simple-string-patterns*: (SimpleMatch, SimpleReplace, SimpleFilterAll, ToSegments, StripCharacters, IsNumeric). The IsNumeric trait will have more options for different number formats (e.g. with spaces or other characters as thousand separators) and number bases (radices). Extra methods will allow matching and filtering by arbitrary character sets.
-- *string-patterns*: Will depend on simple-string-patterns, but focus on the core extensions that build on the regex library.
-
-A potential third crate, called *string-patterns-extras*, may include a regular expression builder with support for negative and positive *look-behind* and *look-ahead* groups via conditional matches on captured substrings. Some of the more experimental methods (such as *match_words_by_proximity*) will move to *string-patterns-extras*. However, even in its current alpha state, *string-patterns* adds mimimal overhead to the Regex crate.
+This crate is still in its alpha stage, but has already been used in 3 API projects.

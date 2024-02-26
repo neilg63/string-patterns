@@ -2,9 +2,6 @@ extern crate regex;
 
 mod utils;
 pub mod enums;
-pub mod alphanumeric;
-pub mod segments;
-pub mod simple_match;
 pub mod pattern_match;
 pub mod pattern_replace;
 pub mod pattern_many;
@@ -27,9 +24,6 @@ pub mod words;
 /// Always consider the simplest strategy for extracting text, e.g. via to_head_tail(), to_segments(), before resorting to the regex-enabled pattern-prefixed methods.
 
 pub use crate::enums::*;
-pub use crate::alphanumeric::*;
-pub use crate::segments::*;
-pub use crate::simple_match::*;
 pub use crate::pattern_match::*;
 pub use crate::pattern_replace::*;
 pub use crate::pattern_many::*;

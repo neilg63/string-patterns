@@ -4,7 +4,7 @@ use crate::{PatternReplace, utils::{build_whole_word_pattern, build_word_pattern
 // with various word boundary and case-sensitivity rules
 
 /// Provides methods to match words with differnt word boundary and case-semsitivity rules 
-pub trait MatchWord where Self:PatternMatch, Self:PatternCapture {
+pub trait MatchWord<'a> where Self:PatternMatch, Self:PatternCapture<'a> {
 
   /// Match a word with bounds options and case_insensitive flag
   fn match_word_bounds(&self, word: &str, bounds: WordBounds, case_insensitive: bool) -> bool {
@@ -144,37 +144,10 @@ pub trait MatchWord where Self:PatternMatch, Self:PatternCapture {
     num_matched == num_words
   }
 
-  /// Check if whole word patterns occur in close proximity as defined by their min and max values
-  /// If the second word may occur before the first the min value should negative
-  /// The distance between the end of the first and start of the second word is measured
-  fn match_words_by_proximity(&self, first: &str, second: &str, min: i16, max: i16, case_insensitive: bool) -> bool {
-    let word_pattern_1 = build_whole_word_pattern(first);
-    let word_pattern_2 = build_whole_word_pattern(second);
-    if let Some((first_first,first_last)) = self.pattern_first_last_matches(&word_pattern_1, case_insensitive) {
-      if let Some((second_first, second_last)) = self.pattern_first_last_matches(&word_pattern_2, case_insensitive) {
-        let diff_i64 = second_last.start() as i64 - first_first.end() as i64;
-        // although indices are usize and convert to i64 for negative values, only consider differences in i16 range (-32768 to 32767)
-        // which suffices for text proximity matches
-        if diff_i64 >= i16::MIN as i64 && diff_i64 <= i16::MAX as i64 {
-          let diff = diff_i64 as i16;
-          return diff >= min && diff <= max;
-        } else if min < 0 {
-          // reverse match logic if negative min offsets are allowed
-          let diff_2_i64 = first_last.start() as i64 - second_first.end() as i64;
-          if diff_2_i64 >= i16::MIN as i64 && diff_2_i64 <= i16::MAX as i64 {
-            let diff_2 = diff_i64 as i16;
-            return diff_2 >= min && diff_2 <= max;
-          }
-        }
-      }
-    }
-    false
-  }
-
 }
 
 /// Automatic implementation for str/String as both implement PatternMatch and PatternCapture in this crate
-impl MatchWord for str {
+impl<'a> MatchWord<'a> for str {
 }
 
 /// Methods for whole or partial word replacements
