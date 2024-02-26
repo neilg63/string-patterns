@@ -18,11 +18,13 @@ Together, these crates aim to make working with strings as easy in Rust as it is
 - Methods containing *_word(s)* match whole or partial words depending on boundary rules
 - Methods containing *_match_all* require all patterns within an array to match.
 - Methods containing *_match_any* return true if any of the patterns within an array match
-- Methods containing *_matches* or *_matched_items* work on arrays or vectors of string or string slices
+- Methods ending in *_captures* return iterable Regex capture objects.
+- Methods ending in *_matches* *_matches_vec* or *_matches_ouet* return vectors of Regex match objects with start and end offsets.
 - Methods with *_matches_filtered* return filtered vectors of matched strings slices
 - Methods containing *_split* return either a vector or tuple pair.
 
-Version 0.3.0 only includes the core text-processing extensions that rely on regular expressions. Other methods bundled with earlier versions of this crate have migrated to the simple-string-patterns](https://crates.io/crates/simple-string-patterns) crate. These crates supplement each other, but may be independently installed depending on your requirements.
+
+Version 0.3.0 only includes the core text-processing extensions that rely on regular expressions. Other methods bundled with earlier versions have migrated to the [simple-string-patterns](https://crates.io/crates/simple-string-patterns) crate. These crates supplement each other, but may be independently installed if you only need some of their features.
 
 ### Removed methods
 Only one *regex* method, **match_words_by_proximity*,  has been removed. However, it will reappear in the future *string-patterns-extras* crate. 
@@ -255,7 +257,6 @@ let numbers: Vec<f64> = input_str.pattern_split_cs(split_pattern)
 
 ### Traits
 
-- **MatchOccurrences**:	Returns the indices of all ocurrences of an exact string
 - **PatternMatch**	Core regular expression match methods, wrappers for re.is_match with case-insensitive (_ci) and case-sensitive (_cs) variants
 - **PatternMatchMany**:	Provides methods to match with multiple patterns expressed as arrays of tuples or simple strs
 - **PatternMatchesMany**: As above but returns a vector of booleans with the results for each pattern with variant method for whole word matches.
@@ -277,4 +278,6 @@ let numbers: Vec<f64> = input_str.pattern_split_cs(split_pattern)
 
 ### Dev Notes
 As of version 0.3.0, this crate is feature complete, although still in a beta stage. All new features will be in a future *string-patterns-extras* crate that builds on this library and *simple-string-patterns*.
-Notes for the 0.2.* series can be found in the [GitHub repo](https://github.com/neilg63/string-patterns) in the v0-2 branch. If you have used versions < 0.3.0 in your projects, you may need to install  *simple-string-patterns* as well.
+Notes for the 0.2.* series can be found in the [GitHub repo](https://github.com/neilg63/string-patterns) in the v0-2 branch. If you upgrade from a pre-0.3.0 version, you may need to install  *simple-string-patterns* as well.
+
+NB: Some updates reflect editorial changes only.
