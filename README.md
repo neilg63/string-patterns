@@ -4,9 +4,9 @@
 
 # String Patterns
 
-This library makes it easier to work with regular expressions in Rust. It builds on the standard regular expression crate, *[regex](https://crates.io/crates/regex)*. It has no other dependencies, but supplements *[simple-string-patterns](https://crates.io/crates/simple-string-patterns)*, which provides an assortment of 
+This library makes it easier to work with regular expressions in Rust. It builds on the standard regular expression crate, *[regex](https://crates.io/crates/regex)*. It has no other dependencies, but supplements *[simple-string-patterns](https://crates.io/crates/simple-string-patterns)*, which provides an assortment of regex-free extension methods to match, split and filter strings by character types or ranges, relying only on the standard library.
 
-Together with its sibliong crate, , It aims to make working with strings as easy in Rust as it is Javascript or Python with cleaner syntax. Simpler string matching methods such as starts_with, contains or ends_with will always perform better, especially when processing large data sets. To this end, the crate provides methods such as *starts_with_ci* and *starts_with_ci_alphanum* for basic string validation without regular expressions as well as extension methods to split strings into vectors of strings or a *head* and *tail* components.
+Together, these crates aim to make working with strings as easy in Rust as it is Javascript or Python with cleaner syntax. Simpler string matching methods such as starts_with, contains or ends_with will always perform better, especially when processing large data sets. To this end, the crate provides methods such as *starts_with_ci* and *starts_with_ci_alphanum* for basic string validation without regular expressions as well as extension methods to split strings into vectors of strings or a *head* and *tail* components.
 
 ### Method overview
 - All pattern-prefixed methods use regular expressions via the Regex crate
