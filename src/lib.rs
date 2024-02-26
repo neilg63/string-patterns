@@ -20,8 +20,7 @@ pub mod words;
 /// There are also variants with a case_insensitive flag and without (_ci and _cs).
 /// When used on arrays or vectors of strings each regular expression will only be compiled and checked once, when you need 
 /// to search within a large set of text records. 
-/// Complex regular expressions, e.g. with look behind (?<=foo) or look ahead, work best after isolating a sample text snippet via simpler text-matching methods.
-/// Always consider the simplest strategy for extracting text, e.g. via to_head_tail(), to_segments(), before resorting to the regex-enabled pattern-prefixed methods.
+/// Always consider the simplest strategy for filtering text before resorting to regular expressions
 
 pub use crate::enums::*;
 pub use crate::pattern_match::*;
