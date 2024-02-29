@@ -19,7 +19,8 @@ Together, these crates aim to make working with strings as easy in Rust as it is
 - Methods containing *_match_all* require all patterns within an array to match.
 - Methods containing *_match_any* return true if any of the patterns within an array match
 - Methods ending in *_captures* return iterable Regex capture objects.
-- Methods ending in *_matches* *_matches_vec* or *_matches_ouet* return vectors of Regex match objects with start and end offsets.
+- Methods containing *_matches* with arrays of regex patterns as the first argument return vectors of boolean results
+- Methods ending in *_matches_vec* or *_matches_outer* return vectors of Regex match objects with start and end offsets.
 - Methods with *_matches_filtered* return filtered vectors of matched strings slices
 - Methods containing *_split* return either a vector or tuple pair.
 
@@ -74,24 +75,6 @@ fn replace_final_os(input: &str) -> String {
   // case-insensitive replacement,
   // NB: the regex syntax and capture rules are enforced by the Regex library
   input.to_string().pattern_replace_ci(r#"(\w)o\b"#, "${1}um") 
-}
-```
-
-##### Simple case-insensitive match
-```rust
-let str_1 = "Dog food";
-if str_1.starts_with_ci("dog") {
-  println!("{} is dog-related", str_1);
-}
-```
-
-##### Simple case-insensitive match on the alphanumeric characters only in a longer text
-```rust
-// This method is handy for validating text values from external data sources with
-// inconsistent naming conventions, e.g. first-name, first_name, firstName or "first name"
-let str_1 = "Do you spell hip-hop with a hyphen?";
-if str_1.contains_ci_alphanum("hiphop") {
-  println!("{} is hip-hop-related", str_1);
 }
 ```
 
@@ -219,7 +202,24 @@ let all_captures = sample_string.pattern_captures(pattern, true);
 /// Yields an iterable regex::Captures object with all nested captured groups
 ```
 
-### Sample implementation of PatternMatch for a custom struct
+##### Extract three float values from a longer string
+This example requires the *simple-string-patterns* crate.
+```rust
+
+let input_str = "-78.29826, 34.15 160.9";
+// the pattern expects valid decimal numbers separated by commas and/or one or more spaces
+let split_pattern = r#"(\s*,\s*|\s+)"#;
+
+let numbers: Vec<f64> = input_str.pattern_split_cs(split_pattern)
+    .into_iter().map(|s| s.to_first_number::<f64>())
+    .filter(|nr| nr.is_some())
+    .map(|s| s.unwrap()).collect();
+// yields a vector of three f64 numbers [-78.29826, 34.15, 160.9];
+```
+
+
+
+### Sample implementations of PatternMatch for a custom struct
 ```rust
 use string_patterns::PatternMatch;
 
@@ -238,21 +238,7 @@ impl PatternMatch for Message {
     self.text.pattern_match_result(pattern, case_sensitive)
   }
 }
-```
 
-##### Extract three float values from a longer string
-This example requires the *simple-string-patterns* crate.
-```rust
-
-let input_str = "-78.29826, 34.15 160.9";
-// the pattern expects valid decimal numbers separated by commas and/or one or more spaces
-let split_pattern = r#"(\s*,\s*|\s+)"#;
-
-let numbers: Vec<f64> = input_str.pattern_split_cs(split_pattern)
-    .into_iter().map(|s| s.to_first_number::<f64>())
-    .filter(|nr| nr.is_some())
-    .map(|s| s.unwrap()).collect();
-// yields a vector of three f64 numbers [-78.29826, 34.15, 160.9];
 ```
 
 ### Traits
