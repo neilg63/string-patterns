@@ -261,7 +261,7 @@ impl PatternMatch for Message {
   }
 }
 
-/// The regular expression is compiled only one. If the regex fails item is returned
+/// The regular expression is compiled only once. If the regex fails, all items are returned
 impl<'a> PatternFilter<'a, Message> for [Message] {
   fn pattern_filter(&'a self, pattern: &str, case_insensitive: bool) -> Vec<Message> {
     if let Ok(re) = build_regex(pattern, case_insensitive) {
