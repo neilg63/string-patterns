@@ -327,3 +327,27 @@ fn test_pattern_match_all_conditional() {
   assert_eq!(sample_2.pattern_word_matches_conditional_ci(&words), vec![false, false, true, true]);
 
 }
+
+#[test]
+fn test_pattern_filter() {
+
+
+  // Alternatively test the boolean results of arrays of case-insensitive whole words 
+  let phrases = [
+    "Blackberries",
+    "White board",
+    "Grey scale",
+    "Blackbirds",
+  ];
+  let filtered_phrases = vec![
+    "Blackberries",
+    "Blackbirds",
+  ];
+  let pattern = "black";
+  // test if the user agent string matches an Android phone
+  assert_eq!(phrases.pattern_filter_ci(pattern), filtered_phrases);
+
+  
+
+}
+

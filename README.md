@@ -8,6 +8,8 @@ This library makes it easier to work with regular expressions in Rust. It builds
 
 Together, these crates aim to make working with strings as easy in Rust as it is Javascript or Python with cleaner syntax. Simpler string matching methods such as starts_with, contains or ends_with will always perform better, especially when processing large data sets. 
 
+Version 0.3.4 adds a *PatternFilter* with methods that filter arrays or vectors of strings or strs by a regex pattern with variants for whole word and case-insensitive matches. This mirrors the functionality in *filter_all_conditional* in *simple-string-patterns*, but with a single regular expression rather than a set of rules.
+
 ### Method overview
 - All pattern-prefixed methods use regular expressions via the Regex crate
 - All other extension methods use standard library functions only to match, remove or extract character sequences.
@@ -23,6 +25,7 @@ Together, these crates aim to make working with strings as easy in Rust as it is
 - Methods ending in *_matches_vec* or *_matches_outer* return vectors of Regex match objects with start and end offsets.
 - Methods with *_matches_filtered* return filtered vectors of matched strings slices
 - Methods containing *_split* return either a vector or tuple pair.
+- Methods with *_filter* or *_filter_word* filter arrays or vectors of strings or str references by the a regex pattern
 
 
 Version 0.3.0 only includes the core text-processing extensions that rely on regular expressions. Other methods bundled with earlier versions have migrated to the [simple-string-patterns](https://crates.io/crates/simple-string-patterns) crate. These crates supplement each other, but may be independently installed if you only need some of their features.
@@ -142,6 +145,25 @@ let target_str = source_str.pattern_replace_pairs_cs(&pattern_replacements);
 // which now requires a second parameter
 ```
 
+##### Filter an array or vector of strings by a regex pattern
+```rust
+let source_strs = [
+  "Ristorante-Venezia-2019.jpg",
+  "Mercado_venecia_2000.jpg",
+  "Mercado_venezuela_2011.jpg",
+  "Venice_Oct_2012.png",
+  "2venice2003.jpg",
+  "venetian_blinds.jpg",
+];
+
+/// filter by file names referencing Venice in various languages, but not Venezuela or venetian blinds
+let pattern = "ven(ezia|ecia|edig|ice|ise)[^a-z]*";
+
+let filtered_strs = source_strs.pattern_filter_ci(pattern); 
+// should yield ["Ristorante-Venezia-2019.jpg", "Mercado_venecia_2000.jpg", "Venice_Oct_2012.png", "2venice2003.jpg"]
+
+```
+
 ##### Replace multiple word pairs in case-sensitive mode
 ```rust
 /// This should have the same result as above but with cleaner and less error-prone syntax
@@ -219,7 +241,7 @@ let numbers: Vec<f64> = input_str.pattern_split_cs(split_pattern)
 
 
 
-### Sample implementations of PatternMatch for a custom struct
+### Sample implementations of PatternMatch and PatternFilter for a custom struct
 ```rust
 use string_patterns::PatternMatch;
 
@@ -234,11 +256,21 @@ pub struct Message {
 
 impl PatternMatch for Message {
   // All other pattern_match variants with a single regular expression are implemented automatically
-  fn pattern_match_result(&self, pattern: &str, case_sensitive: bool) -> Result<bool, Error> {
-    self.text.pattern_match_result(pattern, case_sensitive)
+  fn pattern_match_result(&self, pattern: &str, case_insensitive: bool) -> Result<bool, Error> {
+    self.text.pattern_match_result(pattern, case_insensitive)
   }
 }
 
+/// The regular expression is compiled only one. If the regex fails item is returned
+impl<'a> PatternFilter<'a, Message> for [Message] {
+  fn pattern_filter(&'a self, pattern: &str, case_insensitive: bool) -> Vec<Message> {
+    if let Ok(re) = build_regex(pattern, case_insensitive) {
+    self.into_iter().filter(|m| re.is_match(&m.text)).map(|m| m.to_owned()).collect::<Vec<Message>>()
+    } else {
+      self.to_owned()
+    }
+  }
+}
 ```
 
 ### Traits
@@ -248,6 +280,7 @@ impl PatternMatch for Message {
 - **PatternMatchesMany**: As above but returns a vector of booleans with the results for each pattern with variant method for whole word matches.
 - **PatternMatches**:	Pattern methods for arrays or vectors only, returns vectors of pairs of boolean outcomes and string slices, vectors of booleans matching each input string or filtered vectors of matched string slices
 - **PatternReplace**:	Core regular expression replacement methods
+- **PatternFilter**:	Methods to filter arrays or vectors of strings by a single regex pattern
 - **PatternReplaceMany**:	Provides methods to replace with multiple patterns expressed as arrays of tuples
 - **PatternSplit**:	Methods to split strings to vectors or head/tail tuples of strings
 - **MatchWord**: Has convenience methods to match words with various word boundary rules.
