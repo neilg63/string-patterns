@@ -103,9 +103,10 @@ pub trait PatternCapture<'a> {
 }
 
 
-/// This function is basis for both pattern_matches_vec() and pattern_matches_outer()
-/// and will be used with string-patterns-extras for replicate look-ahead and look-behind behaviour
+/// This function is the basis for both pattern_matches_vec() and pattern_matches_outer()
+/// and will be used with string-patterns-extras to replicate look-ahead and look-behind behaviour
 /// It returns a flattened vector of Match objects
+/// The outer options limits the matches to the whole matched sequence and excludes inner groups
 pub fn find_matches_within_haystack<'a>(haystack: &'a str, pattern: &str, case_insensitive: bool, outer: bool) -> (Vec<Match<'a>>, Option<Regex>) {
   let mut matched_items: Vec<Match<'a>> = Vec::new();
   if let Ok(re) = build_regex(pattern, case_insensitive) {
@@ -140,9 +141,10 @@ pub fn find_matches_within_haystack<'a>(haystack: &'a str, pattern: &str, case_i
   }
 }
 
+/// Implementation for &str/String
 impl<'a> PatternCapture<'a> for str {
 
-  // Yields an option with Regex::Captures as returned from re.captures, Accepts a boolean case_insensitive flag
+  /// Yields an option with Regex::Captures as returned from re.captures, Accepts a boolean case_insensitive flag
   fn pattern_captures(&self, pattern: &str, case_insensitive: bool) -> Option<Captures> {
     if let Ok(re) = build_regex(pattern, case_insensitive) {
       re.captures(self)
@@ -151,6 +153,7 @@ impl<'a> PatternCapture<'a> for str {
     }
   }
 
+  /// Returns vector of match objects. The outer options excludes inner match groups.
   fn pattern_matches_as_vec(&'a self, pattern: &str, case_insensitive: bool, outer: bool) -> Vec<Match<'a>> {
     let (matched_items, _rgx) = find_matches_within_haystack(self, pattern, case_insensitive, outer);
     matched_items
