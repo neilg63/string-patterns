@@ -13,27 +13,46 @@ pub trait PatternSplit {
 
   /// Splits a string on a regular expression with boolean case_insensitive flag. 
   /// Returns  a vector of strings, empty if the regular expression fails.
-  fn pattern_split(&self, pattern: &str, case_sensitive: bool) -> Vec<String>;
-
-  /// Splits a string on a regular expression in case-sensitive mode. 
-  /// Returns  a vector of strings, empty if the regular expression fails.
-  fn pattern_split_cs(&self, pattern: &str) -> Vec<String>;
+  fn pattern_split(&self, pattern: &str, case_sensitive: bool) -> Vec<String> {
+    match self.pattern_split_result(pattern, case_sensitive) {
+      Ok(parts) => parts,
+      Err(_error) => vec![],
+    }
+  }
 
   /// Splits a string on a regular expression in case-isensitive mode. 
   /// Returns  a vector of strings, empty if the regular expression fails.
-  fn pattern_split_ci(&self, pattern: &str) -> Vec<String>;
+  fn pattern_split_ci(&self, pattern: &str) -> Vec<String> {
+    self.pattern_split(pattern, true)
+  }
+
+  /// Splits a string on a regular expression in case-sensitive mode. 
+  /// Returns  a vector of strings, empty if the regular expression fails.
+  fn pattern_split_cs(&self, pattern: &str) -> Vec<String> {
+    self.pattern_split(pattern, false)
+  }
 
   /// Splits a string on a regular expression with boolean case_insensitive flag. 
   /// Returns a tuple with head and tail. The tail will be en empty string if not matched
-  fn pattern_split_pair(&self, pattern: &str, case_sensitive: bool) -> (String, String);
-
-  /// Split a string on a regular expression in case-sensitive mode. 
-  /// Returns a tuple with head and tail. The tail will be en empty string if not matched
-  fn pattern_split_pair_cs(&self, pattern: &str) -> (String, String);
+  fn pattern_split_pair(&self, pattern: &str, case_sensitive: bool) -> (String, String) {
+    match self.pattern_split_pair_result(pattern, case_sensitive) {
+      Ok(parts) => parts,
+      Err(_error) => ("".to_owned(), "".to_owned()),
+    }
+  }
 
   /// Split a string on a regular expression in case-isensitive mode. 
   /// Returns a tuple with head and tail. The tail will be en empty string if not matched
-  fn pattern_split_pair_ci(&self, pattern: &str) -> (String, String);
+  fn pattern_split_pair_ci(&self, pattern: &str) -> (String, String) {
+    self.pattern_split_pair(pattern, true)
+  }
+
+  /// Split a string on a regular expression in case-sensitive mode. 
+  /// Returns a tuple with head and tail. The tail will be en empty string if not matched
+  fn pattern_split_pair_cs(&self, pattern: &str) -> (String, String) {
+    self.pattern_split_pair(pattern, false)
+  }
+
 }
 
 /// Implemented for &str and available to String too
@@ -58,36 +77,6 @@ impl PatternSplit for str {
       },
       Err(error) => Err(error),
     }
-  }
-
-  fn pattern_split(&self, pattern: &str, case_sensitive: bool) -> Vec<String> {
-    match self.pattern_split_result(pattern, case_sensitive) {
-      Ok(parts) => parts,
-      Err(_error) => vec![],
-    }
-  }
-
-  fn pattern_split_pair(&self, pattern: &str, case_sensitive: bool) -> (String, String) {
-    match self.pattern_split_pair_result(pattern, case_sensitive) {
-      Ok(parts) => parts,
-      Err(_error) => ("".to_owned(), "".to_owned()),
-    }
-  }
-
-  fn pattern_split_cs(&self, pattern: &str) -> Vec<String> {
-    self.pattern_split(pattern, false)
-  }
-
-  fn pattern_split_ci(&self, pattern: &str) -> Vec<String> {
-    self.pattern_split(pattern, true)
-  }
-
-  fn pattern_split_pair_cs(&self, pattern: &str) -> (String, String) {
-    self.pattern_split_pair(pattern, false)
-  }
-
-  fn pattern_split_pair_ci(&self, pattern: &str) -> (String, String) {
-    self.pattern_split_pair(pattern, true)
   }
 
 }

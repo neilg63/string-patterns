@@ -31,11 +31,7 @@ pub trait PatternCapture<'a> {
  /// Yields an option with last match object if available with a boolean case_insensitive flag
  fn pattern_last_match(&'a self, pattern: &str, case_insensitive: bool) -> Option<Match> {
    let matched_segments = self.pattern_matches_vec(pattern, case_insensitive);
-   if let Some(last) = matched_segments.last() {
-     Some(*last)
-   } else {
-     None
-   }
+   matched_segments.last().map(|m| *m)
  }
 
  /// returns an option with a pair of match objects

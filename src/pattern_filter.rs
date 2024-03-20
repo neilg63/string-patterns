@@ -1,7 +1,9 @@
 use crate::{build_regex, utils::build_whole_word_pattern};
 
-
-
+/// Trait with methods to filter arrays or vectors of strings by regular expression patterns
+/// Only pattern_filter() method needs to be implemented.
+/// Both implementations ensure the regex is compiled only once.
+/// If the regex fails, filters will not be applied.
 pub trait PatternFilter<'a, T> where T:Sized {
   /// Filter an array of strs by the pattern
   fn pattern_filter(&'a self, pattern: &str, case_insensitive: bool) -> Vec<T>;

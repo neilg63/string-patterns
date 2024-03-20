@@ -45,7 +45,7 @@ impl PatternReplace for String {
 
 }
 
-
+/// Implemented separately of arrays / vectors of strings to ensure the regex is only compiled once
 impl PatternReplace for Vec<String> {
   ///
   /// Optional regex-enabledd replace method that will return None if the regex fails
@@ -64,20 +64,9 @@ impl PatternReplace for Vec<String> {
 
   ///
   /// Simple regex-enabledd replace method that will return the same string if the regex fails
-  /// 
+  /// The _ci and _cs variants rely on this method with the same return type
   fn pattern_replace(&self, pattern: &str, replacement: &str, case_insensitive: bool) -> Vec<String> {
     self.pattern_replace_result(pattern, replacement, case_insensitive).unwrap_or(self.to_owned())
-  }
-
-
-  /// Simple case-insensitive regex-enabled replace method that will return the same string if the regex fails
-  fn pattern_replace_ci(&self, pattern: &str, replacement: &str) -> Vec<String> {
-    self.pattern_replace(pattern, replacement, true)
-  }
-
-  /// Simple case-sensitive regex-enabled replace method that will return the same string if the regex fails
-  fn pattern_replace_cs(&self, pattern: &str, replacement: &str) -> Vec<String> {
-    self.pattern_replace(pattern, replacement, false)
   }
 
 }

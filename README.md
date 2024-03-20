@@ -11,8 +11,6 @@ Together, these crates aim to make working with strings as easy in Rust as it is
 Version 0.3.4 adds a *PatternFilter* with methods that filter arrays or vectors of strings or strs by a regex pattern with variants for whole word and case-insensitive matches. This mirrors the functionality in *filter_all_conditional* in *simple-string-patterns*, but with a single regular expression rather than a set of rules.
 
 ### Method overview
-- All pattern-prefixed methods use regular expressions via the Regex crate
-- All other extension methods use standard library functions only to match, remove or extract character sequences.
 - Methods ending in _result return a Result with a regex::Error if the regular expression fails
 - Many methods without *_ci* or *_cs* suffixes require a boolean *case_insensitive* parameter
 - Methods ending in *_cs* are case-sensitive
