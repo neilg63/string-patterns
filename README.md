@@ -294,6 +294,7 @@ impl<'a> PatternFilter<'a, Message> for [Message] {
   - Both: Whole word, but spaces or other punctuation may occur within the pattern to match one or more words
 
 ### Dev Notes
+As of version 0.3.6, the crate re-exports regex::Regex and regex::Error to help with custom implementations
 As of version 0.3.0, this crate is feature complete, although still in a beta stage. All new features will be in a future *string-patterns-extras* crate that builds on this library and *simple-string-patterns*. 0.3.5 has no new features, only a more notes and a few more methods have default implementations.
 Notes for the 0.2.* series can be found in the [GitHub repo](https://github.com/neilg63/string-patterns) in the v0.2.* branch. If you upgrade from a pre-0.3.0 version, you may need to install  *simple-string-patterns* as well.
 
