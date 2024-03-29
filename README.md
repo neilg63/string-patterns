@@ -276,17 +276,19 @@ impl<'a> PatternFilter<'a, Message> for [Message] {
 
 ### Traits
 
-- **PatternMatch**	Core regular expression match methods, wrappers for re.is_match with case-insensitive (_ci) and case-sensitive (_cs) variants
-- **PatternMatchMany**:	Provides methods to match with multiple patterns expressed as arrays of tuples or simple strs
-- **PatternMatchesMany**: As above but returns a vector of booleans with the results for each pattern with variant method for whole word matches.
-- **PatternMatches**:	Pattern methods for arrays or vectors only, returns vectors of pairs of boolean outcomes and string slices, vectors of booleans matching each input string or filtered vectors of matched string slices
-- **PatternReplace**:	Core regular expression replacement methods
-- **PatternFilter**:	Methods to filter arrays or vectors of strings by a single regex pattern
-- **PatternReplaceMany**:	Provides methods to replace with multiple patterns expressed as arrays of tuples
-- **PatternSplit**:	Methods to split strings to vectors or head/tail tuples of strings
-- **MatchWord**: Has convenience methods to match words with various word boundary rules.
-- **ReplaceWord**: Provides methods to replace one or more words with clean syntax.
-- **PatternCapture**: Returns captures or vectors of each match, whether overlapping or not, and counts of matching patterns or words.
+| Name | Description |
+| ---- | ----------- | 
+| PatternMatch | Core regular expression match methods, wrappers for re.is_match with case-insensitive (_ci) and case-sensitive (_cs) variants |
+| PatternMatchMany|	Provides methods to match with multiple patterns expressed as arrays of tuples or simple strs |
+| PatternMatchesMany | As above but returns a vector of booleans with the results for each pattern with variant method for whole word matches. |
+| PatternMatches | Pattern methods for arrays or vectors only, returns vectors of pairs of boolean outcomes and string slices, vectors of booleans matching each input string or filtered vectors of matched string slices |
+| PatternReplace | Core regular expression replacement methods |
+| PatternFilter | Methods to filter arrays or vectors of strings by a single regex pattern |
+| PatternReplaceMany |	Provides methods to replace with multiple patterns expressed as arrays of tuples |
+| PatternSplit |	Methods to split strings to vectors or head/tail tuples of strings |
+| MatchWord | Has convenience methods to match words with various word boundary rules. |
+| ReplaceWord | Provides methods to replace one or more words with clean syntax. |
+| PatternCapture | Returns captures or vectors of each match, whether overlapping or not, and counts of matching patterns or words. |
 
 ### Enums
 - **WordBounds**:	Has options for *Start*, *End* and *Both* with a method to render regular expression subpatterns with the correct word boundaries
