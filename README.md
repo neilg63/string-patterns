@@ -11,20 +11,23 @@ Together, these crates aim to make working with strings as easy in Rust as it is
 Version 0.3.4 adds a *PatternFilter* with methods that filter arrays or vectors of strings or strs by a regex pattern with variants for whole word and case-insensitive matches. This mirrors the functionality in *filter_all_conditional* in *simple-string-patterns*, but with a single regular expression rather than a set of rules.
 
 ### Method overview
-- Methods ending in _result return a Result with a regex::Error if the regular expression fails
-- Many methods without *_ci* or *_cs* suffixes require a boolean *case_insensitive* parameter
-- Methods ending in *_cs* are case-sensitive
-- Methods ending in *_ci* are case-insensitive
-- Methods containing *_word(s)* match whole or partial words depending on boundary rules
-- Methods containing *_match_all* require all patterns within an array to match.
-- Methods containing *_match_any* return true if any of the patterns within an array match
-- Methods ending in *_captures* return iterable Regex capture objects.
-- Methods containing *_matches* with arrays of regex patterns as the first argument return vectors of boolean results
-- Methods ending in *_matches_vec* or *_matches_outer* return vectors of Regex match objects with start and end offsets.
-- Methods with *_matches_filtered* return filtered vectors of matched strings slices
-- Methods containing *_split* return either a vector or tuple pair.
-- Methods with *_filter* or *_filter_word* filter arrays or vectors of strings or str references by the a regex pattern
-
+### Method overview
+| Position | Component(s) | Meaning |
+| --------- | -------- | ------- |
+| end | _result | Return a Result type with a regex::Error if the regular expression fails |
+| end | - | Many match and replace methods without *_ci* or *_cs* suffixes require a boolean *case_insensitive* parameter |
+| end |  _cs | Case-sensitive |
+| end |  _ci | Case-insensitive |
+| mid, end | _word(s) | Match whole or partial words depending on boundary rules |
+| mid, end | _match_all | Require all patterns within an array to match |
+| mid, end | *_match_any* | Return true if any of the patterns within an array match |
+| end | _captures | return iterable Regex capture objects |
+| mid, end | _matches | With arrays of regex patterns as the first argument, these methods return vectors of boolean results |
+| end | _matches_vec | Return vectors of *Regex::Match* objects with start and end offsets. |
+| end | _matches_outer | Return vectors of outer (or whole-pattern) *Match* objects with start and end offsets. |
+| end |_matches_filtered | return filtered vectors of matched strings slices |
+| end, mid | _split | Return either a vector or tuple pair. |
+| end, mid | _filter, _filter_word | Filter arrays or vectors of strings or str references by the a regex pattern |
 
 Version 0.3.0 only includes the core text-processing extensions that rely on regular expressions. Other methods bundled with earlier versions have migrated to the [simple-string-patterns](https://crates.io/crates/simple-string-patterns) crate. These crates supplement each other, but may be independently installed if you only need some of their features.
 
