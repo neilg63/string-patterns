@@ -8,9 +8,8 @@ This library makes it easier to work with regular expressions in Rust. It builds
 
 Together, these crates aim to make working with strings as easy in Rust as it is Javascript or Python with cleaner syntax. Simpler string matching methods such as starts_with, contains or ends_with will always perform better, especially when processing large data sets. 
 
-Version 0.3.4 adds a *PatternFilter* with methods that filter arrays or vectors of strings or strs by a regex pattern with variants for whole word and case-insensitive matches. This mirrors the functionality in *filter_all_conditional* in *simple-string-patterns*, but with a single regular expression rather than a set of rules.
+The core *PatternMatch* and *PatternReplace* traits are implemented for arrays and vectors of strings to avoid compiling regular expression in a loop. You may need to reimplement for vectors of custom structs as shown in the example below. Simply calling **pattern_match("complex_regex_pattern")** in a loop is an anti-pattern leading to expensive repeated compilation of the same regular expression.
 
-### Method overview
 ### Method overview
 | Position | Component(s) | Meaning |
 | --------- | -------- | ------- |
@@ -29,7 +28,9 @@ Version 0.3.4 adds a *PatternFilter* with methods that filter arrays or vectors 
 | end, mid | _split | Return either a vector or tuple pair. |
 | end, mid | _filter, _filter_word | Filter arrays or vectors of strings or str references by the a regex pattern |
 
-Version 0.3.0 only includes the core text-processing extensions that rely on regular expressions. Other methods bundled with earlier versions have migrated to the [simple-string-patterns](https://crates.io/crates/simple-string-patterns) crate. These crates supplement each other, but may be independently installed if you only need some of their features.
+Version 0.3.4 adds a *PatternFilter* with methods that filter arrays or vectors of strings or strs by a regex pattern with variants for whole word and case-insensitive matches. This mirrors the functionality in *filter_all_conditional* in *simple-string-patterns*, but with a single regular expression rather than a set of rules.
+
+Since version 0.3.0, the crate only includes the core text-processing extensions that rely on regular expressions. Other methods bundled with earlier versions have migrated to the [simple-string-patterns](https://crates.io/crates/simple-string-patterns) crate. These crates supplement each other, but may be independently installed if you only need some of their features.
 
 ### Removed methods
 Only one *regex* method, **match_words_by_proximity*,  has been removed. However, it will reappear in the future *string-patterns-extras* crate. 
