@@ -14,7 +14,7 @@ Version 0.3.4 adds a *PatternFilter* with methods that filter arrays or vectors 
 ### Method overview
 | Position | Component(s) | Meaning |
 | --------- | -------- | ------- |
-| end | _result | Return a Result type with a regex::Error if the regular expression fails |
+| end | _result | Return a *Result* with a regex::Error if the regular expression fails |
 | end | - | Many match and replace methods without *_ci* or *_cs* suffixes require a boolean *case_insensitive* parameter |
 | end |  _cs | Case-sensitive |
 | end |  _ci | Case-insensitive |
@@ -22,7 +22,7 @@ Version 0.3.4 adds a *PatternFilter* with methods that filter arrays or vectors 
 | mid, end | _match_all | Require all patterns within an array to match |
 | mid, end | *_match_any* | Return true if any of the patterns within an array match |
 | end | _captures | return iterable Regex capture objects |
-| mid, end | _matches | With arrays of regex patterns as the first argument, these methods return vectors of boolean results |
+| mid, end | _matches | Return vectors of boolean results with arrays of regex patterns as the first argument |
 | end | _matches_vec | Return vectors of *Regex::Match* objects with start and end offsets. |
 | end | _matches_outer | Return vectors of outer (or whole-pattern) *Match* objects with start and end offsets. |
 | end |_matches_filtered | return filtered vectors of matched strings slices |
