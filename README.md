@@ -8,7 +8,7 @@ This library makes it easier to work with regular expressions in Rust. It builds
 
 Together, these crates aim to make working with strings as easy in Rust as it is Javascript or Python with cleaner syntax. Simpler string matching methods such as starts_with, contains or ends_with will always perform better, especially when processing large data sets. 
 
-The core *PatternMatch* and *PatternReplace* traits are implemented for arrays and vectors of strings to avoid compiling regular expression in a loop. You may need to reimplement these for vectors of custom structs as shown in the example below. Simply calling **my_sytring.pattern_match("complex_regex_pattern")** in a loop is an anti-pattern leading to expensive repeated compilation of the same regular expression.
+The core *PatternMatch* and *PatternReplace* traits are implemented for arrays and vectors of strings to avoid compiling regular expression in a loop. You may need to reimplement these for vectors of custom structs as shown in the example below. Simply calling **my_sytring.pattern_match("complex_regex")** in a loop is an anti-pattern leading to expensive repeated compilation of the same regular expression.
 
 ### Method overview
 | Position | Component(s) | Meaning |
