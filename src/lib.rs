@@ -32,4 +32,4 @@ pub use crate::pattern_split::*;
 pub use crate::pattern_capture::*;
 pub use crate::words::*;
 pub use crate::utils::build_regex;
-pub use regex::{Error, Regex};
+pub use regex::{Error, Regex, Captures, Match};

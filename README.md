@@ -8,7 +8,7 @@ This library makes it easier to work with regular expressions in Rust. It builds
 
 Together, these crates aim to make working with strings as easy in Rust as it is Javascript or Python with cleaner syntax. Simpler string matching methods such as starts_with, contains or ends_with will always perform better, especially when processing large data sets. 
 
-The core *PatternMatch* and *PatternReplace* traits are implemented for arrays and vectors of strings to avoid compiling regular expression in a loop. You may need to reimplement these for vectors of custom structs as shown in the example below. Simply calling **my_string.pattern_match("complex_regex")** in a loop is an anti-pattern leading to expensive repeated compilation of the same regular expression.
+The core *PatternMatch* and *PatternReplace* traits are implemented for arrays or vectors of strings to avoid compiling a regular expression in a loop. You may need to reimplement these for vectors of custom structs as shown in the example below. Simply calling **my_string.pattern_match("complex_regex")** in a loop is an anti-pattern leading to expensive recompilation of the same regular expression.
 
 ### Method overview
 | Position | Component(s) | Meaning |
@@ -300,8 +300,12 @@ impl<'a> PatternFilter<'a, Message> for [Message] {
   - Both: Whole word, but spaces or other punctuation may occur within the pattern to match one or more words
 
 ### Dev Notes
+As of version 0.3.0 the re-exports Regex::Captures and Regex::Match to help with custom implementations.
+
 As of version 0.3.6, the crate re-exports regex::Regex and regex::Error to help with custom implementations
+
 As of version 0.3.0, this crate is feature complete, although still in a beta stage. All new features will be in a future *string-patterns-extras* crate that builds on this library and *simple-string-patterns*. 0.3.5 has no new features, only a more notes and a few more methods have default implementations.
+
 Notes for the 0.2.* series can be found in the [GitHub repo](https://github.com/neilg63/string-patterns) in the v0.2.* branch. If you upgrade from a pre-0.3.0 version, you may need to install  *simple-string-patterns* as well.
 
 NB: Some updates reflect editorial changes only.

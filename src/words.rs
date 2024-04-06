@@ -153,20 +153,22 @@ impl<'a> MatchWord<'a> for str {
 /// Methods for whole or partial word replacements
 pub trait ReplaceWord where Self:PatternReplace {
 
+  type Owned: ToOwned<Owned = Self>;
+
   /// Replace words with boundary and case_insensitive options
   fn replace_word_bounds(&self, word: &str, replacement: &str, bounds: WordBounds, case_insensitive: bool) -> Self where Self:Sized;
 
   /// Replace whole words with case_insensitive options
-  fn replace_word(&self, word: &str, replacement: &str, case_insensitive: bool) -> Self where Self:Sized;
+  fn replace_word(&self, word: &str, replacement: &str, case_insensitive: bool) -> <Self as PatternReplace>::Owned where Self:Sized + Clone;
 
   /// Replace whole words with in case-insensitive mode
-  fn replace_word_ci(&self, word: &str, replacement: &str) -> Self where Self:Sized {
+  fn replace_word_ci(&self, word: &str, replacement: &str) -> <Self as PatternReplace>::Owned where Self:Sized + Clone  {
     let pattern = build_whole_word_pattern(word);
     self.pattern_replace(&pattern, replacement, true)
   }
 
   /// Replace whole words with in case-sensitive mode
-  fn replace_word_cs(&self, word: &str, replacement: &str) -> Self where Self:Sized {
+  fn replace_word_cs(&self, word: &str, replacement: &str) -> <Self as PatternReplace>::Owned where Self:Sized + Clone  {
     let pattern = build_whole_word_pattern(word);
     self.pattern_replace(&pattern, replacement, false)
   }
@@ -192,6 +194,8 @@ pub trait ReplaceWord where Self:PatternReplace {
 
 /// Methods for whole or partial word replacements
 impl ReplaceWord for String {
+
+  type Owned = String;
 
   /// Replace words with boundary and case_insensitive options
   fn replace_word_bounds(&self, word: &str, replacement: &str, bounds: WordBounds, case_insensitive: bool) -> String {
