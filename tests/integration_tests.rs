@@ -27,6 +27,16 @@ fn test_simple_replacement() {
   assert_eq!(source_str.pattern_replace(pattern, replacement,true), target_str);
 }
 
+
+#[test]
+fn test_simple_first_replacement() {
+  let source_str = "The cat sat on the mat eating a rat".to_string();
+  let pattern = r#"at"#; 
+  let replacement = "æt";
+  let target_str = "The cæt sat on the mat eating a rat".to_string();
+  assert_eq!(source_str.pattern_replace_first_ci(pattern, replacement), target_str);
+}
+
 #[test]
 fn test_case_insensitive_replacement() {
   let source_str = "I bought two apples in Africa".to_string();

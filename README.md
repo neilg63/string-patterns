@@ -8,7 +8,9 @@ This library makes it easier to work with regular expressions in Rust. It builds
 
 Together, these crates aim to make working with strings as easy in Rust as it is Javascript or Python with cleaner syntax. Simpler string matching methods such as starts_with, contains or ends_with will always perform better, especially when processing large data sets. 
 
-The core *PatternMatch* and *PatternReplace* traits are implemented for arrays and vectors of strings to avoid compiling regular expression in a loop. You may need to reimplement these for vectors of custom structs as shown in the example below. Simply calling **my_string.pattern_match("complex_regex")** in a loop is an anti-pattern leading to expensive repeated compilation of the same regular expression.
+The core *PatternMatch* and *PatternReplace* traits are implemented for arrays or vectors of strings to avoid compiling a regular expression in a loop. You may need to reimplement these for vectors of custom structs as shown in the example below. Simply calling **my_string.pattern_match("complex_regex")** in a loop is an anti-pattern leading to expensive recompilation of the same regular expression.
+
+Version 0.3.8 introduces variant *_replace_first* methods to replace only the first left-most match in a sample string, implementing *re.replace* rather than *re.replace_all*. This will be faster if you only need to replace one matched pattern per string.
 
 ### Method overview
 | Position | Component(s) | Meaning |
@@ -17,6 +19,8 @@ The core *PatternMatch* and *PatternReplace* traits are implemented for arrays a
 | end | - | Many match and replace methods without *_ci* or *_cs* suffixes require a boolean *case_insensitive* parameter |
 | end |  _cs | Case-sensitive |
 | end |  _ci | Case-insensitive |
+| end, mid | _replace | Replace all matches with the sample string |
+| end, mid | _replace_first | Replace only the first left-most occurrence |
 | mid, end | _word(s) | Match whole or partial words depending on boundary rules |
 | mid, end | _match_all | Require all patterns within an array to match |
 | mid, end | *_match_any* | Return true if any of the patterns within an array match |
@@ -31,9 +35,6 @@ The core *PatternMatch* and *PatternReplace* traits are implemented for arrays a
 Version 0.3.4 adds a *PatternFilter* with methods that filter arrays or vectors of strings or strs by a regex pattern with variants for whole word and case-insensitive matches. This mirrors the functionality in *filter_all_conditional* in *simple-string-patterns*, but with a single regular expression rather than a set of rules.
 
 Since version 0.3.0, the crate only includes the core text-processing extensions that rely on regular expressions. Other methods bundled with earlier versions have migrated to the [simple-string-patterns](https://crates.io/crates/simple-string-patterns) crate. These crates supplement each other, but may be independently installed if you only need some of their features.
-
-### Removed methods
-Only one *regex* method, **match_words_by_proximity*,  has been removed. However, it will reappear in the future *string-patterns-extras* crate. 
 
 #### Case Sensitivity
 In case-insensitive mode the non-capturing **/(?i)/** flag is prepended automatically, but omitted if you add another non-capturing group at the start of your regular expression. In every other way, the pattern-prefixed methods behave like *re.is_match*, *re.replace_all*, *re.find* and *re.capture_iter* methods in the Regex crate. String-patterns unleashes most of the core functionality of the Regex crate, on which it depends, to cover most common use cases in text processing and to act as a building block for specific validators (e.g. email validation) and text transformers. 
@@ -300,8 +301,17 @@ impl<'a> PatternFilter<'a, Message> for [Message] {
   - Both: Whole word, but spaces or other punctuation may occur within the pattern to match one or more words
 
 ### Dev Notes
+Version 0.3.8 adds variant *pattern_replace_first_result* and *pattern_replace_first* methods. These are implemented for String and Vec<String>, but need to be reimplemented for custom structs or collection types. Only the _ci and _cs variants have default implementations.
+
+As of version 0.3.8 the crate re-exports Regex::Captures and Regex::Match to help with custom implementations.
+
 As of version 0.3.6, the crate re-exports regex::Regex and regex::Error to help with custom implementations
-As of version 0.3.0, this crate is feature complete, although still in a beta stage. All new features will be in a future *string-patterns-extras* crate that builds on this library and *simple-string-patterns*. 0.3.5 has no new features, only a more notes and a few more methods have default implementations.
+
+As of version 0.3.0, this crate is nearly feature complete, although still in a beta stage. All new features will be in a future *string-patterns-extras* crate that builds on this library and *simple-string-patterns*. 0.3.5 has no new features, only a more notes and a few more methods have default implementations.
+
 Notes for the 0.2.* series can be found in the [GitHub repo](https://github.com/neilg63/string-patterns) in the v0.2.* branch. If you upgrade from a pre-0.3.0 version, you may need to install  *simple-string-patterns* as well.
+
+### Removed methods
+Only one *regex* method, **match_words_by_proximity*,  has been removed. However, it will reappear in the future *string-patterns-extras* crate. 
 
 NB: Some updates reflect editorial changes only.
