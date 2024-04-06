@@ -84,6 +84,21 @@ fn replace_final_os(input: &str) -> String {
 }
 ```
 
+##### Replace the first match only
+```rust
+  let sample_path = "/User/me/Documents/Accounts/docs/2023/earnings-report.pdf".to_string();
+  // should match any segment between / characters starting with 'doc' and ending in 's'
+  let pattern = r#"/doc[^/]*s/"#;
+  let replacement = r#"/files/"#;
+  // Only replace the first segment matching the above pattern case-insensitively
+  let new_path_1 = sample_path.pattern_replace_first_ci(pattern, replacement);
+  // should yield = "/User/me/files/Accounts/docs/2023/earnings-report.pdf"
+  // replace all matches. Will replace /docs/ as well as /Documents/
+  let new_path_2 = sample_path.pattern_replace_ci(pattern, replacement);
+  // should yield = "/User/me/files/Accounts/files/2023/earnings-report.pdf"
+
+```
+
 ##### Extract the first match from a string
 ```rust
 let str_1 = "The park has many lions, spotted hyenas, leopards, rhinoceroses, hippopotamuses, giraffes, cheetahs and baboons";
