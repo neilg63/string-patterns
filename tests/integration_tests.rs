@@ -1,5 +1,11 @@
 use string_patterns::*;
 
+// utility method. Replicates .to_striungs in simple-string-patterns, but this crate only has regex as a dependency
+
+fn strs_to_owned(strs: &[&str]) -> Vec<String> {
+  strs.into_iter().map(|s| s.to_string()).collect::<Vec<String>>()
+}
+
 #[cfg(test)]
 
 #[test]
@@ -36,8 +42,8 @@ fn test_simple_first_replacement() {
   let target_str = "The cæt sat on the mat eating a rat".to_string();
   assert_eq!(source_str.pattern_replace_first_ci(pattern, replacement), target_str);
 
-  let source_strs = ["cat mat", "bat rat", "fat hat", "pat sat"].into_iter().map(|s| s.to_string()).collect::<Vec<String>>();
-  let target_strs = ["cæt mat", "bæt rat", "fæt hat", "pæt sat"].into_iter().map(|s| s.to_string()).collect::<Vec<String>>();
+  let source_strs = strs_to_owned(&["cat mat", "bat rat", "fat hat", "pat sat"]);
+  let target_strs = strs_to_owned(&["cæt mat", "bæt rat", "fæt hat", "pæt sat"]);
   assert_eq!(source_strs.pattern_replace_first_ci(pattern, replacement), target_strs);
 }
 
@@ -66,18 +72,18 @@ fn test_match_in_string_array() {
 
 #[test]
 fn test_vector_replacement() {
-  let source_strs: Vec<String>  = [
+  let source_strs: Vec<String>  = strs_to_owned(&[
     "fisherman",
     "obbudsman", 
     "handyman"
-  ].into_iter().map(|s| s.to_string()).collect();
+  ]);
   let pattern = r#"man\b"#; 
   let replacement = "woman";
-  let target_strs: Vec<String>  = vec![
+  let target_strs: Vec<String>  = strs_to_owned(&[
     "fisherwoman",
     "obbudswoman", 
     "handywoman"
-  ].into_iter().map(|s| s.to_string()).collect();
+  ]);
   assert_eq!(source_strs.pattern_replace(pattern, replacement,true),target_strs );
 }
 
@@ -112,9 +118,9 @@ fn test_replace_many() {
   let expected_text = "I have five cats and twelve dogs in my garden.".to_string();
   assert_eq!(sample_text.pattern_replace_pairs_ci(&replacement_pairs), expected_text);
   // now test multiple replacements on vectors of strings
-  let sample_strings = ["sheepwolves", "wild lions", "safari parks"].into_iter().map(|s| s.to_string()).collect::<Vec<String>>();
+  let sample_strings = strs_to_owned(&["sheepwolves", "wild lions", "safari parks"]);
   let converted_strings = sample_strings.pattern_replace_pairs_ci(&replacement_pairs);
-  let expected_strings = ["sheepdogs", "wild cats", "gardens"].into_iter().map(|s| s.to_string()).collect::<Vec<String>>();
+  let expected_strings = strs_to_owned(&["sheepdogs", "wild cats", "gardens"]);
   for i in 0..converted_strings.len() {
     assert_eq!(converted_strings.get(i).unwrap().to_owned(), expected_strings.get(i).unwrap().to_owned());
   }
@@ -132,7 +138,7 @@ fn test_pattern_matches_in_arrays() {
   let good_regex = "puppy";
   let expected_matches = vec![false, true, false, false];
   assert_eq!(phrases.pattern_matches_ci(good_regex), expected_matches);
-  let owned_phrases: Vec<String> = phrases.into_iter().map(|s| s.to_string()).collect();
+  let owned_phrases: Vec<String> = strs_to_owned(&phrases);
   assert_eq!(owned_phrases.pattern_matches_ci(good_regex), expected_matches);
   
   let bad_regex = r#"(eye"#;
