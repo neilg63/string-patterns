@@ -35,6 +35,10 @@ fn test_simple_first_replacement() {
   let replacement = "æt";
   let target_str = "The cæt sat on the mat eating a rat".to_string();
   assert_eq!(source_str.pattern_replace_first_ci(pattern, replacement), target_str);
+
+  let source_strs = ["cat mat", "bat rat", "fat hat", "pat sat"].into_iter().map(|s| s.to_string()).collect::<Vec<String>>();
+  let target_strs = ["cæt mat", "bæt rat", "fæt hat", "pæt sat"].into_iter().map(|s| s.to_string()).collect::<Vec<String>>();
+  assert_eq!(source_strs.pattern_replace_first_ci(pattern, replacement), target_strs);
 }
 
 #[test]
