@@ -10,7 +10,7 @@ Together, these crates aim to make working with strings as easy in Rust as it is
 
 The core *PatternMatch* and *PatternReplace* traits are implemented for arrays or vectors of strings to avoid compiling a regular expression in a loop. You may need to reimplement these for vectors of custom structs as shown in the example below. Simply calling **my_string.pattern_match("complex_regex")** in a loop is an anti-pattern leading to expensive recompilation of the same regular expression.
 
-Version 0.3.8 introduces variant *_replace_first* methods to replace only the first left-most match in a sample string, implementing *re.replace* rather than *re.replace_all*. This will be faster if you only need to replace one matched pattern per string.
+Version 0.3.8 introduces variant *_replace_first* methods to replace only the left-most match in a sample string, implementing *re.replace* rather than *re.replace_all*. This is faster when you only need to replace one matched pattern per string. 
 
 ### Method overview
 | Position | Component(s) | Meaning |
