@@ -19,7 +19,7 @@ Version 0.3.8 introduces variant *_replace_first* methods to replace only the le
 | end | - | Many match and replace methods without *_ci* or *_cs* suffixes require a boolean *case_insensitive* parameter |
 | end |  _cs | Case-sensitive |
 | end |  _ci | Case-insensitive |
-| end, mid | _replace | Replace all matches with the sample string |
+| end, mid | _replace | Replace all matches in the haystack |
 | end, mid | _replace_first | Replace only the first left-most occurrence |
 | mid, end | _word(s) | Match whole or partial words depending on boundary rules |
 | mid, end | _match_all | Require all patterns within an array to match |
