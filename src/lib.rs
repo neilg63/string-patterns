@@ -11,7 +11,7 @@ pub mod pattern_capture;
 pub mod words;
 
 /// This library provides a set of traits and extension methods for &str and/or String
-/// to facilitate common string manipulations routines that may require multiple steps
+/// to facilitate common string manipulation routines that may require multiple steps
 /// with the Rust standard library + Regex.
 /// Once installed you need not explicitly add regex::* to your project and
 /// string types will have many new match, replace, split and extract methods.
