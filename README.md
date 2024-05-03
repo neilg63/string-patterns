@@ -36,8 +36,10 @@ Version 0.3.4 adds a *PatternFilter* with methods that filter arrays or vectors 
 
 Since version 0.3.0, the crate only includes the core text-processing extensions that rely on regular expressions. Other methods bundled with earlier versions have migrated to the [simple-string-patterns](https://crates.io/crates/simple-string-patterns) crate. These crates supplement each other, but may be independently installed if you only need some of their features.
 
+In case-insensitive mode the non-capturing ```/(?i)/``` flag is prepended automatically, but omitted if you add another non-capturing group at the start of your regular expression. The ```_ci``` suffix is the equivalent of the **i** modifier in ```/my_complex_regex/i``` as used in Javascript, Perl and many command line tools.
+
+In every other way, the pattern-prefixed methods behave like *re.is_match*, *re.replace_all*, *re.replace*,  *re.find* and *re.capture_iter* methods in the Regex crate. String-patterns unleashes most of the core functionality of the Regex crate, on which it depends, to cover most common use cases in text processing and to act as a building block for specific validators (e.g. email validation) and text transformers. 
 #### Case Sensitivity
-In case-insensitive mode the non-capturing **/(?i)/** flag is prepended automatically, but omitted if you add another non-capturing group at the start of your regular expression. In every other way, the pattern-prefixed methods behave like *re.is_match*, *re.replace_all*, *re.replace*,  *re.find* and *re.capture_iter* methods in the Regex crate. String-patterns unleashes most of the core functionality of the Regex crate, on which it depends, to cover most common use cases in text processing and to act as a building block for specific validators (e.g. email validation) and text transformers. 
 
 Most *match* methods will work on *&str* and *String*, while replacement methods are only implemented for *owned strings*. Likewise, match methods are implemented for arrays and vectors of strings or *string slices*, while replacement methods are only implemented for vectors of *owned strings*. The traits may be implemented for structs or tuples with a string field. 
 
