@@ -37,7 +37,7 @@ Version 0.3.4 adds a *PatternFilter* with methods that filter arrays or vectors 
 Since version 0.3.0, the crate only includes the core text-processing extensions that rely on regular expressions. Other methods bundled with earlier versions have migrated to the [simple-string-patterns](https://crates.io/crates/simple-string-patterns) crate. These crates supplement each other, but may be independently installed if you only need some of their features.
 
 #### Case Sensitivity
-In case-insensitive mode the non-capturing **/(?i)/** flag is prepended automatically, but omitted if you add another non-capturing group at the start of your regular expression. In every other way, the pattern-prefixed methods behave like *re.is_match*, *re.replace_all*, *re.find* and *re.capture_iter* methods in the Regex crate. String-patterns unleashes most of the core functionality of the Regex crate, on which it depends, to cover most common use cases in text processing and to act as a building block for specific validators (e.g. email validation) and text transformers. 
+In case-insensitive mode the non-capturing **/(?i)/** flag is prepended automatically, but omitted if you add another non-capturing group at the start of your regular expression. In every other way, the pattern-prefixed methods behave like *re.is_match*, *re.replace_all*, *re.replace*,  *re.find* and *re.capture_iter* methods in the Regex crate. String-patterns unleashes most of the core functionality of the Regex crate, on which it depends, to cover most common use cases in text processing and to act as a building block for specific validators (e.g. email validation) and text transformers. 
 
 Most *match* methods will work on *&str* and *String*, while replacement methods are only implemented for *owned strings*. Likewise, match methods are implemented for arrays and vectors of strings or *string slices*, while replacement methods are only implemented for vectors of *owned strings*. The traits may be implemented for structs or tuples with a string field. 
 
@@ -327,6 +327,6 @@ As of version 0.3.0, this crate is nearly feature complete, although still in a 
 Notes for the 0.2.* series can be found in the [GitHub repo](https://github.com/neilg63/string-patterns) in the v0.2.* branch. If you upgrade from a pre-0.3.0 version, you may need to install  *simple-string-patterns* as well.
 
 ### Removed methods
-Only one *regex* method, **match_words_by_proximity*,  has been removed. However, it will reappear in the future *string-patterns-extras* crate. 
+Only one *regex* method, **match_words_by_proximity*,  has been removed. However, it may reappear in a future *string-patterns-extras* crate. 
 
 NB: Some updates reflect editorial changes only.
