@@ -13,24 +13,24 @@ The core *PatternMatch* and *PatternReplace* traits are implemented for arrays o
 Version 0.3.8 introduces variant *_replace_first* methods to replace only the left-most match in a sample string, implementing *re.replace* rather than *re.replace_all*. This is faster when you only need to replace one matched pattern per string. 
 
 ### Method overview
-| Position | Component(s) | Meaning |
-| --------- | -------- | ------- |
-| end | _result | Return a *Result* with a regex::Error if the regular expression fails |
-| end | - | Many match and replace methods without *_ci* or *_cs* suffixes require a boolean *case_insensitive* parameter |
-| end |  _cs | Case-sensitive |
-| end |  _ci | Case-insensitive |
-| end, mid | _replace | Replace all matches in the haystack |
-| end, mid | _replace_first | Replace only the first left-most occurrence |
-| mid, end | _word(s) | Match whole or partial words depending on boundary rules |
-| mid, end | _match_all | Require all patterns within an array to match |
-| mid, end | *_match_any* | Return true if any of the patterns within an array match |
-| end | _captures | return iterable Regex capture objects |
-| mid, end | _matches | Return vectors of boolean results with arrays of regex patterns as the first argument |
-| end | _matches_vec | Return vectors of *Regex::Match* objects with start and end offsets. |
-| end | _matches_outer | Return vectors of outer (or whole-pattern) *Match* objects with start and end offsets. |
-| end |_matches_filtered | return filtered vectors of matched strings slices |
-| end, mid | _split | Return either a vector or tuple pair. |
-| end, mid | _filter, _filter_word | Filter arrays or vectors of strings or str references by the a regex pattern |
+| Component(s) | Meaning |
+| -------- | ------- |
+| _result <sub>⇥</sub> | Return a *Result* with a regex::Error if the regular expression fails |
+| - <sub>⇥</sub> | Many match and replace methods without *_ci* or *_cs* suffixes require a boolean *case_insensitive* parameter |
+| _cs <sub>⇥</sub> | Case-sensitive |
+| _ci <sub>⇥</sub> | Case-insensitive |
+| _replace <sub>↔︎⇥</sub> | Replace all matches in the haystack |
+| _replace_first <sub>↔︎⇥</sub> | Replace only the first left-most occurrence |
+| _word(s) <sub>↔︎⇥</sub> | Match whole or partial words depending on boundary rules |
+| _match_all <sub>↔︎⇥</sub> | Require all patterns within an array to match |
+| *_match_any* <sub>↔︎⇥</sub> | Return true if any of the patterns within an array match |
+| _captures <sub>⇥</sub> | return iterable Regex capture objects |
+| _matches <sub>↔︎⇥</sub> | Return vectors of boolean results with arrays of regex patterns as the first argument |
+| _matches_vec <sub>⇥</sub> | Return vectors of *Regex::Match* objects with start and end offsets. |
+| _matches_outer <sub>⇥</sub> | Return vectors of outer (or whole-pattern) *Match* objects with start and end offsets. |
+| _matches_filtered <sub>⇥</sub> | return filtered vectors of matched strings slices |
+| _split <sub>↔︎⇥</sub> | Return either a vector or tuple pair. |
+| _filter, _filter_word <sub>↔︎⇥</sub> | Filter arrays or vectors of strings or str references by the a regex pattern |
 
 Version 0.3.4 adds a *PatternFilter* with methods that filter arrays or vectors of strings or strs by a regex pattern with variants for whole word and case-insensitive matches. This mirrors the functionality in *filter_all_conditional* in *simple-string-patterns*, but with a single regular expression rather than a set of rules.
 
